@@ -1,0 +1,146 @@
+{
+  "overview": {
+    "totalQuiz": "Total Quiz",
+    "completedSQL": "SQL Completed",
+    "averageScore": "Average Score", 
+    "currentRank": "Current Rank",
+    "comparedToLastWeek": "compared to last week",
+    "improvement": "improvement",
+    "rankUp": "ranks up in class"
+  },
+  "activity": {
+    "title": "Learning Activity",
+    "description": "Quiz and SQL activity chart for selected time period",
+    "quiz": "Quiz",
+    "sql": "SQL",
+    "timeRanges": {
+      "7d": "7 days",
+      "30d": "30 days",
+      "3m": "3 months",
+      "1y": "1 year"
+    }
+  },
+  "schedule": {
+    "title": "Today's Schedule",
+    "description": "Class schedule for",
+    "lecture": "lecture",
+    "lab": "lab",
+    "practice": "practice",
+    "ongoing": "Ongoing",
+    "upcoming": "Upcoming",
+    "completed": "Completed",
+    "noClasses": "You have no classes today!",
+    "noClassesSubtitle": "Enjoy your free time",
+    "andMore": "And {{count}} more classes...",
+    "viewFullSchedule": "View full schedule",
+    "loadError": "Cannot load schedule",
+    "retry": "Retry",
+    "periods": "periods"
+  },
+  "exams": {
+    "title": "Upcoming Exams",
+    "description": "Exams and tests in the coming week",
+    "noExams": "No upcoming exams"
+  },
+  "performance": {
+    "title": "Performance & Recent Activities",
+    "sqlResults": "SQL Results Ratio",
+    "recentActivities": "Recent Activities",
+    "accepted": "Accepted",
+    "wrongAnswer": "Wrong Answer",
+    "compileError": "Compile Error", 
+    "timeLimit": "Time Limit"
+  },
+  "progress": {
+    "title": "Learning Progress",
+    "description": "Goals and current progress",
+    "quizProgress": "Quiz Progress",
+    "sqlProgress": "SQL Progress",
+    "weeklyGoal": "Weekly Goal",
+    "monthlyGoalComplete": "of monthly goal completed",
+    "weeklyGoalComplete": "of this week's goal"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "description": "Quick access to main features",
+    "takeQuiz": "Take Quiz",
+    "practiceSQL": "Practice SQL",
+    "viewRanking": "View Ranking",
+    "detailedAnalytics": "Detailed Analytics",
+    "createQuiz": "Create Quiz",
+    "importQuestions": "Import Questions"
+  },
+  "recentActivities": {
+    "title": "Recent Activities",
+    "description": "Learning history and recent achievements",
+    "completedQuiz": "Completed Quiz",
+    "submittedSQL": "Submitted SQL",
+    "achievementUnlocked": "Achievement Unlocked",
+    "studyStreak": "Study Streak",
+    "joinedContest": "Joined Contest",
+    "viewAll": "View All"
+  },
+  "timeAgo": {
+    "hoursAgo": "hours ago",
+    "dayAgo": "day ago", 
+    "minutesAgo": "minutes ago",
+    "justNow": "just now"
+  },
+  "practiceSuggestions": {
+    "title": "Practice Suggestions",
+    "type": {
+      "quiz": "Quiz",
+      "practice": "Practice"
+    },
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "doNow": "Do now",
+    "noSuggestions": "No suggestions at this time",
+    "suggestion1": {
+      "title": "Advanced SQL JOIN",
+      "reason": "You often make mistakes in this topic"
+    },
+    "suggestion2": {
+      "title": "Advanced WHERE practice",
+      "reason": "Many mistakes in condition questions"
+    },
+    "suggestion3": {
+      "title": "Quiz: GROUP BY & HAVING",
+      "reason": "Not completed yet"
+    }
+  },
+  "recentQuizSubmissions": {
+    "title": "Recent Quiz Results",
+    "description": "Results of recently completed quizzes",
+    "viewAll": "View All",
+    "loadError": "Cannot load quiz history",
+    "noSubmissions": "No quiz results yet",
+    "noSubmissionsDesc": "You haven't completed any quizzes yet",
+    "quiz": "Quiz",
+    "correctAnswers": "correct answers",
+    "status": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "average": "Average",
+      "poor": "Needs Improvement"
+    }
+  },
+  "upcomingExamQuizzes": {
+    "title": "Upcoming Exam Quizzes",
+    "loadError": "Cannot load exam quiz list",
+    "noExams": "No exam quizzes",
+    "noExamsDesc": "No exam quizzes scheduled in the next month",
+    "questions": "questions",
+    "timeStatus": {
+      "remaining": "Remaining",
+      "hours": "h",
+      "days": "days",
+      "ongoing": "Ongoing",
+      "ended": "Ended"
+    },
+    "duration": "minutes"
+  }
+} 

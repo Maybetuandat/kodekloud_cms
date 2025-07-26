@@ -1,0 +1,96 @@
+{
+  "page": {
+    "title": "Schedule",
+    "description": "Manage classes and activities",
+    "weekNavigation": "Week navigation"
+  },
+  "navigation": {
+    "previousWeek": "Previous Week",
+    "nextWeek": "Next Week",
+    "currentWeek": "Current Week",
+    "goToToday": "Today"
+  },
+  "viewMode": {
+    "week": "Week",
+    "month": "Month", 
+    "day": "Day"
+  },
+  "days": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
+  "timeSlots": {
+    "time": "Time",
+    "period": "Period",
+    "slot1": "Period 1",
+    "slot2": "Period 2",
+    "slot3": "Period 3",
+    "slot4": "Period 4",
+    "slot5": "Period 5",
+    "slot6": "Period 6",
+    "slot7": "Period 7",
+    "slot8": "Period 8",
+    "slot9": "Period 9",
+    "slot10": "Period 10",
+    "slot11": "Period 11",
+    "slot12": "Period 12",
+    "slot13": "Period 13",
+    "slot14": "Period 14",
+    "slot15": "Period 15"
+  },
+  "class": {
+    "subject": "Subject",
+    "code": "Course Code",
+    "group": "Group",
+    "room": "Room",
+    "building": "Building",
+    "instructor": "Instructor",
+    "time": "Time",
+    "duration": "Duration",
+    "periods": "periods",
+    "type": {
+      "lecture": "Lecture",
+      "lab": "Lab",
+      "practice": "Practice"
+    }
+  },
+  "week": {
+    "title": "Week",
+    "weekOf": "Week of",
+    "weekNumber": "Week {number}",
+    "weekRange": "From {start} to {end}"
+  },
+  "empty": {
+    "noClasses": "No classes",
+    "noSchedule": "No schedule",
+    "freeTime": "Free time"
+  },
+  "actions": {
+    "viewDetails": "View Details",
+    "editSchedule": "Edit Schedule",
+    "exportSchedule": "Export Schedule",
+    "printSchedule": "Print Schedule",
+    "shareSchedule": "Share Schedule"
+  },
+  "filters": {
+    "allSubjects": "All Subjects",
+    "allInstructors": "All Instructors",
+    "allRooms": "All Rooms",
+    "filterBy": "Filter by",
+    "clearFilters": "Clear Filters"
+  },
+  "semester": {
+    "label": "Semester"
+  },
+  "format": {
+    "timeFormat": "HH:mm",
+    "dateFormat": "MM/dd/yyyy",
+    "weekFormat": "MM/dd",
+    "fullDateFormat": "EEEE, MM/dd/yyyy"
+  }
+} 

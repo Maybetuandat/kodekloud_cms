@@ -1,0 +1,32 @@
+{
+  "title": "ASSIGNMENT LIST",
+  "searchPlaceholder": "Search by code or question name...",
+  "noResults": "No results found",
+  "noAssignments": "No assignments",
+  "noResultsDescription": "No assignments found with keyword \"{keyword}\"",
+  "noAssignmentsDescription": "Currently no assignments assigned to you",
+  "clearFilter": "Clear filter",
+  "openingAssignment": "Opening: {title}",
+  "redirectingToAssignment": "Redirecting to assignment",
+  "totalAssignments": "assignments",
+  "pagination": {
+    "page": "Page",
+    "of": "of",
+    "rowsPerPage": "Rows per page",
+    "showing": "Showing",
+    "to": "to",
+    "entries": "entries"
+  },
+  "questionCard": {
+    "difficulty": "Difficulty",
+    "category": "Category",
+    "submissions": "submissions",
+    "accepted": "Accepted",
+    "wrongAnswer": "Wrong Answer",
+    "timeLimit": "Time Limit",
+    "compileError": "Compile Error",
+    "notStarted": "Not Started",
+    "tags": "Tags",
+    "points": "points"
+  }
+} 

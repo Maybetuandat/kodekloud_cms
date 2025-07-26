@@ -1,0 +1,146 @@
+{
+  "overview": {
+    "totalQuiz": "Tổng Quiz",
+    "completedSQL": "SQL Hoàn Thành", 
+    "averageScore": "Điểm Trung Bình",
+    "currentRank": "Xếp Hạng",
+    "comparedToLastWeek": "so với tuần trước",
+    "improvement": "cải thiện",
+    "rankUp": "bậc trong lớp"
+  },
+  "activity": {
+    "title": "Hoạt Động Học Tập",
+    "description": "Biểu đồ hoạt động Quiz và SQL trong khoảng thời gian",
+    "quiz": "Quiz",
+    "sql": "SQL",
+    "timeRanges": {
+      "7d": "7 ngày",
+      "30d": "30 ngày",
+      "3m": "3 tháng",
+      "1y": "1 năm"
+    }
+  },
+  "schedule": {
+    "title": "Thời Khóa Biểu Hôm Nay",
+    "description": "Lịch học ngày",
+    "lecture": "lecture",
+    "lab": "lab", 
+    "practice": "practice",
+    "ongoing": "Đang diễn ra",
+    "upcoming": "Sắp tới",
+    "completed": "Đã kết thúc",
+    "noClasses": "Hôm nay bạn không có tiết học nào!",
+    "noClassesSubtitle": "Hãy tận hưởng thời gian rảnh rỗi",
+    "andMore": "Và {{count}} tiết học khác...",
+    "viewFullSchedule": "Xem thời khóa biểu đầy đủ",
+    "loadError": "Không thể tải thời khóa biểu",
+    "retry": "Thử lại",
+    "periods": "tiết học"
+  },
+  "exams": {
+    "title": "Lịch Thi Sắp Tới",
+    "description": "Các kỳ thi và kiểm tra trong tuần tới",
+    "noExams": "Không có lịch thi sắp tới"
+  },
+  "performance": {
+    "title": "Hiệu Suất & Hoạt Động Gần Đây",
+    "sqlResults": "Tỷ Lệ Kết Quả SQL",
+    "recentActivities": "Hoạt Động Gần Đây",
+    "accepted": "Accepted",
+    "wrongAnswer": "Wrong Answer", 
+    "compileError": "Compile Error",
+    "timeLimit": "Time Limit"
+  },
+  "progress": {
+    "title": "Tiến Độ Học Tập",
+    "description": "Mục tiêu và tiến độ hiện tại",
+    "quizProgress": "Quiz Progress",
+    "sqlProgress": "SQL Progress", 
+    "weeklyGoal": "Weekly Goal",
+    "monthlyGoalComplete": "hoàn thành mục tiêu tháng",
+    "weeklyGoalComplete": "mục tiêu tuần này"
+  },
+  "quickActions": {
+    "title": "Thao Tác Nhanh",
+    "description": "Truy cập nhanh các tính năng chính",
+    "takeQuiz": "Làm Quiz",
+    "practiceSQL": "Thực hành SQL",
+    "viewRanking": "Xem Bảng xếp hạng",
+    "detailedAnalytics": "Phân tích Chi tiết",
+    "createQuiz": "Tạo Quiz mới",
+    "importQuestions": "Import câu hỏi"
+  },
+  "recentActivities": {
+    "title": "Hoạt động Gần đây",
+    "description": "Lịch sử học tập và thành tích gần đây",
+    "completedQuiz": "Hoàn thành Quiz",
+    "submittedSQL": "Nộp bài SQL",
+    "achievementUnlocked": "Mở khóa thành tích",
+    "studyStreak": "Chuỗi học tập",
+    "joinedContest": "Tham gia cuộc thi",
+    "viewAll": "Xem tất cả"
+  },
+  "timeAgo": {
+    "hoursAgo": "giờ trước",
+    "dayAgo": "ngày trước",
+    "minutesAgo": "phút trước",
+    "justNow": "vừa xong"
+  },
+  "practiceSuggestions": {
+    "title": "Gợi ý bài tập",
+    "type": {
+      "quiz": "Quiz",
+      "practice": "Thực hành"
+    },
+    "difficulty": {
+      "easy": "Dễ",
+      "medium": "Trung bình",
+      "hard": "Khó"
+    },
+    "doNow": "Làm ngay",
+    "noSuggestions": "Không có gợi ý nào lúc này",
+    "suggestion1": {
+      "title": "SQL JOIN nâng cao",
+      "reason": "Bạn thường sai ở chủ đề này"
+    },
+    "suggestion2": {
+      "title": "Bài tập WHERE nâng cao",
+      "reason": "Sai nhiều ở câu điều kiện"
+    },
+    "suggestion3": {
+      "title": "Quiz: GROUP BY & HAVING",
+      "reason": "Chưa hoàn thành"
+    }
+  },
+  "recentQuizSubmissions": {
+    "title": "Bài kiểm tra gần đây",
+    "description": "Kết quả các bài kiểm tra vừa hoàn thành",
+    "viewAll": "Xem tất cả",
+    "loadError": "Không thể tải lịch sử bài kiểm tra",
+    "noSubmissions": "Chưa có bài kiểm tra nào",
+    "noSubmissionsDesc": "Bạn chưa hoàn thành bài kiểm tra nào",
+    "quiz": "Bài kiểm tra",
+    "correctAnswers": "câu đúng",
+    "status": {
+      "excellent": "Xuất sắc",
+      "good": "Tốt",
+      "average": "Trung bình",
+      "poor": "Cần cải thiện"
+    }
+  },
+  "upcomingExamQuizzes": {
+    "title": "Bài kiểm tra sắp tới",
+    "loadError": "Không thể tải danh sách bài kiểm tra",
+    "noExams": "Không có bài kiểm tra nào",
+    "noExamsDesc": "Hiện tại không có bài kiểm tra nào trong tháng tới",
+    "questions": "câu hỏi",
+    "timeStatus": {
+      "remaining": "Còn",
+      "hours": "h",
+      "days": "ngày",
+      "ongoing": "Đang diễn ra",
+      "ended": "Đã kết thúc"
+    },
+    "duration": "phút"
+  }
+} 

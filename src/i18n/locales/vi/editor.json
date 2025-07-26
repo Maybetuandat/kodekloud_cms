@@ -1,0 +1,163 @@
+{
+  "tabs": {
+    "assignment": "Đề bài",
+    "discussion": "Bàn luận",
+    "assistant": "AI Assistant"
+  },
+  "assignment": {
+    "selectQuestion": "Chọn câu hỏi để bắt đầu",
+    "noQuestionSelected": "Vui lòng chọn một câu hỏi từ danh sách để bắt đầu luyện tập SQL.",
+    "features": {
+      "viewDetail": "Xem đề bài chi tiết",
+      "runTest": "Viết và chạy thử SQL",
+      "submit": "Nộp bài để kiểm tra kết quả",
+      "discuss": "Trao đổi với cộng đồng",
+      "aiAssist": "Nhận hỗ trợ từ AI Assistant"
+    },
+    "loading": "Đang tải đề bài...",
+    "error": "Có lỗi xảy ra",
+    "retry": "Thử lại",
+    "points": "điểm",
+    "difficulty": {
+      "easy": "Dễ",
+      "medium": "Trung bình",
+      "hard": "Khó"
+    },
+    "questionTypes": {
+      "SELECT": "SELECT",
+      "INSERT": "INSERT",
+      "UPDATE": "UPDATE",
+      "DELETE": "DELETE",
+      "CREATE": "CREATE",
+      "PROCEDURE": "PROCEDURE",
+      "INDEX": "INDEX"
+    }
+  },
+  "discussion": {
+    "title": "Thảo luận",
+    "noQuestion": "Chọn một câu hỏi để xem thảo luận",
+    "description": "Bạn có thể tham gia thảo luận với cộng đồng về các câu hỏi SQL",
+    "inputPlaceholder": "Nhập bình luận...",
+    "noComments": "Chưa có bình luận nào",
+    "firstComment": "Hãy là người đầu tiên chia sẻ ý kiến về câu hỏi này!",
+    "loadingComments": "Đang tải bình luận...",
+    "loadMore": "Tải thêm bình luận",
+    "likeComment": "Đã thích bình luận",
+    "unlikeComment": "Đã bỏ thích bình luận",
+    "commentSent": "Đã gửi bình luận thành công!",
+    "errors": {
+      "error": "Không thể gửi bình luận",
+      "loadComments": "Lỗi khi tải bình luận",
+      "sendComment": "Lỗi khi gửi bình luận",
+      "likeComment": "Lỗi khi thích bình luận",
+      "emptyComment": "Vui lòng nhập nội dung bình luận"
+    }
+  },
+  "aiAssistant": {
+    "title": "AI Assistant",
+    "welcome": "Xin chào! Tôi có thể giúp gì cho bạn với bài tập SQL này?",
+    "inputPlaceholder": "Nhập câu hỏi của bạn...",
+    "messageSent": "Đã gửi tin nhắn cho AI",
+    "responseReceived": "AI đã trả lời!",
+    "attachFile": "Đính kèm file",
+    "exampleResponse": "Tôi đã xem qua câu hỏi của bạn. Đây là một bài tập về {type}. Bạn cần viết truy vấn để {title}. Bạn có cần giải thích thêm về cách tiếp cận không?"
+  },
+  "sqlEditor": {
+    "title": "Trình SQL",
+    "selectDatabase": "Chọn database",
+    "noDatabase": "Chưa có database",
+    "uploadFile": "Tải lên file",
+    "uploadShort": "Tải lên",
+    "uploading": "Đang tải...",
+    "history": "Lịch sử submit",
+    "submit": "Nộp bài",
+    "submitting": "Đang nộp...",
+    "runQuery": "Chạy truy vấn",
+    "running": "Đang chạy...",
+    "saveQuery": "Lưu truy vấn",
+    "shortcuts": {
+      "runQuery": "Ctrl + Enter"
+    },
+    "errors": {
+      "noQuestion": "Chưa có đề bài",
+      "noQuestionUpload": "Vui lòng chọn một câu hỏi để upload file",
+      "noQuestionSubmit": "Vui lòng chọn một câu hỏi để nộp bài",
+      "noQuestionRun": "Chưa có đề bài để chạy query",
+      "emptyQuery": "Vui lòng nhập SQL query trước khi chạy",
+      "emptyQuerySubmit": "Vui lòng nhập SQL query trước khi nộp bài",
+      "noDatabase": "Vui lòng chọn loại database",
+      "noDatabaseUpload": "Vui lòng chọn loại database trước khi upload file",
+      "invalidDatabase": "Database không hợp lệ",
+      "invalidFile": "File không hợp lệ",
+      "sqlFileOnly": "Chỉ chấp nhận file có đuôi .sql",
+      "fileTooLarge": "Kích thước file không được vượt quá 1MB",
+      "uploadFailed": "Lỗi khi upload file",
+      "submitFailed": "Lỗi khi nộp bài",
+      "runFailed": "Lỗi khi chạy query",
+      "saveFailed": "Chưa có chức năng này."
+    },
+    "success": {
+      "queryExecuted": "Biên dịch truy vấn thành công!",
+      "fileUploaded": "File đã được upload thành công"
+    },
+    "results": {
+      "rows": "rows",
+      "executionTime": "ms",
+      "error": "Lỗi",
+      "result": "Kết quả truy vấn sẽ hiển thị tại đây.",
+      "noResult": "Không có dữ liệu."
+    }
+  },
+  "queryHistory": {
+    "title": "Lịch sử submit",
+    "headers": {
+      "time": "Thời gian",
+      "status": "Trạng thái",
+      "duration": "Thời lượng",
+      "result": "Kết quả",
+      "dbType": "Loại DB"
+    },
+    "status": {
+      "AC": "AC",
+      "WA": "WA",
+      "TLE": "TLE",
+      "CE": "CE",
+      "PENDING": "Chờ"
+    },
+    "close": "Đóng",
+    "queryDetail": "SQL Query",
+    "noHistory": "Chưa có lịch sử"
+  },
+  "questionSelector": {
+    "title": "Chọn câu hỏi",
+    "searchPlaceholder": "Nhập mã hoặc tiêu đề câu hỏi...",
+    "loading": "Đang tải...",
+    "noResults": "Không tìm thấy câu hỏi nào",
+    "error": "Có lỗi xảy ra",
+    "pagination": {
+      "page": "Trang",
+      "of": "của"
+    },
+    "clear": "Xóa"
+  },
+  "layout": {
+    "sidebar": "Thanh bên",
+    "editor": "Trình soạn thảo",
+    "dragToResize": "Kéo để thay đổi kích thước"
+  },
+  "fileUpload": {
+    "selectFile": "Chọn file SQL",
+    "dragDrop": "Kéo thả file SQL vào đây hoặc",
+    "browse": "duyệt file",
+    "maxSize": "Kích thước tối đa: 1MB",
+    "allowedTypes": "Chỉ chấp nhận file .sql"
+  },
+  "contextMenu": {
+    "cut": "Cắt",
+    "copy": "Sao chép",
+    "paste": "Dán",
+    "selectAll": "Chọn tất cả",
+    "undo": "Hoàn tác",
+    "redo": "Làm lại"
+  }
+}

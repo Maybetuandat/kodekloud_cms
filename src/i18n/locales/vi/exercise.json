@@ -1,0 +1,54 @@
+{
+  "title": "DANH SÁCH BÀI TẬP",
+  "searchPlaceholder": "Nhập mã hoặc tiêu đề câu hỏi...",
+  "noResults": "Không tìm thấy kết quả",
+  "noAssignments": "Không có bài tập nào",
+  "noResultsDescription": "Không tìm thấy bài tập nào với từ khóa \"{keyword}\"",
+  "noAssignmentsDescription": "Hiện tại chưa có bài tập nào được phân công cho bạn",
+
+  "openingAssignment": "Đang mở: {title}",
+  "redirectingToAssignment": "Chuyển đến đề bài",
+  "totalAssignments": "bài",
+  "pagination": {
+    "page": "Trang",
+    "of": "của",
+    "rowsPerPage": "Số hàng mỗi trang",
+    "showing": "Hiển thị",
+    "to": "đến",
+    "entries": "mục",
+    "shortPoints": "đ"
+  },
+  "questionCard": {
+    "difficulty": "Độ khó",
+    "category": "Danh mục",
+    "submissions": "lượt",
+    "accepted": "Accepted",
+    "wrongAnswer": "Wrong Answer",
+    "timeLimit": "Time Limit",
+    "compileError": "Compile Error",
+    "notStarted": "Chưa làm",
+    "new": "Mới",
+    "tags": "Thẻ",
+    "points": "điểm",
+    "shortPoints": "đ",
+    "easy": "Dễ",
+    "medium": "Trung bình",
+    "hard": "Khó",
+    "allCategories": "Tất cả loại",
+    "allDifficulties": "Tất cả độ khó",
+    "allStatuses": "Tất cả trạng thái"
+  },
+  "filter": {
+    "search": "Tìm kiếm",
+    "clearFilter": "Xóa bộ lọc",
+    "activeFilters": "Bộ lọc đang áp dụng",
+    "keyword": "Từ khóa",
+    "code": "Mã",
+    "title": "Tiêu đề",
+    "type": "Loại",
+    "status": "Trạng thái"
+  },
+  "common": {
+    "retry": "Thử lại"
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "page": {
+    "title": "Thời Khóa Biểu",
+    "description": "Quản lý lịch học và hoạt động",
+    "weekNavigation": "Điều hướng tuần"
+  },
+  "navigation": {
+    "previousWeek": "Tuần trước",
+    "nextWeek": "Tuần tiếp",
+    "currentWeek": "Tuần hiện tại",
+    "goToToday": "Hôm nay"
+  },
+  "viewMode": {
+    "week": "Tuần",
+    "month": "Tháng",
+    "day": "Ngày"
+  },
+  "days": {
+    "monday": "Thứ 2",
+    "tuesday": "Thứ 3",
+    "wednesday": "Thứ 4",
+    "thursday": "Thứ 5",
+    "friday": "Thứ 6",
+    "saturday": "Thứ 7",
+    "sunday": "Chủ Nhật"
+  },
+  "timeSlots": {
+    "time": "Giờ",
+    "period": "Tiết",
+    "slot1": "Tiết 1",
+    "slot2": "Tiết 2",
+    "slot3": "Tiết 3",
+    "slot4": "Tiết 4",
+    "slot5": "Tiết 5",
+    "slot6": "Tiết 6",
+    "slot7": "Tiết 7",
+    "slot8": "Tiết 8",
+    "slot9": "Tiết 9",
+    "slot10": "Tiết 10",
+    "slot11": "Tiết 11",
+    "slot12": "Tiết 12",
+    "slot13": "Tiết 13",
+    "slot14": "Tiết 14",
+    "slot15": "Tiết 15"
+  },
+  "class": {
+    "subject": "Môn học",
+    "code": "Mã môn",
+    "group": "Nhóm",
+    "room": "Phòng",
+    "building": "Tòa nhà",
+    "instructor": "Giảng viên",
+    "time": "Thời gian",
+    "duration": "Thời lượng",
+    "periods": "tiết",
+    "type": {
+      "lecture": "Lý thuyết",
+      "lab": "Thực hành",
+      "practice": "Bài tập"
+    }
+  },
+  "week": {
+    "title": "Tuần",
+    "weekOf": "Tuần của",
+    "weekNumber": "Tuần {number}",
+    "weekRange": "Từ {start} đến {end}"
+  },
+  "empty": {
+    "noClasses": "Không có lớp học",
+    "noSchedule": "Không có lịch học",
+    "freeTime": "Thời gian rảnh"
+  },
+  "actions": {
+    "viewDetails": "Xem chi tiết",
+    "editSchedule": "Chỉnh sửa lịch",
+    "exportSchedule": "Xuất lịch",
+    "printSchedule": "In lịch",
+    "shareSchedule": "Chia sẻ lịch"
+  },
+  "filters": {
+    "allSubjects": "Tất cả môn học",
+    "allInstructors": "Tất cả giảng viên",
+    "allRooms": "Tất cả phòng học",
+    "filterBy": "Lọc theo",
+    "clearFilters": "Xóa bộ lọc"
+  },
+  "semester": {
+    "label": "Học kỳ"
+  },
+  "format": {
+    "timeFormat": "HH:mm",
+    "dateFormat": "dd/MM/yyyy",
+    "weekFormat": "dd/MM",
+    "fullDateFormat": "EEEE, dd/MM/yyyy"
+  }
+} 

@@ -1,0 +1,32 @@
+{
+  "title": "DANH SÁCH BÀI TẬP",
+  "searchPlaceholder": "Tìm kiếm theo mã hoặc tên câu hỏi...",
+  "noResults": "Không tìm thấy kết quả",
+  "noAssignments": "Không có bài tập nào",
+  "noResultsDescription": "Không tìm thấy bài tập nào với từ khóa \"{keyword}\"",
+  "noAssignmentsDescription": "Hiện tại chưa có bài tập nào được phân công cho bạn",
+  "clearFilter": "Xóa bộ lọc",
+  "openingAssignment": "Đang mở: {title}",
+  "redirectingToAssignment": "Chuyển đến đề bài",
+  "totalAssignments": "bài",
+  "pagination": {
+    "page": "Trang",
+    "of": "của",
+    "rowsPerPage": "Số hàng mỗi trang",
+    "showing": "Hiển thị",
+    "to": "đến",
+    "entries": "mục"
+  },
+  "questionCard": {
+    "difficulty": "Độ khó",
+    "category": "Danh mục",
+    "submissions": "lượt",
+    "accepted": "Accepted",
+    "wrongAnswer": "Wrong Answer",
+    "timeLimit": "Time Limit",
+    "compileError": "Compile Error",
+    "notStarted": "Not Started",
+    "tags": "Thẻ",
+    "points": "điểm"
+  }
+} 

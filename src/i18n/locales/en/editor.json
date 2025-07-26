@@ -1,0 +1,163 @@
+{
+  "tabs": {
+    "assignment": "Assignment",
+    "discussion": "Discussion",
+    "assistant": "AI Assistant"
+  },
+  "assignment": {
+    "selectQuestion": "Select a question to start",
+    "noQuestionSelected": "Please select a question from the list to start practicing SQL.",
+    "features": {
+      "viewDetail": "View detailed assignment",
+      "runTest": "Write and test SQL",
+      "submit": "Submit for evaluation",
+      "discuss": "Discuss with community",
+      "aiAssist": "Get AI assistance"
+    },
+    "loading": "Loading assignment...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "points": "points",
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "questionTypes": {
+      "SELECT": "SELECT",
+      "INSERT": "INSERT",
+      "UPDATE": "UPDATE",
+      "DELETE": "DELETE",
+      "CREATE": "CREATE",
+      "PROCEDURE": "PROCEDURE",
+      "INDEX": "INDEX"
+    }
+  },
+  "discussion": {
+    "title": "Discussion",
+    "noQuestion": "Select a question to view discussion",
+    "description": "You can participate in discussions with the community about SQL questions",
+    "inputPlaceholder": "Enter your comment...",
+    "noComments": "No comments yet",
+    "firstComment": "Be the first to share your thoughts on this question!",
+    "loadingComments": "Loading comments...",
+    "loadMore": "Load more comments",
+    "likeComment": "Liked comment",
+    "unlikeComment": "Unliked comment",
+    "commentSent": "Comment sent successfully!",
+    "errors": {
+      "error": "Error uploading comment",
+      "loadComments": "Error loading comments",
+      "sendComment": "Error sending comment",
+      "likeComment": "Error liking comment",
+      "emptyComment": "Please enter comment content"
+    }
+  },
+  "aiAssistant": {
+    "title": "AI Assistant",
+    "welcome": "Hello! How can I help you with this SQL exercise?",
+    "inputPlaceholder": "Type your question...",
+    "messageSent": "Message sent to AI",
+    "responseReceived": "AI responded!",
+    "attachFile": "Attach file",
+    "exampleResponse": "I've reviewed your question. This is an exercise about {type}. You need to write a query to {title}. Do you need further explanation about the approach?"
+  },
+  "sqlEditor": {
+    "title": "SQL Editor",
+    "selectDatabase": "Select database",
+    "noDatabase": "No database available",
+    "uploadFile": "Upload file",
+    "uploadShort": "Upload",
+    "uploading": "Uploading...",
+    "history": "History",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "runQuery": "Run query",
+    "running": "Running...",
+    "saveQuery": "Save query",
+    "shortcuts": {
+      "runQuery": "Ctrl + Enter"
+    },
+    "errors": {
+      "noQuestion": "No assignment selected",
+      "noQuestionUpload": "Please select a question to upload file",
+      "noQuestionSubmit": "Please select a question to submit",
+      "noQuestionRun": "No assignment to run query",
+      "emptyQuery": "Please enter SQL query before running",
+      "emptyQuerySubmit": "Please enter SQL query before submitting",
+      "noDatabase": "Please select database type",
+      "noDatabaseUpload": "Please select database type before uploading file",
+      "invalidDatabase": "Invalid database",
+      "invalidFile": "Invalid file",
+      "sqlFileOnly": "Only .sql files are accepted",
+      "fileTooLarge": "File size must not exceed 1MB",
+      "uploadFailed": "Error uploading file",
+      "submitFailed": "Error submitting solution",
+      "runFailed": "Error running query",
+      "saveFailed": "This feature is not available yet."
+    },
+    "success": {
+      "queryExecuted": "Query executed successfully",
+      "fileUploaded": "File uploaded successfully"
+    },
+    "results": {
+      "rows": "rows",
+      "executionTime": "ms",
+      "error": "Error",
+      "result": "Query results will be displayed here.",
+      "noResult": "No data."
+    }
+  },
+  "queryHistory": {
+    "title": "Query History",
+    "headers": {
+      "time": "Time",
+      "status": "Status",
+      "duration": "Duration",
+      "result": "Result",
+      "dbType": "DB Type"
+    },
+    "status": {
+      "AC": "AC",
+      "WA": "WA",
+      "TLE": "TLE",
+      "CE": "CE",
+      "PENDING": "PENDING"
+    },
+    "close": "Close",
+    "queryDetail": "SQL Query",
+    "noHistory": "No history available"
+  },
+  "questionSelector": {
+    "title": "Select Question",
+    "searchPlaceholder": "Enter question code or title...",
+    "loading": "Loading...",
+    "noResults": "No questions found",
+    "error": "An error occurred",
+    "pagination": {
+      "page": "Page",
+      "of": "of"
+    },
+    "clear": "Clear"
+  },
+  "layout": {
+    "sidebar": "Sidebar",
+    "editor": "Editor",
+    "dragToResize": "Drag to resize"
+  },
+  "fileUpload": {
+    "selectFile": "Select SQL file",
+    "dragDrop": "Drag and drop SQL file here or",
+    "browse": "browse files",
+    "maxSize": "Maximum size: 1MB",
+    "allowedTypes": "Only .sql files accepted"
+  },
+  "contextMenu": {
+    "cut": "Cut",
+    "copy": "Copy",
+    "paste": "Paste",
+    "selectAll": "Select All",
+    "undo": "Undo",
+    "redo": "Redo"
+  }
+}
