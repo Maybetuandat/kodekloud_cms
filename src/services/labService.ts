@@ -1,20 +1,30 @@
-import { CreateLabRequest, Lab, UpdateLabRequest } from "@/types/lab";
+import { CreateLabRequest, Lab, PaginatedResponse, PaginationParams, UpdateLabRequest } from "@/types/lab";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 export const labService = {
-  // Get all labs or filter by active status
-  getLabs: async (isActivate?: boolean): Promise<Lab[]> => {
-    const url = new URL(`${API_BASE_URL}/lab`);
-    if (isActivate !== undefined) {
-      url.searchParams.append('isActivate', isActivate.toString());
-    }
-    
-    const response = await fetch(url.toString());
-    if (!response.ok) {
-      throw new Error('Failed to fetch labs');
-    }
-    return response.json();
-  },
+  
+  getLabsPaginated: async (
+      params: PaginationParams & { isActivate?: boolean }
+    ): Promise<PaginatedResponse<Lab>> => {
+      const url = new URL(`${API_BASE_URL}/lab`);
+      
+      // Add pagination params
+      url.searchParams.append('page', params.page.toString());
+      url.searchParams.append('size', params.size.toString());
+      url.searchParams.append('sortBy', params.sortBy);
+      url.searchParams.append('sortDir', params.sortDir);
+      
+      // Add filter params
+      if (params.isActivate !== undefined) {
+        url.searchParams.append('isActivate', params.isActivate.toString());
+      }
+      
+      const response = await fetch(url.toString());
+      if (!response.ok) {
+        throw new Error('Failed to fetch labs');
+      }
+      return response.json();
+    },
 
   // Get lab by ID
   getLabById: async (id: string): Promise<Lab> => {
