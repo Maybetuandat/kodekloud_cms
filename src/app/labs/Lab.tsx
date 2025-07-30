@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -21,11 +21,15 @@ export default function LabPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   
-  // Dialog states
+  // Dialog states với enhanced control
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editingLab, setEditingLab] = useState<Lab | null>(null);
   const [deletingLab, setDeletingLab] = useState<Lab | null>(null);
+  
+  // Focus management states
+  const [isDialogClosing, setIsDialogClosing] = useState(false);
+  const dialogCloseTimeoutRef = useRef<NodeJS.Timeout>();
   
   // Filter states
   const [filters, setFilters] = useState<LabFilters>({
@@ -33,6 +37,15 @@ export default function LabPage() {
     status: "all",
     sortBy: "newest",
   });
+
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      if (dialogCloseTimeoutRef.current) {
+        clearTimeout(dialogCloseTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Fetch labs data
   const fetchLabs = useCallback(async (showToast = false) => {
@@ -96,23 +109,80 @@ export default function LabPage() {
     return result;
   }, [labs, filters]);
 
-  // Create lab handler
+  // Focus cleanup utility
+  const clearFocusTraps = useCallback(() => {
+    // Remove any lingering focus guard elements
+    const focusGuards = document.querySelectorAll('[data-radix-focus-guard]');
+    focusGuards.forEach(guard => {
+      if (guard.parentNode) {
+        guard.parentNode.removeChild(guard);
+      }
+    });
+    
+    // Remove any orphaned dialog overlays
+    const overlays = document.querySelectorAll('[data-radix-dialog-overlay]');
+    overlays.forEach(overlay => {
+      const content = overlay.parentNode?.querySelector('[data-radix-dialog-content]');
+      if (!content) {
+        overlay.remove();
+      }
+    });
+    
+    // Ensure body is focusable and restore normal interaction
+    document.body.tabIndex = -1;
+    document.body.focus();
+    document.body.blur();
+    document.body.removeAttribute('tabindex');
+    
+    // Clear any pointer-events none that might block interaction
+    document.body.style.pointerEvents = '';
+  }, []);
+
+  // Enhanced dialog close handler
+  const handleDialogClose = useCallback((callback?: () => void) => {
+    setIsDialogClosing(true);
+    
+    // Clear any existing timeout
+    if (dialogCloseTimeoutRef.current) {
+      clearTimeout(dialogCloseTimeoutRef.current);
+    }
+    
+    // Close dialog with proper cleanup sequence
+    dialogCloseTimeoutRef.current = setTimeout(() => {
+      if (callback) callback();
+      
+      // Additional cleanup
+      setTimeout(() => {
+        setIsDialogClosing(false);
+        clearFocusTraps();
+      }, 100);
+    }, 150);
+  }, [clearFocusTraps]);
+
+  // Create lab handler với enhanced cleanup
   const handleCreateLab = useCallback(async (data: CreateLabRequest) => {
     try {
       setActionLoading(true);
       const newLab = await labService.createLab(data);
       setLabs(prev => [newLab, ...prev]);
       toast.success(t('labs.createSuccess', { name: newLab.name }));
+      
+      // Close dialog with proper cleanup
+      handleDialogClose(() => setFormDialogOpen(false));
+      
     } catch (error) {
       console.error("Failed to create lab:", error);
       toast.error(t('labs.createError'));
       throw error;
     } finally {
-      setActionLoading(false);
+      // Delay clearing loading state to ensure smooth transition
+      setTimeout(() => {
+        setActionLoading(false);
+      }, 200);
     }
-  }, [t]);
+  }, [t, handleDialogClose]);
 
-  // Update lab handler
+  // Update lab handler với enhanced cleanup
   const handleUpdateLab = useCallback(async (data: UpdateLabRequest) => {
     if (!editingLab) return;
 
@@ -121,14 +191,21 @@ export default function LabPage() {
       const updatedLab = await labService.updateLab(editingLab.id, data);
       setLabs(prev => prev.map(l => l.id === editingLab.id ? updatedLab : l));
       toast.success(t('labs.updateSuccess', { name: updatedLab.name }));
+      
+      // Close dialog with proper cleanup
+      handleDialogClose(() => setFormDialogOpen(false));
+      
     } catch (error) {
       console.error("Failed to update lab:", error);
       toast.error(t('labs.updateError'));
       throw error;
     } finally {
-      setActionLoading(false);
+      // Delay clearing loading state to ensure smooth transition
+      setTimeout(() => {
+        setActionLoading(false);
+      }, 200);
     }
-  }, [editingLab, t]);
+  }, [editingLab, t, handleDialogClose]);
 
   // Delete lab handler
   const handleDeleteLab = useCallback(async () => {
@@ -139,14 +216,20 @@ export default function LabPage() {
       await labService.deleteLab(deletingLab.id);
       setLabs(prev => prev.filter(l => l.id !== deletingLab.id));
       toast.success(t('labs.deleteSuccess', { name: deletingLab.name }));
+      
+      // Close dialog with proper cleanup
+      handleDialogClose(() => setDeleteDialogOpen(false));
+      
     } catch (error) {
       console.error("Failed to delete lab:", error);
       toast.error(t('labs.deleteError'));
       throw error;
     } finally {
-      setActionLoading(false);
+      setTimeout(() => {
+        setActionLoading(false);
+      }, 200);
     }
-  }, [deletingLab, t]);
+  }, [deletingLab, t, handleDialogClose]);
 
   // Toggle lab status handler
   const handleToggleStatus = useCallback(async (lab: Lab) => {
@@ -168,20 +251,50 @@ export default function LabPage() {
     }
   }, [t]);
 
-  // Dialog handlers
+  // Enhanced dialog handlers
   const openCreateDialog = () => {
     setEditingLab(null);
+    setIsDialogClosing(false);
     setFormDialogOpen(true);
   };
 
   const openEditDialog = (lab: Lab) => {
     setEditingLab(lab);
+    setIsDialogClosing(false);
     setFormDialogOpen(true);
   };
 
   const openDeleteDialog = (lab: Lab) => {
     setDeletingLab(lab);
+    setIsDialogClosing(false);
     setDeleteDialogOpen(true);
+  };
+
+  // Enhanced form dialog close handler
+  const handleFormDialogClose = (open: boolean) => {
+    if (actionLoading || isDialogClosing) {
+      // Prevent closing when loading or already closing
+      return;
+    }
+    
+    if (!open) {
+      handleDialogClose(() => setFormDialogOpen(false));
+    } else {
+      setFormDialogOpen(open);
+    }
+  };
+
+  // Enhanced delete dialog close handler
+  const handleDeleteDialogClose = (open: boolean) => {
+    if (actionLoading || isDialogClosing) {
+      return;
+    }
+    
+    if (!open) {
+      handleDialogClose(() => setDeleteDialogOpen(false));
+    } else {
+      setDeleteDialogOpen(open);
+    }
   };
 
   const clearFilters = () => {
@@ -240,18 +353,18 @@ export default function LabPage() {
         </div>
       )}
 
-      {/* Dialogs */}
+      {/* Enhanced Dialogs với better state management */}
       <LabFormDialog
-        open={formDialogOpen}
-        onOpenChange={setFormDialogOpen}
+        open={formDialogOpen && !isDialogClosing}
+        onOpenChange={handleFormDialogClose}
         lab={editingLab}
         onSubmit={editingLab ? handleUpdateLab : handleCreateLab}
         loading={actionLoading}
       />
 
       <LabDeleteDialog
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
+        open={deleteDialogOpen && !isDialogClosing}
+        onOpenChange={handleDeleteDialogClose}
         lab={deletingLab}
         onConfirm={handleDeleteLab}
         loading={actionLoading}

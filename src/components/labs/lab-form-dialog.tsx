@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -70,6 +70,7 @@ export function LabFormDialog({
 }: LabFormDialogProps) {
   const { t } = useTranslation('common');
   const isEditMode = !!lab;
+  const submitInProgressRef = useRef(false);
   
   const labFormSchema = createLabFormSchema(t);
   type LabFormData = z.infer<typeof labFormSchema>;
@@ -103,29 +104,65 @@ export function LabFormDialog({
     }
   }, [open, lab, form]);
 
+  // Enhanced submit handler
   const handleSubmit = async (data: LabFormData) => {
+    if (submitInProgressRef.current) return;
+    
     try {
+      submitInProgressRef.current = true;
       await onSubmit(data);
+      
+      // Reset form after successful submission
       form.reset();
-      onOpenChange(false);
+      
+      // Note: onOpenChange will be called by parent component
+      // Don't call it here to avoid race conditions
+      
     } catch (error) {
-      // Error handling is done in parent component
       console.error("Form submission error:", error);
+    } finally {
+      submitInProgressRef.current = false;
     }
   };
 
+  // Enhanced open change handler
   const handleOpenChange = (newOpen: boolean) => {
-    if (!loading) {
-      onOpenChange(newOpen);
-      if (!newOpen) {
-        form.reset();
-      }
+    // Prevent closing during submission or when loading
+    if (loading || submitInProgressRef.current) {
+      return;
+    }
+    
+    if (!newOpen) {
+      // Reset form when closing
+      form.reset();
+    }
+    
+    onOpenChange(newOpen);
+  };
+
+  const handleCancel = () => {
+    if (!loading && !submitInProgressRef.current) {
+      handleOpenChange(false);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent 
+        className="sm:max-w-[500px]"
+        onInteractOutside={(e) => {
+          // Prevent closing when loading or submitting
+          if (loading || submitInProgressRef.current) {
+            e.preventDefault();
+          }
+        }}
+        onEscapeKeyDown={(e) => {
+          // Prevent closing when loading or submitting
+          if (loading || submitInProgressRef.current) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle>
             {isEditMode ? t('labs.editLab') : t('labs.createLab')}
@@ -150,6 +187,7 @@ export function LabFormDialog({
                       placeholder={t('labs.labNamePlaceholder')}
                       {...field}
                       disabled={loading}
+                      autoComplete="off"
                     />
                   </FormControl>
                   <FormMessage />
@@ -236,14 +274,20 @@ export function LabFormDialog({
 
             <div className="flex justify-end gap-3 pt-4">
               <Button 
+                type="button"
                 variant="outline" 
-                onClick={() => handleOpenChange(false)}
-                disabled={loading}
+                onClick={handleCancel}
+                disabled={loading || submitInProgressRef.current}
               >
                 {t('common.cancel')}
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button 
+                type="submit" 
+                disabled={loading || submitInProgressRef.current}
+              >
+                {(loading || submitInProgressRef.current) && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 {isEditMode ? t('common.save') : t('labs.createLab')}
               </Button>
             </div>

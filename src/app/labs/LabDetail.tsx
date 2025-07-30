@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -16,325 +16,495 @@ import { labService } from "@/services/labService";
 import { setupStepService } from "@/services/setupStepService";
 
 export default function LabDetailPage() {
- const { t } = useTranslation('common');
- const { id } = useParams<{ id: string }>();
- const navigate = useNavigate();
+  const { t } = useTranslation('common');
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
 
- // State management
- const [lab, setLab] = useState<Lab | null>(null);
- const [setupSteps, setSetupSteps] = useState<SetupStep[]>([]);
- const [loading, setLoading] = useState(true);
- const [actionLoading, setActionLoading] = useState(false);
+  // State management
+  const [lab, setLab] = useState<Lab | null>(null);
+  const [setupSteps, setSetupSteps] = useState<SetupStep[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
 
- // Dialog states
- const [editLabDialogOpen, setEditLabDialogOpen] = useState(false);
- const [deleteLabDialogOpen, setDeleteLabDialogOpen] = useState(false);
- const [stepFormDialogOpen, setStepFormDialogOpen] = useState(false);
- const [editingStep, setEditingStep] = useState<SetupStep | null>(null);
+  // Dialog states với enhanced control
+  const [editLabDialogOpen, setEditLabDialogOpen] = useState(false);
+  const [deleteLabDialogOpen, setDeleteLabDialogOpen] = useState(false);
+  const [stepFormDialogOpen, setStepFormDialogOpen] = useState(false);
+  const [editingStep, setEditingStep] = useState<SetupStep | null>(null);
 
- // Fetch lab data
- const fetchLabData = useCallback(async () => {
-   if (!id) return;
+  // Focus management states
+  const [isLabDialogClosing, setIsLabDialogClosing] = useState(false);
+  const [isDeleteDialogClosing, setIsDeleteDialogClosing] = useState(false);
+  const [isStepDialogClosing, setIsStepDialogClosing] = useState(false);
+  
+  const labDialogTimeoutRef = useRef<NodeJS.Timeout>();
+  const deleteDialogTimeoutRef = useRef<NodeJS.Timeout>();
+  const stepDialogTimeoutRef = useRef<NodeJS.Timeout>();
 
-   try {
-     setLoading(true);
-     const [labData, stepsData] = await Promise.all([
-       labService.getLabById(id),
-       labService.getLabSetupSteps(id),
-     ]);
-     
-     setLab(labData);
-     setSetupSteps(stepsData);
-   } catch (error) {
-     console.error("Failed to fetch lab data:", error);
-     toast.error(t('labs.loadError'));
-     navigate("/labs");
-   } finally {
-     setLoading(false);
-   }
- }, [id, navigate, t]);
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      if (labDialogTimeoutRef.current) clearTimeout(labDialogTimeoutRef.current);
+      if (deleteDialogTimeoutRef.current) clearTimeout(deleteDialogTimeoutRef.current);
+      if (stepDialogTimeoutRef.current) clearTimeout(stepDialogTimeoutRef.current);
+    };
+  }, []);
 
- // Load data on mount
- useEffect(() => {
-   fetchLabData();
- }, [fetchLabData]);
+  // Focus cleanup utility
+  const clearFocusTraps = useCallback(() => {
+    // Remove any lingering focus guard elements
+    const focusGuards = document.querySelectorAll('[data-radix-focus-guard]');
+    focusGuards.forEach(guard => {
+      if (guard.parentNode) {
+        guard.parentNode.removeChild(guard);
+      }
+    });
+    
+    // Remove any orphaned dialog overlays
+    const overlays = document.querySelectorAll('[data-radix-dialog-overlay]');
+    overlays.forEach(overlay => {
+      const content = overlay.parentNode?.querySelector('[data-radix-dialog-content]');
+      if (!content) {
+        overlay.remove();
+      }
+    });
+    
+    // Ensure body is focusable and restore normal interaction
+    document.body.tabIndex = -1;
+    document.body.focus();
+    document.body.blur();
+    document.body.removeAttribute('tabindex');
+    
+    // Clear any pointer-events blocks
+    document.body.style.pointerEvents = '';
+  }, []);
 
- // Update lab handler
- const handleUpdateLab = useCallback(async (data: UpdateLabRequest) => {
-   if (!lab) return;
+  // Enhanced dialog close handlers
+  const handleLabDialogClose = useCallback((callback?: () => void) => {
+    setIsLabDialogClosing(true);
+    
+    if (labDialogTimeoutRef.current) {
+      clearTimeout(labDialogTimeoutRef.current);
+    }
+    
+    labDialogTimeoutRef.current = setTimeout(() => {
+      if (callback) callback();
+      
+      setTimeout(() => {
+        setIsLabDialogClosing(false);
+        clearFocusTraps();
+      }, 100);
+    }, 150);
+  }, [clearFocusTraps]);
 
-   try {
-     setActionLoading(true);
-     const updatedLab = await labService.updateLab(lab.id, data);
-     setLab(updatedLab);
-     toast.success(t('labs.updateSuccess', { name: updatedLab.name }));
-   } catch (error) {
-     console.error("Failed to update lab:", error);
-     toast.error(t('labs.updateError'));
-     throw error;
-   } finally {
-     setActionLoading(false);
-   }
- }, [lab, t]);
+  const handleDeleteDialogClose = useCallback((callback?: () => void) => {
+    setIsDeleteDialogClosing(true);
+    
+    if (deleteDialogTimeoutRef.current) {
+      clearTimeout(deleteDialogTimeoutRef.current);
+    }
+    
+    deleteDialogTimeoutRef.current = setTimeout(() => {
+      if (callback) callback();
+      
+      setTimeout(() => {
+        setIsDeleteDialogClosing(false);
+        clearFocusTraps();
+      }, 100);
+    }, 150);
+  }, [clearFocusTraps]);
 
- // Delete lab handler
- const handleDeleteLab = useCallback(async () => {
-   if (!lab) return;
+  const handleStepDialogClose = useCallback((callback?: () => void) => {
+    setIsStepDialogClosing(true);
+    
+    if (stepDialogTimeoutRef.current) {
+      clearTimeout(stepDialogTimeoutRef.current);
+    }
+    
+    stepDialogTimeoutRef.current = setTimeout(() => {
+      if (callback) callback();
+      
+      setTimeout(() => {
+        setIsStepDialogClosing(false);
+        clearFocusTraps();
+      }, 100);
+    }, 150);
+  }, [clearFocusTraps]);
 
-   try {
-     setActionLoading(true);
-     await labService.deleteLab(lab.id);
-     toast.success(t('labs.deleteSuccess', { name: lab.name }));
-     navigate("/labs");
-   } catch (error) {
-     console.error("Failed to delete lab:", error);
-     toast.error(t('labs.deleteError'));
-     throw error;
-   } finally {
-     setActionLoading(false);
-   }
- }, [lab, navigate, t]);
+  // Fetch lab data
+  const fetchLabData = useCallback(async () => {
+    if (!id) return;
 
- // Toggle lab status handler
- const handleToggleLabStatus = useCallback(async () => {
-   if (!lab) return;
+    try {
+      setLoading(true);
+      const [labData, stepsData] = await Promise.all([
+        labService.getLabById(id),
+        labService.getLabSetupSteps(id),
+      ]);
+      
+      setLab(labData);
+      setSetupSteps(stepsData);
+    } catch (error) {
+      console.error("Failed to fetch lab data:", error);
+      toast.error(t('labs.loadError'));
+      navigate("/labs");
+    } finally {
+      setLoading(false);
+    }
+  }, [id, navigate, t]);
 
-   try {
-     setActionLoading(true);
-     const updatedLab = await labService.toggleLabStatus(lab.id);
-     setLab(updatedLab);
-     toast.success(
-       t('labs.toggleStatusSuccess', { 
-         name: lab.name, 
-         status: updatedLab.isActive ? t('labs.activated') : t('labs.deactivated')
-       })
-     );
-   } catch (error) {
-     console.error("Failed to toggle lab status:", error);
-     toast.error(t('labs.toggleStatusError'));
-   } finally {
-     setActionLoading(false);
-   }
- }, [lab, t]);
+  // Load data on mount
+  useEffect(() => {
+    fetchLabData();
+  }, [fetchLabData]);
 
- // Create setup step handler
- const handleCreateSetupStep = useCallback(async (data: CreateSetupStepRequest) => {
-   if (!lab) return;
+  // Enhanced update lab handler
+  const handleUpdateLab = useCallback(async (data: UpdateLabRequest) => {
+    if (!lab) return;
 
-   try {
-     setActionLoading(true);
-     const newStep = await setupStepService.createSetupStep(lab.id, data);
-     setSetupSteps(prev => [...prev, newStep].sort((a, b) => a.stepOrder - b.stepOrder));
-     toast.success(t('labs.setupStepCreateSuccess', { title: newStep.title }));
-     setEditingStep(null);
-   } catch (error) {
-     console.error("Failed to create setup step:", error);
-     toast.error(t('labs.setupStepCreateError'));
-     throw error;
-   } finally {
-     setActionLoading(false);
-   }
- }, [lab, t]);
+    try {
+      setActionLoading(true);
+      const updatedLab = await labService.updateLab(lab.id, data);
+      setLab(updatedLab);
+      toast.success(t('labs.updateSuccess', { name: updatedLab.name }));
+      
+      // Close dialog with proper cleanup
+      handleLabDialogClose(() => setEditLabDialogOpen(false));
+      
+    } catch (error) {
+      console.error("Failed to update lab:", error);
+      toast.error(t('labs.updateError'));
+      throw error;
+    } finally {
+      setTimeout(() => {
+        setActionLoading(false);
+      }, 200);
+    }
+  }, [lab, t, handleLabDialogClose]);
 
- // Update setup step handler
- const handleUpdateSetupStep = useCallback(async (data: UpdateSetupStepRequest) => {
-   try {
-     setActionLoading(true);
-     const updatedStep = await setupStepService.updateSetupStep(data);
-     setSetupSteps(prev => prev.map(step => 
-       step.id === data.id ? updatedStep : step
-     ));
-     toast.success(t('labs.setupStepUpdateSuccess', { title: updatedStep.title }));
-     setEditingStep(null);
-   } catch (error) {
-     console.error("Failed to update setup step:", error);
-     toast.error(t('labs.setupStepUpdateError'));
-     throw error;
-   } finally {
-     setActionLoading(false);
-   }
- }, [t]);
+  // Enhanced delete lab handler
+  const handleDeleteLab = useCallback(async () => {
+    if (!lab) return;
 
- // Delete setup step handler
- const handleDeleteSetupStep = useCallback(async (step: SetupStep) => {
-   try {
-     setActionLoading(true);
-     await setupStepService.deleteSetupStep(step.id);
-     setSetupSteps(prev => prev.filter(s => s.id !== step.id));
-     toast.success(t('labs.setupStepDeleteSuccess', { title: step.title }));
-   } catch (error) {
-     console.error("Failed to delete setup step:", error);
-     toast.error(t('labs.setupStepDeleteError'));
-   } finally {
-     setActionLoading(false);
-   }
- }, [t]);
+    try {
+      setActionLoading(true);
+      await labService.deleteLab(lab.id);
+      toast.success(t('labs.deleteSuccess', { name: lab.name }));
+      
+      // Navigate after successful deletion
+      setTimeout(() => {
+        navigate("/labs");
+      }, 100);
+      
+    } catch (error) {
+      console.error("Failed to delete lab:", error);
+      toast.error(t('labs.deleteError'));
+      throw error;
+    } finally {
+      setTimeout(() => {
+        setActionLoading(false);
+      }, 200);
+    }
+  }, [lab, navigate, t]);
 
- // Move step up handler
- const handleMoveStepUp = useCallback(async (step: SetupStep) => {
-   const sortedSteps = [...setupSteps].sort((a, b) => a.stepOrder - b.stepOrder);
-   const currentIndex = sortedSteps.findIndex(s => s.id === step.id);
-   
-   if (currentIndex <= 0) return;
+  // Toggle lab status handler
+  const handleToggleLabStatus = useCallback(async () => {
+    if (!lab) return;
 
-   const prevStep = sortedSteps[currentIndex - 1];
-   const newStepOrder = prevStep.stepOrder;
-   const newPrevStepOrder = step.stepOrder;
+    try {
+      setActionLoading(true);
+      const updatedLab = await labService.toggleLabStatus(lab.id);
+      setLab(updatedLab);
+      toast.success(
+        t('labs.toggleStatusSuccess', { 
+          name: lab.name, 
+          status: updatedLab.isActive ? t('labs.activated') : t('labs.deactivated')
+        })
+      );
+    } catch (error) {
+      console.error("Failed to toggle lab status:", error);
+      toast.error(t('labs.toggleStatusError'));
+    } finally {
+      setActionLoading(false);
+    }
+  }, [lab, t]);
 
-   try {
-     setActionLoading(true);
-     await Promise.all([
-       setupStepService.updateSetupStep({ ...step, stepOrder: newStepOrder }),
-       setupStepService.updateSetupStep({ ...prevStep, stepOrder: newPrevStepOrder }),
-     ]);
+  // Enhanced create setup step handler
+  const handleCreateSetupStep = useCallback(async (data: CreateSetupStepRequest) => {
+    if (!lab) return;
 
-     setSetupSteps(prev => prev.map(s => {
-       if (s.id === step.id) return { ...s, stepOrder: newStepOrder };
-       if (s.id === prevStep.id) return { ...s, stepOrder: newPrevStepOrder };
-       return s;
-     }));
+    try {
+      setActionLoading(true);
+      const newStep = await setupStepService.createSetupStep(lab.id, data);
+      setSetupSteps(prev => [...prev, newStep].sort((a, b) => a.stepOrder - b.stepOrder));
+      toast.success(t('labs.setupStepCreateSuccess', { title: newStep.title }));
+      
+      // Close dialog with proper cleanup
+      handleStepDialogClose(() => {
+        setStepFormDialogOpen(false);
+        setEditingStep(null);
+      });
+      
+    } catch (error) {
+      console.error("Failed to create setup step:", error);
+      toast.error(t('labs.setupStepCreateError'));
+      throw error;
+    } finally {
+      setTimeout(() => {
+        setActionLoading(false);
+      }, 200);
+    }
+  }, [lab, t, handleStepDialogClose]);
 
-     toast.success(t('labs.moveStepUpSuccess'));
-   } catch (error) {
-     console.error("Failed to move step up:", error);
-     toast.error(t('labs.moveStepError'));
-   } finally {
-     setActionLoading(false);
-   }
- }, [setupSteps, t]);
+  // Enhanced update setup step handler
+  const handleUpdateSetupStep = useCallback(async (data: UpdateSetupStepRequest) => {
+    try {
+      setActionLoading(true);
+      const updatedStep = await setupStepService.updateSetupStep(data);
+      setSetupSteps(prev => prev.map(step => 
+        step.id === data.id ? updatedStep : step
+      ));
+      toast.success(t('labs.setupStepUpdateSuccess', { title: updatedStep.title }));
+      
+      // Close dialog with proper cleanup
+      handleStepDialogClose(() => {
+        setStepFormDialogOpen(false);
+        setEditingStep(null);
+      });
+      
+    } catch (error) {
+      console.error("Failed to update setup step:", error);
+      toast.error(t('labs.setupStepUpdateError'));
+      throw error;
+    } finally {
+      setTimeout(() => {
+        setActionLoading(false);
+      }, 200);
+    }
+  }, [t, handleStepDialogClose]);
 
- // Move step down handler
- const handleMoveStepDown = useCallback(async (step: SetupStep) => {
-   const sortedSteps = [...setupSteps].sort((a, b) => a.stepOrder - b.stepOrder);
-   const currentIndex = sortedSteps.findIndex(s => s.id === step.id);
-   
-   if (currentIndex >= sortedSteps.length - 1) return;
+  // Delete setup step handler
+  const handleDeleteSetupStep = useCallback(async (step: SetupStep) => {
+    try {
+      setActionLoading(true);
+      await setupStepService.deleteSetupStep(step.id);
+      setSetupSteps(prev => prev.filter(s => s.id !== step.id));
+      toast.success(t('labs.setupStepDeleteSuccess', { title: step.title }));
+    } catch (error) {
+      console.error("Failed to delete setup step:", error);
+      toast.error(t('labs.setupStepDeleteError'));
+    } finally {
+      setActionLoading(false);
+    }
+  }, [t]);
 
-   const nextStep = sortedSteps[currentIndex + 1];
-   const newStepOrder = nextStep.stepOrder;
-   const newNextStepOrder = step.stepOrder;
+  // Move step up handler
+  const handleMoveStepUp = useCallback(async (step: SetupStep) => {
+    const sortedSteps = [...setupSteps].sort((a, b) => a.stepOrder - b.stepOrder);
+    const currentIndex = sortedSteps.findIndex(s => s.id === step.id);
+    
+    if (currentIndex <= 0) return;
 
-   try {
-     setActionLoading(true);
-     await Promise.all([
-       setupStepService.updateSetupStep({ ...step, stepOrder: newStepOrder }),
-       setupStepService.updateSetupStep({ ...nextStep, stepOrder: newNextStepOrder }),
-     ]);
+    const prevStep = sortedSteps[currentIndex - 1];
+    const newStepOrder = prevStep.stepOrder;
+    const newPrevStepOrder = step.stepOrder;
 
-     setSetupSteps(prev => prev.map(s => {
-       if (s.id === step.id) return { ...s, stepOrder: newStepOrder };
-       if (s.id === nextStep.id) return { ...s, stepOrder: newNextStepOrder };
-       return s;
-     }));
+    try {
+      setActionLoading(true);
+      await Promise.all([
+        setupStepService.updateSetupStep({ ...step, stepOrder: newStepOrder }),
+        setupStepService.updateSetupStep({ ...prevStep, stepOrder: newPrevStepOrder }),
+      ]);
 
-     toast.success(t('labs.moveStepDownSuccess'));
-   } catch (error) {
-     console.error("Failed to move step down:", error);
-     toast.error(t('labs.moveStepError'));
-   } finally {
-     setActionLoading(false);
-   }
- }, [setupSteps, t]);
+      setSetupSteps(prev => prev.map(s => {
+        if (s.id === step.id) return { ...s, stepOrder: newStepOrder };
+        if (s.id === prevStep.id) return { ...s, stepOrder: newPrevStepOrder };
+        return s;
+      }));
 
- // Dialog handlers
- const openCreateStepDialog = () => {
-   setEditingStep(null);
-   setStepFormDialogOpen(true);
- };
+      toast.success(t('labs.moveStepUpSuccess'));
+    } catch (error) {
+      console.error("Failed to move step up:", error);
+      toast.error(t('labs.moveStepError'));
+    } finally {
+      setActionLoading(false);
+    }
+  }, [setupSteps, t]);
 
- const openEditStepDialog = (step: SetupStep) => {
-   setEditingStep(step);
-   setStepFormDialogOpen(true);
- };
+  // Move step down handler
+  const handleMoveStepDown = useCallback(async (step: SetupStep) => {
+    const sortedSteps = [...setupSteps].sort((a, b) => a.stepOrder - b.stepOrder);
+    const currentIndex = sortedSteps.findIndex(s => s.id === step.id);
+    
+    if (currentIndex >= sortedSteps.length - 1) return;
 
- // Show loading state
- if (loading) {
-   return (
-     <div className="container mx-auto px-4 py-6">
-       <div className="flex items-center justify-center py-12">
-         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-         <span className="ml-2 text-muted-foreground">{t('labs.loadingLab')}</span>
-       </div>
-     </div>
-   );
- }
+    const nextStep = sortedSteps[currentIndex + 1];
+    const newStepOrder = nextStep.stepOrder;
+    const newNextStepOrder = step.stepOrder;
 
- // Show not found if lab doesn't exist
- if (!lab) {
-   return (
-     <div className="container mx-auto px-4 py-6">
-       <div className="text-center py-12">
-         <h1 className="text-2xl font-bold mb-2">{t('labs.notFound')}</h1>
-         <p className="text-muted-foreground mb-4">
-           {t('labs.notFoundDescription')}
-         </p>
-         <button 
-           onClick={() => navigate("/labs")}
-           className="text-primary hover:underline"
-         >
-           {t('labs.backToList')}
-         </button>
-       </div>
-     </div>
-   );
- }
+    try {
+      setActionLoading(true);
+      await Promise.all([
+        setupStepService.updateSetupStep({ ...step, stepOrder: newStepOrder }),
+        setupStepService.updateSetupStep({ ...nextStep, stepOrder: newNextStepOrder }),
+      ]);
 
- return (
-   <div className="container mx-auto px-4 py-6 space-y-6">
-     {/* Header */}
-     <LabDetailHeader
-       lab={lab}
-       onEdit={() => setEditLabDialogOpen(true)}
-       onDelete={() => setDeleteLabDialogOpen(true)}
-       onToggleStatus={handleToggleLabStatus}
-       loading={actionLoading}
-     />
+      setSetupSteps(prev => prev.map(s => {
+        if (s.id === step.id) return { ...s, stepOrder: newStepOrder };
+        if (s.id === nextStep.id) return { ...s, stepOrder: newNextStepOrder };
+        return s;
+      }));
 
-     {/* Content */}
-     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-       {/* Lab Info */}
-       <div className="lg:col-span-1">
-         <LabInfoCard lab={lab} />
-       </div>
+      toast.success(t('labs.moveStepDownSuccess'));
+    } catch (error) {
+      console.error("Failed to move step down:", error);
+      toast.error(t('labs.moveStepError'));
+    } finally {
+      setActionLoading(false);
+    }
+  }, [setupSteps, t]);
 
-       {/* Setup Steps */}
-       <div className="lg:col-span-2">
-         <SetupStepsList
-           steps={setupSteps}
-           onCreateStep={openCreateStepDialog}
-           onEditStep={openEditStepDialog}
-           onDeleteStep={handleDeleteSetupStep}
-           onMoveStepUp={handleMoveStepUp}
-           onMoveStepDown={handleMoveStepDown}
-           loading={actionLoading}
-         />
-       </div>
-     </div>
+  // Enhanced dialog handlers
+  const openCreateStepDialog = () => {
+    setEditingStep(null);
+    setIsStepDialogClosing(false);
+    setStepFormDialogOpen(true);
+  };
 
-     {/* Dialogs */}
-     <LabFormDialog
-       open={editLabDialogOpen}
-       onOpenChange={setEditLabDialogOpen}
-       lab={lab}
-       onSubmit={handleUpdateLab}
-       loading={actionLoading}
-     />
+  const openEditStepDialog = (step: SetupStep) => {
+    setEditingStep(step);
+    setIsStepDialogClosing(false);
+    setStepFormDialogOpen(true);
+  };
 
-     <LabDeleteDialog
-       open={deleteLabDialogOpen}
-       onOpenChange={setDeleteLabDialogOpen}
-       lab={lab}
-       onConfirm={handleDeleteLab}
-       loading={actionLoading}
-     />
+  // Enhanced dialog close handlers for UI
+  const handleEditLabDialogClose = (open: boolean) => {
+    if (actionLoading || isLabDialogClosing) return;
+    
+    if (!open) {
+      handleLabDialogClose(() => setEditLabDialogOpen(false));
+    } else {
+      setEditLabDialogOpen(open);
+    }
+  };
 
-     <SetupStepFormDialog
-       open={stepFormDialogOpen}
-       onOpenChange={setStepFormDialogOpen}
-       setupStep={editingStep}
-       onSubmit={editingStep ? (data => handleUpdateSetupStep(data as UpdateSetupStepRequest)) : handleCreateSetupStep}
-       loading={actionLoading}
-     />
-   </div>
- );
+  const handleDeleteLabDialogClose = (open: boolean) => {
+    if (actionLoading || isDeleteDialogClosing) return;
+    
+    if (!open) {
+      handleDeleteDialogClose(() => setDeleteLabDialogOpen(false));
+    } else {
+      setDeleteLabDialogOpen(open);
+    }
+  };
+
+  const handleStepFormDialogClose = (open: boolean) => {
+    if (actionLoading || isStepDialogClosing) return;
+    
+    if (!open) {
+      handleStepDialogClose(() => setStepFormDialogOpen(false));
+    } else {
+      setStepFormDialogOpen(open);
+    }
+  };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <span className="ml-2 text-muted-foreground">{t('labs.loadingLab')}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Show not found if lab doesn't exist
+  if (!lab) {
+    return (
+      <div className="container mx-auto px-4 py-6">
+        <div className="text-center py-12">
+          <h1 className="text-2xl font-bold mb-2">{t('labs.notFound')}</h1>
+          <p className="text-muted-foreground mb-4">
+            {t('labs.notFoundDescription')}
+          </p>
+          <button 
+            onClick={() => navigate("/labs")}
+            className="text-primary hover:underline"
+          >
+            {t('labs.backToList')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      {/* Header */}
+      <LabDetailHeader
+        lab={lab}
+        onEdit={() => {
+          setIsLabDialogClosing(false);
+          setEditLabDialogOpen(true);
+        }}
+        onDelete={() => {
+          setIsDeleteDialogClosing(false);
+          setDeleteLabDialogOpen(true);
+        }}
+        onToggleStatus={handleToggleLabStatus}
+        loading={actionLoading}
+      />
+
+      {/* Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Lab Info */}
+        <div className="lg:col-span-1">
+          <LabInfoCard lab={lab} />
+        </div>
+
+        {/* Setup Steps */}
+        <div className="lg:col-span-2">
+          <SetupStepsList
+            steps={setupSteps}
+            onCreateStep={openCreateStepDialog}
+            onEditStep={openEditStepDialog}
+            onDeleteStep={handleDeleteSetupStep}
+            onMoveStepUp={handleMoveStepUp}
+            onMoveStepDown={handleMoveStepDown}
+            loading={actionLoading}
+          />
+        </div>
+      </div>
+
+      {/* Enhanced Dialogs với better state management */}
+      <LabFormDialog
+        open={editLabDialogOpen && !isLabDialogClosing}
+        onOpenChange={handleEditLabDialogClose}
+        lab={lab}
+        onSubmit={handleUpdateLab}
+        loading={actionLoading}
+      />
+
+      <LabDeleteDialog
+        open={deleteLabDialogOpen && !isDeleteDialogClosing}
+        onOpenChange={handleDeleteLabDialogClose}
+        lab={lab}
+        onConfirm={handleDeleteLab}
+        loading={actionLoading}
+      />
+
+      <SetupStepFormDialog
+        open={stepFormDialogOpen && !isStepDialogClosing}
+        onOpenChange={handleStepFormDialogClose}
+        setupStep={editingStep}
+        onSubmit={editingStep ? 
+          (data => handleUpdateSetupStep(data as UpdateSetupStepRequest)) : 
+          handleCreateSetupStep
+        }
+        loading={actionLoading}
+      />
+    </div>
+  );
 }

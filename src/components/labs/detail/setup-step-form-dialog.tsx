@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Loader2, Terminal } from "lucide-react";
+import { z } from "zod";
+import { Loader2, Terminal, Clock, RotateCcw, AlertCircle } from "lucide-react";
 
 import {
   Dialog,
@@ -24,15 +24,19 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+
 import { SetupStep, CreateSetupStepRequest, UpdateSetupStepRequest } from "@/types/setupStep";
 
+// Validation schema
 const setupStepFormSchema = z.object({
-  title: z.string().min(1, "Tiêu đề không được để trống"),
+  title: z.string().min(1, "Tiêu đề là bắt buộc"),
   description: z.string().optional(),
-  setupCommand: z.string().min(1, "Setup command không được để trống"),
-  expectedExitCode: z.number().min(0).max(255, "Mã thoát phải từ 0-255"),
-  retryCount: z.number().min(1, "Số lần thử lại phải ít nhất 1").max(10, "Số lần thử lại không được vượt quá 10"),
-  timeoutSeconds: z.number().min(1, "Timeout phải ít nhất 1 giây").max(3600, "Timeout không được vượt quá 3600 giây"),
+  setupCommand: z.string().min(1, "Lệnh setup là bắt buộc"),
+  expectedExitCode: z.number().int().min(0).max(255),
+  retryCount: z.number().int().min(1).max(10),
+  timeoutSeconds: z.number().int().min(1).max(3600),
   continueOnFailure: z.boolean(),
 });
 
@@ -54,6 +58,7 @@ export function SetupStepFormDialog({
   loading = false,
 }: SetupStepFormDialogProps) {
   const isEditMode = !!setupStep;
+  const submitInProgressRef = useRef(false);
 
   const form = useForm<SetupStepFormData>({
     resolver: zodResolver(setupStepFormSchema),
@@ -93,35 +98,71 @@ export function SetupStepFormDialog({
     }
   }, [open, setupStep, form]);
 
+  // Enhanced submit handler
   const handleSubmit = async (data: SetupStepFormData) => {
+    if (submitInProgressRef.current) return;
+    
     try {
+      submitInProgressRef.current = true;
       if (isEditMode && setupStep) {
         await onSubmit({ ...data, id: setupStep.id });
       } else {
         await onSubmit(data);
       }
+      
+      // Reset form after successful submission
       form.reset();
-      onOpenChange(false);
+      
+      // Note: onOpenChange will be called by parent component
+      
     } catch (error) {
-      // Error handling is done in parent component
       console.error("Form submission error:", error);
+    } finally {
+      submitInProgressRef.current = false;
     }
   };
 
+  // Enhanced open change handler
   const handleOpenChange = (newOpen: boolean) => {
-    if (!loading) {
-      onOpenChange(newOpen);
-      if (!newOpen) {
-        form.reset();
-      }
+    // Prevent closing during submission or when loading
+    if (loading || submitInProgressRef.current) {
+      return;
+    }
+    
+    if (!newOpen) {
+      // Reset form when closing
+      form.reset();
+    }
+    
+    onOpenChange(newOpen);
+  };
+
+  const handleCancel = () => {
+    if (!loading && !submitInProgressRef.current) {
+      handleOpenChange(false);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent 
+        className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto"
+        onInteractOutside={(e) => {
+          // Prevent closing when loading or submitting
+          if (loading || submitInProgressRef.current) {
+            e.preventDefault();
+          }
+        }}
+        onEscapeKeyDown={(e) => {
+          // Prevent closing when loading or submitting
+          if (loading || submitInProgressRef.current) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Terminal className="h-5 w-5" />
             {isEditMode ? "Chỉnh sửa Setup Step" : "Tạo Setup Step mới"}
           </DialogTitle>
           <DialogDescription>
@@ -143,9 +184,10 @@ export function SetupStepFormDialog({
                     <FormLabel>Tiêu đề *</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Nhập tiêu đề setup step..."
+                        placeholder="Ví dụ: Cài đặt Docker"
                         {...field}
                         disabled={loading}
+                        autoComplete="off"
                       />
                     </FormControl>
                     <FormMessage />
@@ -161,14 +203,14 @@ export function SetupStepFormDialog({
                     <FormLabel>Mô tả</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Mô tả chi tiết về setup step..."
+                        placeholder="Mô tả chi tiết về bước setup này..."
                         rows={3}
                         {...field}
                         disabled={loading}
                       />
                     </FormControl>
                     <FormDescription>
-                      Mô tả chi tiết về mục đích của setup step này
+                      Mô tả ngắn gọn về chức năng của step này.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -176,124 +218,144 @@ export function SetupStepFormDialog({
               />
             </div>
 
-            {/* Command */}
-            <FormField
-              control={form.control}
-              name="setupCommand"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <Terminal className="h-4 w-4" />
-                    Setup Command *
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="apt-get update && apt-get install -y docker.io"
-                      rows={4}
-                      className="font-mono text-sm"
-                      {...field}
-                      disabled={loading}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Lệnh shell sẽ được thực thi trong container
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Command Configuration */}
+            <Card>
+              <CardContent className="pt-6 space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Terminal className="h-4 w-4" />
+                  <h3 className="font-medium">Cấu hình Command</h3>
+                </div>
 
-            {/* Configuration Options */}
-            <div className="space-y-4">
-              <h4 className="font-medium text-sm">Cấu hình nâng cao</h4>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="setupCommand"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Lệnh Setup *</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="sudo apt-get update && sudo apt-get install -y docker.io"
+                          rows={4}
+                          className="font-mono text-sm"
+                          {...field}
+                          disabled={loading}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Lệnh sẽ được thực thi để setup môi trường lab.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="expectedExitCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Mã thoát mong đợi</FormLabel>
+                      <FormLabel className="flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4" />
+                        Exit Code mong đợi
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           placeholder="0"
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                          disabled={loading}
                           min={0}
                           max={255}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Mã thoát khi command thành công (0-255)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="retryCount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Số lần thử lại</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="1"
                           {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                           disabled={loading}
-                          min={1}
-                          max={10}
                         />
                       </FormControl>
                       <FormDescription>
-                        Số lần thử lại khi command thất bại (1-10)
+                        Exit code để xác định lệnh thành công (thường là 0).
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              </CardContent>
+            </Card>
 
-                <FormField
-                  control={form.control}
-                  name="timeoutSeconds"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Timeout (giây)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="300"
-                          {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                          disabled={loading}
-                          min={1}
-                          max={3600}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Thời gian timeout cho command (1-3600 giây)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            {/* Execution Configuration */}
+            <Card>
+              <CardContent className="pt-6 space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Clock className="h-4 w-4" />
+                  <h3 className="font-medium">Cấu hình thực thi</h3>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="retryCount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <RotateCcw className="h-4 w-4" />
+                          Số lần retry
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="1"
+                            min={1}
+                            max={10}
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                            disabled={loading}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Số lần thử lại nếu lệnh thất bại.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="timeoutSeconds"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          Timeout (giây)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="300"
+                            min={1}
+                            max={3600}
+                            {...field}
+                            onChange={(e) => field.onChange(parseInt(e.target.value) || 300)}
+                            disabled={loading}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Thời gian chờ tối đa (1-3600 giây).
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <FormField
                   control={form.control}
                   name="continueOnFailure"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                       <div className="space-y-0.5">
-                        <FormLabel className="text-sm font-medium">
+                        <FormLabel className="text-base">
                           Tiếp tục khi thất bại
                         </FormLabel>
-                        <FormDescription className="text-xs">
-                          Tiếp tục thực hiện các step tiếp theo khi step này thất bại
+                        <FormDescription>
+                          Cho phép các bước tiếp theo chạy ngay cả khi bước này thất bại.
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -306,21 +368,27 @@ export function SetupStepFormDialog({
                     </FormItem>
                   )}
                 />
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
+            {/* Form Actions */}
             <div className="flex justify-end gap-3 pt-4">
-              <Button
+              <Button 
                 type="button"
-                variant="outline"
-                onClick={() => handleOpenChange(false)}
-                disabled={loading}
+                variant="outline" 
+                onClick={handleCancel}
+                disabled={loading || submitInProgressRef.current}
               >
-                Hủy
+                Hủy bỏ
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isEditMode ? "Cập nhật" : "Tạo mới"}
+              <Button 
+                type="submit" 
+                disabled={loading || submitInProgressRef.current}
+              >
+                {(loading || submitInProgressRef.current) && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {isEditMode ? "Cập nhật" : "Tạo Setup Step"}
               </Button>
             </div>
           </form>
