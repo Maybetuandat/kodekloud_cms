@@ -34,7 +34,7 @@ export interface PaginatedResponse<T> {
 
 export interface LabFilters {
   search: string;
-  status: "all" | "active" | "inactive";
+  status: null | true | false;
   sortBy: "newest" | "oldest" | "name" | "estimatedTime";
 }
 

@@ -3,34 +3,33 @@ import { CreateLabRequest, Lab, PaginatedResponse, PaginationParams, UpdateLabRe
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 export const labService = {
   
-  getLabsPaginated: async (
-      params: PaginationParams & { isActivate?: Boolean }
-    ): Promise<PaginatedResponse<Lab>> => {
-      const url = new URL(`${API_BASE_URL}/lab`);
-      
-      // Add pagination params
-      url.searchParams.append('page', params.page.toString());
-      url.searchParams.append('size', params.size.toString());
-      url.searchParams.append('sortBy', params.sortBy);
-      url.searchParams.append('sortDir', params.sortDir);
-      
-      // Add filter params
-      if (params.isActivate !== undefined) {
-        url.searchParams.append('isActivate', params.isActivate.toString());
-      }
-      
-      const response = await fetch(url.toString());
-      if (!response.ok) {
-        throw new Error('Failed to fetch labs');
-      }
-      return response.json();
-    },
-
-  // Get lab by ID
-  getLabById: async (id: string): Promise<Lab> => {
-    const response = await fetch(`${API_BASE_URL}/lab/${id}`);
+    getLabsPaginated: async (
+    params: PaginationParams & { 
+      isActivate?: Boolean;
+      search?: string; 
+    }
+  ): Promise<PaginatedResponse<Lab>> => {
+    const url = new URL(`${API_BASE_URL}/lab`);
+    
+    
+    url.searchParams.append('page', params.page.toString());
+    url.searchParams.append('size', params.size.toString());
+    url.searchParams.append('sortBy', params.sortBy);
+    url.searchParams.append('sortDir', params.sortDir);
+    
+    
+    if (params.isActivate !== undefined) {
+      url.searchParams.append('isActivate', params.isActivate.toString());
+    }
+    
+    
+    if (params.search && params.search.trim()) {
+      url.searchParams.append('search', params.search.trim());
+    }
+    
+    const response = await fetch(url.toString());
     if (!response.ok) {
-      throw new Error('Failed to fetch lab');
+      throw new Error('Failed to fetch labs');
     }
     return response.json();
   },

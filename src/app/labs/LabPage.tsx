@@ -17,31 +17,27 @@ import { labService } from "@/services/labService";
 export default function LabPage() {
   const { t } = useTranslation('common');
 
-  // State management
   const [labs, setLabs] = useState<Lab[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(10); // Mặc định 10 labs mỗi trang
+  const [pageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
 
-  // Filter state
   const [filters, setFilters] = useState<LabFilters>({
     search: "",
-    status: null,
+    status: undefined,
     sortBy: "newest",
   });
 
-  // Dialog states
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editingLab, setEditingLab] = useState<Lab | null>(null);
   const [deletingLab, setDeletingLab] = useState<Lab | null>(null);
 
-  // Enhanced dialog state management
   const [isDialogClosing, setIsDialogClosing] = useState(false);
   const dialogTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -52,49 +48,6 @@ export default function LabPage() {
     };
   }, []);
 
-  // Load labs with pagination
-  const loadLabs = useCallback(async (page = currentPage) => {
-    try {
-      setLoading(true);
-      
-      // Map filter values to API parameters
-      const sortBy = mapSortByToApi(filters.sortBy);
-      const sortDir = filters.sortBy === 'oldest' ? 'asc' : 'desc';
-      const isActivate = filters.status;
-
-      const response: PaginatedResponse<Lab> = await labService.getLabsPaginated({
-        page,
-        size: pageSize,
-        sortBy,
-        sortDir,
-        isActivate : isActivate !== null ? isActivate : undefined,
-      });
-
-      // Filter by search on client side if needed
-      let filteredData = response.data;
-      if (filters.search.trim()) {
-        const searchTerm = filters.search.toLowerCase();
-        filteredData = response.data.filter(lab => 
-          lab.name.toLowerCase().includes(searchTerm) ||
-          lab.description?.toLowerCase().includes(searchTerm) ||
-          lab.baseImage.toLowerCase().includes(searchTerm)
-        );
-      }
-
-      setLabs(filteredData);
-      setCurrentPage(response.currentPage);
-      setTotalPages(response.totalPages);
-      setTotalItems(response.totalItems);
-
-    } catch (error) {
-      console.error('Error loading labs:', error);
-      toast.error(t('labs.loadError'));
-      setLabs([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, pageSize, currentPage, t]);
-
   // Map sort options to API fields
   const mapSortByToApi = (sortBy: string): string => {
     switch (sortBy) {
@@ -103,34 +56,69 @@ export default function LabPage() {
         return 'createdAt';
       case 'name':
         return 'name';
-      case 'estimatedTime':
-        return 'estimatedTime';
       default:
         return 'createdAt';
     }
   };
+
+  
+  const loadLabs = useCallback(async (page = currentPage, customFilters = filters) => {
+    try {
+      setLoading(true);
+      
+      console.log("Loading labs with filters:", customFilters, "Page:", page);
+      
+      const sortBy = mapSortByToApi(customFilters.sortBy);
+      const sortDir = customFilters.sortBy === 'oldest' ? 'asc' : 'desc';
+      const isActivate = customFilters.status === undefined ? undefined : customFilters.status;
+      const search = customFilters.search.trim() || undefined;
+
+      
+      const response: PaginatedResponse<Lab> = await labService.getLabsPaginated({
+        page,
+        size: pageSize,
+        sortBy,
+        sortDir,
+        isActivate,
+        search, 
+      });
+
+      
+      setLabs(response.data);
+      setCurrentPage(response.currentPage);
+      setTotalPages(response.totalPages);
+      setTotalItems(response.totalItems);
+
+    } catch (error) {
+      console.error('Error loading labs:', error);
+      toast.error(t('labs.loadError'));
+      setLabs([]);
+      setTotalPages(0);
+      setTotalItems(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [pageSize, t]);
 
   // Initial load
   useEffect(() => {
     loadLabs();
   }, []);
 
-  // Handle filter changes
   const handleFiltersChange = useCallback((newFilters: LabFilters) => {
     setFilters(newFilters);
-    setCurrentPage(0); // Reset về trang đầu khi filter thay đổi
-    loadLabs(0);
+    console.log("Filters changed:", newFilters);
+    setCurrentPage(0); 
+    loadLabs(0, newFilters);
   }, [loadLabs]);
 
   // Handle page change
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-    loadLabs(page);
-  }, [loadLabs]);
+    loadLabs(page, filters);
+  }, [loadLabs, filters]);
 
-  // Handle page size change (không cần thiết vì cố định 10)
   const handlePageSizeChange = useCallback((size: number) => {
-    // Giữ nguyên pageSize = 10, không thay đổi
     console.log('Page size change not implemented, keeping default 10');
   }, []);
 
@@ -144,7 +132,7 @@ export default function LabPage() {
       handleFormDialogClose(() => setFormDialogOpen(false));
       
       // Reload current page
-      await loadLabs();
+      await loadLabs(currentPage, filters);
     } catch (error: any) {
       console.error('Error creating lab:', error);
       toast.error(error.message || t('labs.createError'));
@@ -185,7 +173,7 @@ export default function LabPage() {
       toast.success(t('labs.deleteSuccess', { name: deletingLab.name }));
       handleDeleteDialogClose(() => setDeleteDialogOpen(false));
       
-      // Reload current page or go to previous page if current page becomes empty
+      
       const newTotalItems = totalItems - 1;
       const newTotalPages = Math.ceil(newTotalItems / pageSize);
       const shouldGoToPreviousPage = currentPage >= newTotalPages && currentPage > 0;
@@ -193,7 +181,7 @@ export default function LabPage() {
       if (shouldGoToPreviousPage) {
         handlePageChange(currentPage - 1);
       } else {
-        await loadLabs();
+        await loadLabs(currentPage, filters);
       }
     } catch (error: any) {
       console.error('Error deleting lab:', error);
@@ -262,14 +250,12 @@ export default function LabPage() {
   };
 
   const handleRefresh = () => {
-    loadLabs();
+    loadLabs(currentPage, filters);
     toast.success(t('labs.refreshSuccess'));
   };
 
-  // Check if any filters are active
-  const hasFilters = filters.search.trim() !== "" || filters.status !== null || filters.sortBy !== "newest";
+  const hasFilters = filters.search.trim() !== "" || filters.status !== undefined || filters.sortBy !== "newest";
 
-  // Enhanced dialog close handlers
   const handleFormDialogOpenChange = (open: boolean) => {
     if (actionLoading || isDialogClosing) return;
     
@@ -320,7 +306,7 @@ export default function LabPage() {
           onCreateLab={openCreateDialog}
           onClearFilters={() => handleFiltersChange({
             search: "",
-            status: null, 
+            status: undefined, 
             sortBy: "newest"
           })}
           loading={actionLoading}
