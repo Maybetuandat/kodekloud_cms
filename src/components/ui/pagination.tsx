@@ -13,7 +13,7 @@ interface PaginationProps {
   loading?: boolean;
 }
 
-const PAGE_SIZE_OPTIONS = [10, 20, 50, 100];
+
 
 export function Pagination({
   currentPage,
@@ -24,8 +24,8 @@ export function Pagination({
   onPageSizeChange,
   loading = false
 }: PaginationProps) {
-  const startItem = currentPage * pageSize + 1;
-  const endItem = Math.min((currentPage + 1) * pageSize, totalItems);
+  
+  
 
   const canGoPrevious = currentPage > 0;
   const canGoNext = currentPage < totalPages - 1;
@@ -66,101 +66,66 @@ export function Pagination({
   if (totalPages <= 1) {
     return null;
   }
+return (
+  <div className="flex items-center justify-center px-2 py-4">
+    <div className="flex items-center space-x-1">
+      <Button
+        variant="outline"
+        className="h-8 w-8 p-0"
+        onClick={() => onPageChange(0)}
+        disabled={!canGoPrevious || loading}
+      >
+        <span className="sr-only">Trang đầu</span>
+        <ChevronsLeft className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="outline"
+        className="h-8 w-8 p-0"
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={!canGoPrevious || loading}
+      >
+        <span className="sr-only">Trang trước</span>
+        <ChevronLeft className="h-4 w-4" />
+      </Button>
 
-  return (
-    <div className="flex items-center justify-between px-2 py-4">
-      <div className="flex items-center space-x-2">
-        <p className="text-sm text-muted-foreground">
-          Hiển thị {startItem} đến {endItem} trong tổng số {totalItems} kết quả
-        </p>
-      </div>
+      {getVisiblePages().map((page, idx) => (
+        <React.Fragment key={idx}>
+          {page === '...' ? (
+            <span className="flex h-8 w-8 items-center justify-center text-sm">
+              ...
+            </span>
+          ) : (
+            <Button
+              variant={page === currentPage ? "default" : "outline"}
+              className="h-8 w-8 p-0"
+              onClick={() => onPageChange(page as number)}
+              disabled={loading}
+            >
+              {(page as number) + 1}
+            </Button>
+          )}
+        </React.Fragment>
+      ))}
 
-      <div className="flex items-center space-x-6">
-        <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Số dòng mỗi trang</p>
-          <Select
-            value={pageSize.toString()}
-            onValueChange={(value) => onPageSizeChange(Number(value))}
-            disabled={loading}
-          >
-            <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={pageSize} />
-            </SelectTrigger>
-            <SelectContent side="top">
-              {PAGE_SIZE_OPTIONS.map((size) => (
-                <SelectItem key={size} value={size.toString()}>
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">
-            Trang {currentPage + 1} / {totalPages}
-          </p>
-        </div>
-
-        <div className="flex items-center space-x-1">
-          <Button
-            variant="outline"
-            className="h-8 w-8 p-0"
-            onClick={() => onPageChange(0)}
-            disabled={!canGoPrevious || loading}
-          >
-            <span className="sr-only">Trang đầu</span>
-            <ChevronsLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            className="h-8 w-8 p-0"
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={!canGoPrevious || loading}
-          >
-            <span className="sr-only">Trang trước</span>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-
-          {getVisiblePages().map((page, idx) => (
-            <React.Fragment key={idx}>
-              {page === '...' ? (
-                <span className="flex h-8 w-8 items-center justify-center text-sm">
-                  ...
-                </span>
-              ) : (
-                <Button
-                  variant={page === currentPage ? "default" : "outline"}
-                  className="h-8 w-8 p-0"
-                  onClick={() => onPageChange(page as number)}
-                  disabled={loading}
-                >
-                  {(page as number) + 1}
-                </Button>
-              )}
-            </React.Fragment>
-          ))}
-
-          <Button
-            variant="outline"
-            className="h-8 w-8 p-0"
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={!canGoNext || loading}
-          >
-            <span className="sr-only">Trang sau</span>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            className="h-8 w-8 p-0"
-            onClick={() => onPageChange(totalPages - 1)}
-            disabled={!canGoNext || loading}
-          >
-            <span className="sr-only">Trang cuối</span>
-            <ChevronsRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <Button
+        variant="outline"
+        className="h-8 w-8 p-0"
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={!canGoNext || loading}
+      >
+        <span className="sr-only">Trang sau</span>
+        <ChevronRight className="h-4 w-4" />
+      </Button>
+      <Button
+        variant="outline"
+        className="h-8 w-8 p-0"
+        onClick={() => onPageChange(totalPages - 1)}
+        disabled={!canGoNext || loading}
+      >
+        <span className="sr-only">Trang cuối</span>
+        <ChevronsRight className="h-4 w-4" />
+      </Button>
     </div>
-  );
+  </div>
+)
 }

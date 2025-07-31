@@ -4,7 +4,7 @@ import { MainLayout } from "./layouts/MainLayout";
 
 import "./i18n"; 
 
-import Lab from "./app/labs/Lab";
+import Lab from "./app/labs/LabPage";
 import HomePage from "./app/home";
 import LabDetail from "./app/labs/LabDetail";
 

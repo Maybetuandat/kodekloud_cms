@@ -165,7 +165,11 @@
       "baseImageRequired": "Base image không được để trống",
       "timeMin": "Thời gian ước tính phải ít nhất 1 phút",
       "timeMax": "Thời gian ước tính không được vượt quá 600 phút"
-    }
+    },
+    "itemsPerPage": "Mục mỗi trang",
+    "goToPage": "Đi đến trang",
+    "pageInfo": "Trang {{current}} / {{total}}",
+    "totalItems": "Tổng cộng {{count}} mục"
     
   }
 }

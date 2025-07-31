@@ -165,6 +165,10 @@
       "baseImageRequired": "Base image is required",
       "timeMin": "Estimated time must be at least 1 minute",
       "timeMax": "Estimated time cannot exceed 600 minutes"
-    }
+    },
+    "itemsPerPage": "Items per page",
+    "goToPage": "Go to page",
+    "pageInfo": "Page {{current}} / {{total}}",
+    "totalItems": "Total {{count}} items"
   }
 }

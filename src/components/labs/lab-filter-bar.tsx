@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 
 export interface LabFilters {
   search: string;
-  status: "all" | "active" | "inactive";
+  status: null | true | false;
   sortBy: "newest" | "oldest" | "name" | "estimatedTime";
 }
 
@@ -39,9 +39,14 @@ export function LabFilterBar({
   };
 
   const handleStatusChange = (value: string) => {
+    let statusValue: null | true | false;
+    if (value === "all") statusValue = null;
+    else if (value === "active") statusValue = true;
+    else statusValue = false;
+    
     onFiltersChange({ 
       ...filters, 
-      status: value as LabFilters["status"] 
+      status: statusValue
     });
   };
 
@@ -55,15 +60,15 @@ export function LabFilterBar({
   const clearFilters = () => {
     onFiltersChange({
       search: "",
-      status: "all",
+      status: null,
       sortBy: "newest",
     });
   };
 
-  const hasActiveFilters = filters.search || filters.status !== "all" || filters.sortBy !== "newest";
+  const hasActiveFilters = filters.search || filters.status !== null || filters.sortBy !== "newest";
   const activeFilterCount = [
     filters.search,
-    filters.status !== "all",
+    filters.status !== null,
     filters.sortBy !== "newest",
   ].filter(Boolean).length;
 
@@ -75,7 +80,7 @@ export function LabFilterBar({
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder={t('labs.searchPlaceholder')}
+            placeholder={t('labs.searchPlaceholder') || "Tìm kiếm labs..."}
             value={filters.search}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-10"
@@ -84,27 +89,31 @@ export function LabFilterBar({
         </div>
 
         {/* Status filter */}
-        <Select value={filters.status} onValueChange={handleStatusChange}>
+        <Select 
+          value={filters.status === null ? "all" : filters.status ? "active" : "inactive"} 
+          onValueChange={handleStatusChange} 
+          disabled={loading}
+        >
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder={t('labs.statusFilter')} />
+            <SelectValue placeholder={t('labs.statusFilter') || "Trạng thái"} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{t('labs.allStatus')}</SelectItem>
-            <SelectItem value="active">{t('labs.active')}</SelectItem>
-            <SelectItem value="inactive">{t('labs.inactive')}</SelectItem>
+            <SelectItem value="all">{t('labs.allStatus') || "Tất cả"}</SelectItem>
+            <SelectItem value="active">{t('labs.active') || "Hoạt động"}</SelectItem>
+            <SelectItem value="inactive">{t('labs.inactive') || "Không hoạt động"}</SelectItem>
           </SelectContent>
         </Select>
 
         {/* Sort filter */}
-        <Select value={filters.sortBy} onValueChange={handleSortChange}>
+        <Select value={filters.sortBy} onValueChange={handleSortChange} disabled={loading}>
           <SelectTrigger className="w-full sm:w-[160px]">
-            <SelectValue placeholder={t('labs.sortBy')} />
+            <SelectValue placeholder={t('labs.sortBy') || "Sắp xếp"} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="newest">{t('labs.newest')}</SelectItem>
-            <SelectItem value="oldest">{t('labs.oldest')}</SelectItem>
-            <SelectItem value="name">{t('labs.nameSort')}</SelectItem>
-            <SelectItem value="estimatedTime">{t('labs.timeSort')}</SelectItem>
+            <SelectItem value="newest">{t('labs.newest') || "Mới nhất"}</SelectItem>
+            <SelectItem value="oldest">{t('labs.oldest') || "Cũ nhất"}</SelectItem>
+            <SelectItem value="name">{t('labs.nameSort') || "Tên A-Z"}</SelectItem>
+            <SelectItem value="estimatedTime">{t('labs.timeSort') || "Thời gian"}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -112,7 +121,12 @@ export function LabFilterBar({
       {/* Results count and active filters */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          
+          <span>
+            {totalCount === 0 
+              ? (t('labs.noLabs') || "Không có lab nào")
+              : `${totalCount} ${totalCount === 1 ? (t('labs.lab') || 'lab') : (t('labs.labs') || 'labs')}`
+            }
+          </span>
         </div>
 
         {/* Active filters */}
@@ -121,7 +135,7 @@ export function LabFilterBar({
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
               <Badge variant="secondary" className="gap-1">
-                {activeFilterCount} {t('labs.activeFilters')}
+                {activeFilterCount} {t('labs.activeFilters') || "bộ lọc"}
               </Badge>
             </div>
             <Button
@@ -129,9 +143,10 @@ export function LabFilterBar({
               size="sm"
               onClick={clearFilters}
               className="gap-1 text-xs h-7"
+              disabled={loading}
             >
               <X className="h-3 w-3" />
-              {t('labs.clearFilters')}
+              {t('labs.clearFilters') || "Xóa bộ lọc"}
             </Button>
           </div>
         )}
