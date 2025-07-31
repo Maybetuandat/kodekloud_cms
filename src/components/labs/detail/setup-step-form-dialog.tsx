@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2, Terminal, Clock, RotateCcw, AlertCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   Dialog,
@@ -29,19 +30,6 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import { SetupStep, CreateSetupStepRequest, UpdateSetupStepRequest } from "@/types/setupStep";
 
-// Validation schema
-const setupStepFormSchema = z.object({
-  title: z.string().min(1, "Tiêu đề là bắt buộc"),
-  description: z.string().optional(),
-  setupCommand: z.string().min(1, "Lệnh setup là bắt buộc"),
-  expectedExitCode: z.number().int().min(0).max(255),
-  retryCount: z.number().int().min(1).max(10),
-  timeoutSeconds: z.number().int().min(1).max(3600),
-  continueOnFailure: z.boolean(),
-});
-
-type SetupStepFormData = z.infer<typeof setupStepFormSchema>;
-
 interface SetupStepFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -57,8 +45,22 @@ export function SetupStepFormDialog({
   onSubmit,
   loading = false,
 }: SetupStepFormDialogProps) {
+  const { t } = useTranslation('common');
   const isEditMode = !!setupStep;
   const submitInProgressRef = useRef(false);
+
+  // Dynamic validation schema with i18n
+  const setupStepFormSchema = z.object({
+    title: z.string().min(1, t('setupSteps.validation.titleRequired')),
+    description: z.string().optional(),
+    setupCommand: z.string().min(1, t('setupSteps.validation.commandRequired')),
+    expectedExitCode: z.number().int().min(0).max(255),
+    retryCount: z.number().int().min(1).max(10),
+    timeoutSeconds: z.number().int().min(1).max(3600),
+    continueOnFailure: z.boolean(),
+  });
+
+  type SetupStepFormData = z.infer<typeof setupStepFormSchema>;
 
   const form = useForm<SetupStepFormData>({
     resolver: zodResolver(setupStepFormSchema),
@@ -163,12 +165,12 @@ export function SetupStepFormDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Terminal className="h-5 w-5" />
-            {isEditMode ? "Chỉnh sửa Setup Step" : "Tạo Setup Step mới"}
+            {isEditMode ? t('setupSteps.editTitle') : t('setupSteps.createTitle')}
           </DialogTitle>
           <DialogDescription>
             {isEditMode
-              ? "Cập nhật thông tin setup step."
-              : "Thêm một bước thiết lập mới cho lab."}
+              ? t('setupSteps.editDescription')
+              : t('setupSteps.createDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -181,10 +183,10 @@ export function SetupStepFormDialog({
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tiêu đề *</FormLabel>
+                    <FormLabel>{t('setupSteps.fields.title')} *</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Ví dụ: Cài đặt Docker"
+                        placeholder={t('setupSteps.placeholders.title')}
                         {...field}
                         disabled={loading}
                         autoComplete="off"
@@ -200,17 +202,17 @@ export function SetupStepFormDialog({
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mô tả</FormLabel>
+                    <FormLabel>{t('setupSteps.fields.description')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Mô tả chi tiết về bước setup này..."
+                        placeholder={t('setupSteps.placeholders.description')}
                         rows={3}
                         {...field}
                         disabled={loading}
                       />
                     </FormControl>
                     <FormDescription>
-                      Mô tả ngắn gọn về chức năng của step này.
+                      {t('setupSteps.hints.description')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -223,7 +225,7 @@ export function SetupStepFormDialog({
               <CardContent className="pt-6 space-y-4">
                 <div className="flex items-center gap-2 mb-4">
                   <Terminal className="h-4 w-4" />
-                  <h3 className="font-medium">Cấu hình Command</h3>
+                  <h3 className="font-medium">{t('setupSteps.sections.commandConfig')}</h3>
                 </div>
 
                 <FormField
@@ -231,10 +233,10 @@ export function SetupStepFormDialog({
                   name="setupCommand"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Lệnh Setup *</FormLabel>
+                      <FormLabel>{t('setupSteps.fields.setupCommand')} *</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="sudo apt-get update && sudo apt-get install -y docker.io"
+                          placeholder={t('setupSteps.placeholders.setupCommand')}
                           rows={4}
                           className="font-mono text-sm"
                           {...field}
@@ -242,7 +244,7 @@ export function SetupStepFormDialog({
                         />
                       </FormControl>
                       <FormDescription>
-                        Lệnh sẽ được thực thi để setup môi trường lab.
+                        {t('setupSteps.hints.setupCommand')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -256,7 +258,7 @@ export function SetupStepFormDialog({
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
                         <AlertCircle className="h-4 w-4" />
-                        Exit Code mong đợi
+                        {t('setupSteps.fields.expectedExitCode')}
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -270,7 +272,7 @@ export function SetupStepFormDialog({
                         />
                       </FormControl>
                       <FormDescription>
-                        Exit code để xác định lệnh thành công (thường là 0).
+                        {t('setupSteps.hints.expectedExitCode')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -284,7 +286,7 @@ export function SetupStepFormDialog({
               <CardContent className="pt-6 space-y-4">
                 <div className="flex items-center gap-2 mb-4">
                   <Clock className="h-4 w-4" />
-                  <h3 className="font-medium">Cấu hình thực thi</h3>
+                  <h3 className="font-medium">{t('setupSteps.sections.executionConfig')}</h3>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -295,7 +297,7 @@ export function SetupStepFormDialog({
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
                           <RotateCcw className="h-4 w-4" />
-                          Số lần retry
+                          {t('setupSteps.fields.retryCount')}
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -309,7 +311,7 @@ export function SetupStepFormDialog({
                           />
                         </FormControl>
                         <FormDescription>
-                          Số lần thử lại nếu lệnh thất bại.
+                          {t('setupSteps.hints.retryCount')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -323,7 +325,7 @@ export function SetupStepFormDialog({
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
                           <Clock className="h-4 w-4" />
-                          Timeout (giây)
+                          {t('setupSteps.fields.timeout')}
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -337,7 +339,7 @@ export function SetupStepFormDialog({
                           />
                         </FormControl>
                         <FormDescription>
-                          Thời gian chờ tối đa (1-3600 giây).
+                          {t('setupSteps.hints.timeout')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -352,10 +354,10 @@ export function SetupStepFormDialog({
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                       <div className="space-y-0.5">
                         <FormLabel className="text-base">
-                          Tiếp tục khi thất bại
+                          {t('setupSteps.fields.continueOnFailure')}
                         </FormLabel>
                         <FormDescription>
-                          Cho phép các bước tiếp theo chạy ngay cả khi bước này thất bại.
+                          {t('setupSteps.hints.continueOnFailure')}
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -379,7 +381,7 @@ export function SetupStepFormDialog({
                 onClick={handleCancel}
                 disabled={loading || submitInProgressRef.current}
               >
-                Hủy bỏ
+                {t('common.cancel')}
               </Button>
               <Button 
                 type="submit" 
@@ -388,7 +390,7 @@ export function SetupStepFormDialog({
                 {(loading || submitInProgressRef.current) && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                {isEditMode ? "Cập nhật" : "Tạo Setup Step"}
+                {isEditMode ? t('common.update') : t('setupSteps.createButton')}
               </Button>
             </div>
           </form>

@@ -102,4 +102,11 @@ export const labService = {
     }
     return response.json();
   },
+  getLabById: async (id: string): Promise<Lab> => {
+    const response = await fetch(`${API_BASE_URL}/lab/${id}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch lab');
+    }
+    return response.json();
+  },
 };

@@ -171,5 +171,60 @@
     "pageInfo": "Trang {{current}} / {{total}}",
     "totalItems": "Tổng cộng {{count}} mục"
     
+  },
+  "setupSteps": {
+    "editTitle": "Chỉnh sửa Setup Step",
+    "createTitle": "Tạo Setup Step mới", 
+    "editDescription": "Cập nhật thông tin setup step.",
+    "createDescription": "Thêm một bước thiết lập mới cho lab.",
+    "createButton": "Tạo Setup Step",
+    
+    "fields": {
+      "title": "Tiêu đề",
+      "description": "Mô tả", 
+      "setupCommand": "Lệnh Setup",
+      "expectedExitCode": "Exit Code mong đợi",
+      "retryCount": "Số lần retry",
+      "timeout": "Timeout (giây)",
+      "continueOnFailure": "Tiếp tục khi thất bại"
+    },
+    
+    "placeholders": {
+      "title": "Ví dụ: Cài đặt Docker",
+      "description": "Mô tả chi tiết về bước setup này...",
+      "setupCommand": "sudo apt-get update && sudo apt-get install -y docker.io"
+    },
+    
+    "hints": {
+      "description": "Mô tả ngắn gọn về chức năng của step này.",
+      "setupCommand": "Lệnh sẽ được thực thi để setup môi trường lab.",
+      "expectedExitCode": "Exit code để xác định lệnh thành công (thường là 0).",
+      "retryCount": "Số lần thử lại nếu lệnh thất bại.",
+      "timeout": "Thời gian chờ tối đa (1-3600 giây).",
+      "continueOnFailure": "Cho phép các bước tiếp theo chạy ngay cả khi bước này thất bại."
+    },
+    
+    "sections": {
+      "commandConfig": "Cấu hình Command",
+      "executionConfig": "Cấu hình thực thi"
+    },
+    
+    "validation": {
+      "titleRequired": "Tiêu đề là bắt buộc",
+      "commandRequired": "Lệnh setup là bắt buộc"
+    },
+    "badges": {
+      "exitCode": "Exit",
+      "retry": "Retry", 
+      "seconds": "s",
+      "continueOnFailure": "Tiếp tục khi thất bại"
+    },
+    
+    "tooltips": {
+      "expectedExitCode": "Mã thoát mong đợi",
+      "retryCount": "Số lần thử lại khi thất bại", 
+      "timeout": "Thời gian timeout",
+      "continueOnFailure": "Tiếp tục thực hiện khi step này thất bại"
+    }
   }
 }

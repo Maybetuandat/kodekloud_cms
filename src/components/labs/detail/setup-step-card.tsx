@@ -12,6 +12,7 @@ import {
   Terminal,
   AlertTriangle
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import {
   Card,
@@ -61,6 +62,8 @@ export function SetupStepCard({
   loading = false,
   className,
 }: SetupStepCardProps) {
+  const { t } = useTranslation('common');
+
   return (
     <TooltipProvider>
       <Card className={cn("group hover:shadow-md transition-all duration-200", className)}>
@@ -125,7 +128,7 @@ export function SetupStepCard({
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => onEdit(step)}>
                     <Edit className="mr-2 h-4 w-4" />
-                    Chỉnh sửa
+                    {t('common.edit')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
@@ -133,7 +136,7 @@ export function SetupStepCard({
                     className="text-destructive focus:text-destructive"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Xóa
+                    {t('common.delete')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -145,7 +148,7 @@ export function SetupStepCard({
           {/* Command */}
           <div className="space-y-2">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Setup Command
+              {t('setupSteps.fields.setupCommand')}
             </label>
             <div className="bg-muted rounded-lg p-3 font-mono text-sm relative">
               <Terminal className="absolute top-2 right-2 h-3 w-3 text-muted-foreground" />
@@ -161,11 +164,11 @@ export function SetupStepCard({
               <TooltipTrigger asChild>
                 <Badge variant="outline" className="gap-1 text-xs">
                   <CheckCircle className="h-3 w-3" />
-                  Exit: {step.expectedExitCode}
+                  {t('setupSteps.badges.exitCode')}: {step.expectedExitCode}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Mã thoát mong đợi</p>
+                <p>{t('setupSteps.tooltips.expectedExitCode')}</p>
               </TooltipContent>
             </Tooltip>
 
@@ -173,11 +176,11 @@ export function SetupStepCard({
               <TooltipTrigger asChild>
                 <Badge variant="outline" className="gap-1 text-xs">
                   <RotateCcw className="h-3 w-3" />
-                  Retry: {step.retryCount}
+                  {t('setupSteps.badges.retry')}: {step.retryCount}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Số lần thử lại khi thất bại</p>
+                <p>{t('setupSteps.tooltips.retryCount')}</p>
               </TooltipContent>
             </Tooltip>
 
@@ -185,11 +188,11 @@ export function SetupStepCard({
               <TooltipTrigger asChild>
                 <Badge variant="outline" className="gap-1 text-xs">
                   <Clock className="h-3 w-3" />
-                  {step.timeoutSeconds}s
+                  {step.timeoutSeconds}{t('setupSteps.badges.seconds')}
                 </Badge>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Thời gian timeout</p>
+                <p>{t('setupSteps.tooltips.timeout')}</p>
               </TooltipContent>
             </Tooltip>
 
@@ -198,11 +201,11 @@ export function SetupStepCard({
                 <TooltipTrigger asChild>
                   <Badge variant="secondary" className="gap-1 text-xs">
                     <AlertTriangle className="h-3 w-3" />
-                    Continue on failure
+                    {t('setupSteps.badges.continueOnFailure')}
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Tiếp tục thực hiện khi step này thất bại</p>
+                  <p>{t('setupSteps.tooltips.continueOnFailure')}</p>
                 </TooltipContent>
               </Tooltip>
             )}

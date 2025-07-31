@@ -6,15 +6,6 @@ import { vi, enUS } from "date-fns/locale";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,26 +63,6 @@ export function LabDetailHeader({
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-2xl font-bold tracking-tight">
-                  {lab.name}
-                </h1>
-                <Badge 
-                  variant={lab.isActive ? "default" : "secondary"}
-                  className="shrink-0"
-                >
-                  {lab.isActive ? t('labs.active') : t('labs.inactive')}
-                </Badge>
-              </div>
-              
-              {lab.description && (
-                <p className="text-muted-foreground max-w-2xl">
-                  {lab.description}
-                </p>
-              )}
-            </div>
           </div>
 
           {/* Metadata */}

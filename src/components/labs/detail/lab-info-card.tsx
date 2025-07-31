@@ -47,8 +47,8 @@ export function LabInfoCard({ lab }: LabInfoCardProps) {
       <CardContent className="space-y-6">
         {/* Basic Info */}
         <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
+            
+            <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-muted-foreground">
                 {t('labs.labId')}
               </label>
@@ -57,7 +57,7 @@ export function LabInfoCard({ lab }: LabInfoCardProps) {
               </p>
             </div>
             
-            <div className="space-y-2">
+            <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-muted-foreground">
                 {t('labs.status')}
               </label>
@@ -65,68 +65,68 @@ export function LabInfoCard({ lab }: LabInfoCardProps) {
                 {lab.isActive ? t('labs.active') : t('labs.inactive')}
               </Badge>
             </div>
-          </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">
-              {t('labs.labName')}
-            </label>
-            <p className="text-sm">
-              {lab.name}
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">
-              {t('labs.description')}
-            </label>
-            <p className="text-sm">
-              {lab.description}
-            </p>
-          </div>
-        </div>
-
-        <Separator />
-
-        {/* Technical Specifications */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-medium flex items-center gap-2">
-            <Dock className="h-4 w-4" />
-            {t('labs.technicalSpecs')}
-          </h4>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">
-              {t('labs.baseDockerImage')}
-            </label>
-            <p className="font-mono text-sm bg-muted px-2 py-1 rounded">
-              {lab.baseImage}
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">
-              {t('labs.estimatedTime')}
-            </label>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">
-                {lab.estimatedTime} {t('labs.minutes')}
-              </span>
+            
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-muted-foreground">
+                {t('labs.labName')}
+              </label>
+              <p className="text-sm">
+                {lab.name}
+              </p>
             </div>
+
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-muted-foreground">
+                {t('labs.description')}
+              </label>
+              <p className="text-sm">
+                {lab.description}
+              </p>
+            </div>
+            
           </div>
-        </div>
 
         <Separator />
 
-        {/* Other Information */}
+                  {/* Technical Specifications */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-medium flex items-center gap-2">
+                <Dock className="h-4 w-4" />
+                {t('labs.technicalSpecs')}
+              </h4>
+
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-muted-foreground">
+                  {t('labs.baseDockerImage')}
+                </label>
+                <p className="font-mono text-sm bg-muted px-2 py-1 rounded">
+                  {lab.baseImage}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-muted-foreground">
+                  {t('labs.estimatedTime')}
+                </label>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">
+                    {lab.estimatedTime} {t('labs.minutes')}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+        <Separator />
+
+       {/* Other Information */}
         <div className="space-y-4">
           <h4 className="text-sm font-medium flex items-center gap-2">
             <Calendar className="h-4 w-4" />
             {t('labs.otherInfo')}
           </h4>
 
-          <div className="space-y-2">
+          <div className="flex items-center justify-between">
             <label className="text-sm font-medium text-muted-foreground">
               {t('labs.createdDate')}
             </label>

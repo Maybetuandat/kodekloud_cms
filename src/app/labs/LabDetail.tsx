@@ -441,7 +441,7 @@ export default function LabDetailPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
+    <div className="min-h-screen w-full px-4 py-6 space-y-6">
       {/* Header */}
       <LabDetailHeader
         lab={lab}

@@ -170,5 +170,60 @@
     "goToPage": "Go to page",
     "pageInfo": "Page {{current}} / {{total}}",
     "totalItems": "Total {{count}} items"
+  },
+  "setupSteps": {
+    "editTitle": "Edit Setup Step",
+    "createTitle": "Create New Setup Step", 
+    "editDescription": "Update setup step information.",
+    "createDescription": "Add a new setup step for the lab.",
+    "createButton": "Create Setup Step",
+    
+    "fields": {
+      "title": "Title",
+      "description": "Description", 
+      "setupCommand": "Setup Command",
+      "expectedExitCode": "Expected Exit Code",
+      "retryCount": "Retry Count",
+      "timeout": "Timeout (seconds)",
+      "continueOnFailure": "Continue on Failure"
+    },
+    
+    "placeholders": {
+      "title": "e.g: Install Docker",
+      "description": "Detailed description of this setup step...",
+      "setupCommand": "sudo apt-get update && sudo apt-get install -y docker.io"
+    },
+    
+    "hints": {
+      "description": "Brief description of this step's functionality.",
+      "setupCommand": "Command to be executed for lab environment setup.",
+      "expectedExitCode": "Exit code to determine command success (usually 0).",
+      "retryCount": "Number of retry attempts if command fails.",
+      "timeout": "Maximum wait time (1-3600 seconds).",
+      "continueOnFailure": "Allow subsequent steps to run even if this step fails."
+    },
+    
+    "sections": {
+      "commandConfig": "Command Configuration",
+      "executionConfig": "Execution Configuration"
+    },
+    
+    "validation": {
+      "titleRequired": "Title is required",
+      "commandRequired": "Setup command is required"
+    },
+    "badges": {
+      "exitCode": "Exit",
+      "retry": "Retry",
+      "seconds": "s", 
+      "continueOnFailure": "Continue on failure"
+    },
+    
+    "tooltips": {
+      "expectedExitCode": "Expected exit code",
+      "retryCount": "Number of retry attempts on failure",
+      "timeout": "Timeout duration", 
+      "continueOnFailure": "Continue execution when this step fails"
+    }
   }
 }

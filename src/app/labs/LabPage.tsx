@@ -23,7 +23,7 @@ export default function LabPage() {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(12);
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
 
@@ -277,7 +277,7 @@ export default function LabPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
+    <div className="min-h-screen w-full px-4 py-6 space-y-6">
       {/* Header */}
       <LabHeader
         onCreateLab={openCreateDialog}
