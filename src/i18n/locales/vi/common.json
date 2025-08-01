@@ -169,7 +169,8 @@
     "itemsPerPage": "Mục mỗi trang",
     "goToPage": "Đi đến trang",
     "pageInfo": "Trang {{current}} / {{total}}",
-    "totalItems": "Tổng cộng {{count}} mục"
+    "totalItems": "Tổng cộng {{count}} mục",
+    "testSetupSteps": "Kiểm tra các bước thiết lập"
     
   },
   "setupSteps": {

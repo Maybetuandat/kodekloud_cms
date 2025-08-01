@@ -129,8 +129,7 @@ export function LabCard({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onEdit(lab)}>
-                <Settings className="mr-2 h-4 w-4" />
-                {t('common.edit')}
+               
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onToggleStatus(lab)}>
                 {lab.isActive ? (

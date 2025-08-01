@@ -169,7 +169,8 @@
     "itemsPerPage": "Items per page",
     "goToPage": "Go to page",
     "pageInfo": "Page {{current}} / {{total}}",
-    "totalItems": "Total {{count}} items"
+    "totalItems": "Total {{count}} items",
+    "testSetupSteps": "Test"
   },
   "setupSteps": {
     "editTitle": "Edit Setup Step",

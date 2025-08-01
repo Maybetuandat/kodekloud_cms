@@ -1,6 +1,6 @@
 import { CreateLabRequest, Lab, PaginatedResponse, PaginationParams, UpdateLabRequest } from "@/types/lab";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/labs`
 export const labService = {
   
     getLabsPaginated: async (
@@ -9,7 +9,7 @@ export const labService = {
       search?: string; 
     }
   ): Promise<PaginatedResponse<Lab>> => {
-    const url = new URL(`${API_BASE_URL}/lab`);
+    const url = new URL(API_BASE_URL);
     
     
     url.searchParams.append('page', params.page.toString());
@@ -36,7 +36,7 @@ export const labService = {
 
   // Create new lab
   createLab: async (lab: CreateLabRequest): Promise<Lab> => {
-    const response = await fetch(`${API_BASE_URL}/lab`, {
+    const response = await fetch(API_BASE_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ export const labService = {
 
   // Update lab
   updateLab: async (id: string, lab: UpdateLabRequest): Promise<Lab> => {
-    const response = await fetch(`${API_BASE_URL}/lab/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ export const labService = {
 
   // Delete lab
   deleteLab: async (id: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/lab/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
       method: 'DELETE',
     });
     
@@ -82,7 +82,7 @@ export const labService = {
 
   // Toggle lab status
   toggleLabStatus: async (id: string): Promise<Lab> => {
-    const response = await fetch(`${API_BASE_URL}/lab/${id}/toggle-status`, {
+    const response = await fetch(`${API_BASE_URL}/${id}/toggle-status`, {
       method: 'PUT',
     });
     
@@ -95,15 +95,9 @@ export const labService = {
   },
 
   // Get lab setup steps
-  getLabSetupSteps: async (id: string): Promise<any[]> => {
-    const response = await fetch(`${API_BASE_URL}/lab/${id}/setup-steps`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch setup steps');
-    }
-    return response.json();
-  },
+
   getLabById: async (id: string): Promise<Lab> => {
-    const response = await fetch(`${API_BASE_URL}/lab/${id}`);
+    const response = await fetch(`${API_BASE_URL}/${id}`);
     if (!response.ok) {
       throw new Error('Failed to fetch lab');
     }

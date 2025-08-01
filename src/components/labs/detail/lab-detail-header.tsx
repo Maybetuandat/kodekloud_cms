@@ -6,6 +6,7 @@ import { vi, enUS } from "date-fns/locale";
 import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,22 +49,28 @@ export function LabDetailHeader({
 
   return (
     <div className="space-y-4">
-    
+      {/* Header actions - 3 column layout */}
+      <div className="grid grid-cols-3 items-center gap-4">
+        {/* Left: Back button */}
+        <div className="flex justify-start">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => navigate("/labs")}
+            className="shrink-0"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        </div>
 
-      {/* Header actions */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div className="space-y-3">
-          {/* Title and status */}
-          <div className="flex items-start gap-3">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => navigate("/labs")}
-              className="shrink-0 mt-1"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
+        {/* Center: Lab title and info */}
+        <div className="flex flex-col items-center text-center space-y-2">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold tracking-tight">{lab.name}</h1>
+           
           </div>
+          
+       
 
           {/* Metadata */}
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -78,8 +85,8 @@ export function LabDetailHeader({
           </div>
         </div>
 
-        {/* Action buttons */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Right: Action buttons */}
+        <div className="flex items-center gap-2 justify-end">
           <Button
             variant="outline"
             onClick={onEdit}

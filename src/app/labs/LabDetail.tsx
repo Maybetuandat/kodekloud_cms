@@ -139,7 +139,7 @@ export default function LabDetailPage() {
       setLoading(true);
       const [labData, stepsData] = await Promise.all([
         labService.getLabById(id),
-        labService.getLabSetupSteps(id),
+        setupStepService.getLabSetupSteps(id),
       ]);
       
       setLab(labData);
@@ -408,6 +408,7 @@ export default function LabDetailPage() {
     }
   };
 
+  const handleTestSetupStep = 
   // Show loading state
   if (loading) {
     return (

@@ -1,12 +1,19 @@
 // src/services/setupStepService.ts
 import { SetupStep, CreateSetupStepRequest, UpdateSetupStepRequest } from '@/types/setupStep';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/labs/setup-steps`
 
 export const setupStepService = {
+    getLabSetupSteps: async (id: string): Promise<any[]> => {
+      const response = await fetch(`${API_BASE_URL}/${id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch setup steps');
+      }
+      return response.json();
+    },
   // Create setup step for a lab
   createSetupStep: async (labId: string, setupStep: CreateSetupStepRequest): Promise<SetupStep> => {
-    const response = await fetch(`${API_BASE_URL}/setup-step/${labId}`, {
+    const response = await fetch(`${API_BASE_URL}/${labId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -23,7 +30,7 @@ export const setupStepService = {
 
   // Create multiple setup steps
   createBatchSetupSteps: async (labId: string, setupSteps: CreateSetupStepRequest[]): Promise<SetupStep[]> => {
-    const response = await fetch(`${API_BASE_URL}/setup-step/batch/${labId}`, {
+    const response = await fetch(`${API_BASE_URL}/batch/${labId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -41,7 +48,7 @@ export const setupStepService = {
 
   // Update setup step
   updateSetupStep: async (setupStep: UpdateSetupStepRequest): Promise<SetupStep> => {
-    const response = await fetch(`${API_BASE_URL}/setup-step`, {
+    const response = await fetch(`${API_BASE_URL}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -58,7 +65,7 @@ export const setupStepService = {
 
   // Delete setup step
   deleteSetupStep: async (setupStepId: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/setup-step/${setupStepId}`, {
+    const response = await fetch(`${API_BASE_URL}/${setupStepId}`, {
       method: 'DELETE',
     });
     
@@ -70,7 +77,7 @@ export const setupStepService = {
 
   // Delete multiple setup steps
   deleteBatchSetupSteps: async (setupStepIds: string[]): Promise<number> => {
-    const response = await fetch(`${API_BASE_URL}/setup-step/batch`, {
+    const response = await fetch(`${API_BASE_URL}/batch`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -85,4 +92,7 @@ export const setupStepService = {
     const result = await response.json();
     return result.deletedCount;
   },
+  // testSetupStep : async (labId : string): Promise<string> =>{
+  //   const response = await fetch(`${API_BASE_URL}/`)
+  // }
 };
