@@ -408,7 +408,7 @@ export default function LabDetailPage() {
     }
   };
 
-  const handleTestSetupStep = 
+  
   // Show loading state
   if (loading) {
     return (

@@ -86,16 +86,7 @@ export function SetupStepsList({
             
             {/* Add step hint */}
             <div className="flex justify-center pt-4 ">
-              <Button
-                variant="outline"
-                onClick={onCreateStep}
-                disabled={loading}
-                className="gap-2 border-dashed bg-primary text-primary-foreground"
-              >
-                <Plus className="h-4 w-4" />
-                {t('labs.addNewStep')}
-              </Button>
-
+             
 
 
             <Button
@@ -104,7 +95,7 @@ export function SetupStepsList({
                 disabled={loading}
                 className="ml-6 bg-primary text-primary-foreground"
               >
-                <Plus className="h-4 w-4" />
+               
                 {t('labs.testSetupSteps')}
               </Button>
 
