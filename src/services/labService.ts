@@ -103,4 +103,14 @@ export const labService = {
     }
     return response.json();
   },
+  testSetupStep: async(labId : string) => {
+
+    const response = await fetch(`${API_BASE_URL}/test/${labId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    return response.json();
+  }
 };

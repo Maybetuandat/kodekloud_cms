@@ -21,6 +21,8 @@ interface SetupStepsListProps {
   onMoveStepUp: (step: SetupStep) => void;
   onMoveStepDown: (step: SetupStep) => void;
   loading?: boolean;
+  testSetupStep : (labId : string) => void;
+  labId : string;
 }
 
 export function SetupStepsList({
@@ -31,6 +33,8 @@ export function SetupStepsList({
   onMoveStepUp,
   onMoveStepDown,
   loading = false,
+  testSetupStep, 
+  labId
 }: SetupStepsListProps) {
   const { t } = useTranslation('common');
   const sortedSteps = [...steps].sort((a, b) => a.stepOrder - b.stepOrder);
@@ -91,7 +95,7 @@ export function SetupStepsList({
 
             <Button
                 variant="outline"
-                onClick={onCreateStep}
+                onClick={() => testSetupStep(labId)}
                 disabled={loading}
                 className="ml-6 bg-primary text-primary-foreground"
               >

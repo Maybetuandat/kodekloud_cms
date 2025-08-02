@@ -283,6 +283,30 @@ export default function LabDetailPage() {
     }
   }, [t, handleStepDialogClose]);
 
+
+  const handleTestSetupStep = useCallback(async(labId : string) => {
+    try
+    {
+          setActionLoading(true);
+          const result = await labService.testSetupStep(labId);
+          if(result.success) {
+            toast.success(result.message + ' ' + result.podName);
+          }
+          else
+          {
+            toast.error(result.error);
+          }
+    }
+    catch (error) {
+      console.error("Failed to test setup step:", error);
+      toast.error(t('labs.setupStepTestError'));
+    }
+    finally {
+      setActionLoading(false);
+    }
+  }, [t, labService]);  // dependencies array : function se duoc tao khi cac thanh phan nay thay doi
+    
+  
   // Delete setup step handler
   const handleDeleteSetupStep = useCallback(async (step: SetupStep) => {
     try {
@@ -475,6 +499,8 @@ export default function LabDetailPage() {
             onMoveStepUp={handleMoveStepUp}
             onMoveStepDown={handleMoveStepDown}
             loading={actionLoading}
+            testSetupStep={handleTestSetupStep}
+            labId={lab.id}
           />
         </div>
       </div>
