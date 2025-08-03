@@ -17,9 +17,10 @@
     "next": "Tiếp theo",
     "previous": "Trước",
     "clear": "Xóa",
-    "close": "Đóng"
+    "close": "Đóng",
+    "update": "Cập nhật"
   },
-   "settings": {
+  "settings": {
     "title": "Cài đặt",
     "description": "Tùy chỉnh giao diện và ngôn ngữ ứng dụng",
     "appearance": {
@@ -55,7 +56,7 @@
     "sidebar": {
     "account": "Tài khoản",
     "settings": "Cài đặt",
-    "interface": "Giao diện",
+  
     "logout": "Đăng xuất",
     "light": "Sáng",
     "dark": "Tối",

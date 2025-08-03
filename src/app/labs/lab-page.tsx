@@ -3,12 +3,12 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { LabHeader } from "@/components/labs/lab-header";
-import { LabFilterBar, LabFilters } from "@/components/labs/lab-filter-bar";
-import { LabCard } from "@/components/labs/lab-card";
-import { LabEmptyState } from "@/components/labs/lab-empty-state";
-import { LabFormDialog } from "@/components/labs/lab-form-dialog";
-import { LabDeleteDialog } from "@/components/labs/lab-delete-dialog";
+import { LabHeader } from "@/components/labs/index/lab-header";
+import { LabFilterBar, LabFilters } from "@/components/labs/index/lab-filter-bar";
+import { LabCard } from "@/components/labs/index/lab-card";
+import { LabEmptyState } from "@/components/labs/index/lab-empty-state";
+import { LabFormDialog } from "@/components/labs/index/lab-form-dialog";
+import { LabDeleteDialog } from "@/components/labs/index/lab-delete-dialog";
 import { Pagination } from "@/components/ui/pagination";
 
 import { Lab, CreateLabRequest, UpdateLabRequest, PaginatedResponse } from "@/types/lab";

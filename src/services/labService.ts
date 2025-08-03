@@ -1,4 +1,5 @@
 import { CreateLabRequest, Lab, PaginatedResponse, PaginationParams, UpdateLabRequest } from "@/types/lab";
+import { LabTestResponse, LabTestStatusResponse, StopTestResponse, WebSocketConnectionInfo } from "@/types/labTest";
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/labs`
 export const labService = {
@@ -103,14 +104,77 @@ export const labService = {
     }
     return response.json();
   },
-  testSetupStep: async(labId : string) => {
-
+ 
+   /**
+   * Khởi tạo test lab với setup steps execution
+   * Trả về thông tin WebSocket để connect realtime logs
+   */
+  testSetupStep: async (labId: string): Promise<LabTestResponse> => {
     const response = await fetch(`${API_BASE_URL}/test/${labId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-    })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Network error' }));
+      throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+    }
+
     return response.json();
-  }
+  },
+
+  /**
+   * Lấy trạng thái của pod test
+   */
+  getTestStatus: async (labId: string, podName: string): Promise<LabTestStatusResponse> => {
+    const url = new URL(`${API_BASE_URL}/test/${labId}/status`);
+    url.searchParams.append('podName', podName);
+
+    const response = await fetch(url.toString());
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Network error' }));
+      throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return response.json();
+  },
+
+  /**
+   * Dừng và xóa pod test
+   */
+  stopTestExecution: async (labId: string, podName: string): Promise<StopTestResponse> => {
+    const url = new URL(`${API_BASE_URL}/test/${labId}`);
+    url.searchParams.append('podName', podName);
+
+    const response = await fetch(url.toString(), {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Network error' }));
+      throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return response.json();
+  },
+
+  /**
+   * Lấy thông tin kết nối WebSocket cho pod cụ thể
+   */
+  getWebSocketInfo: async (podName: string): Promise<WebSocketConnectionInfo> => {
+    const url = new URL(`${API_BASE_URL}/test/websocket-info`);
+    url.searchParams.append('podName', podName);
+
+    const response = await fetch(url.toString());
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Network error' }));
+      throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return response.json();
+  },
 };

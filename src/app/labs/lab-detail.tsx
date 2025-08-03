@@ -4,22 +4,32 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
-import { LabDetailHeader } from "@/components/labs/detail/lab-detail-header";
-import { LabInfoCard } from "@/components/labs/detail/lab-info-card";
-import { SetupStepsList } from "@/components/labs/detail/setup-steps-list";
-import { LabFormDialog } from "@/components/labs/lab-form-dialog";
-import { LabDeleteDialog } from "@/components/labs/lab-delete-dialog";
-import { SetupStepFormDialog } from "@/components/labs/detail/setup-step-form-dialog";
+import { LabDetailHeader } from "@/components/labs/detail/index/lab-detail-header";
+import { LabInfoCard } from "@/components/labs/detail/index/lab-info-card";
+import { SetupStepsList } from "@/components/labs/detail/index/setup-steps-list";
+import { LabFormDialog } from "@/components/labs/index/lab-form-dialog";
+import { LabDeleteDialog } from "@/components/labs/index/lab-delete-dialog";
+import { SetupStepFormDialog } from "@/components/labs/detail/index/setup-step-form-dialog";
 import { Lab, UpdateLabRequest } from "@/types/lab";
 import { SetupStep, CreateSetupStepRequest, UpdateSetupStepRequest } from "@/types/setupStep";
 import { labService } from "@/services/labService";
 import { setupStepService } from "@/services/setupStepService";
+
+
+import { TerminalDialog } from "@/components/labs/detail/terminal/terminal-dialog";
+import { LabTestResponse } from "@/types/labTest";
 
 export default function LabDetailPage() {
   const { t } = useTranslation('common');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
+ const [terminalDialogOpen, setTerminalDialogOpen] = useState(false);
+  const [terminalConfig, setTerminalConfig] = useState<{
+    websocketUrl: string;
+    podName: string;
+    labName: string;
+  } | null>(null);
   // State management
   const [lab, setLab] = useState<Lab | null>(null);
   const [setupSteps, setSetupSteps] = useState<SetupStep[]>([]);
@@ -284,27 +294,106 @@ export default function LabDetailPage() {
   }, [t, handleStepDialogClose]);
 
 
-  const handleTestSetupStep = useCallback(async(labId : string) => {
-    try
-    {
-          setActionLoading(true);
-          const result = await labService.testSetupStep(labId);
-          if(result.success) {
-            toast.success(result.message + ' ' + result.podName);
-          }
-          else
-          {
-            toast.error(result.error);
-          }
+  // const handleTestSetupStep = useCallback(async(labId : string) => {
+  //   try
+  //   {
+  //         setActionLoading(true);
+  //         const result = await labService.testSetupStep(labId);
+  //         if(result.success) {
+  //           toast.success(result.message + ' ' + result.podName);
+  //         }
+  //         else
+  //         {
+  //           toast.error(result.error);
+  //         }
+  //   }
+  //   catch (error) {
+  //     console.error("Failed to test setup step:", error);
+  //     toast.error(t('labs.setupStepTestError'));
+  //   }
+  //   finally {
+  //     setActionLoading(false);
+  //   }
+  // }, [t, labService]);  // dependencies array : function se duoc tao khi cac thanh phan nay thay doi
+
+
+
+
+
+  const handleTestSetupStep = useCallback(async (labId: string) => {
+  try {
+    setActionLoading(true);
+    
+    // Call the test API with proper typing
+    const result: LabTestResponse = await labService.testSetupStep(labId);
+    
+    // Check if response is successful
+    if (result.success) {
+      // Show success toast
+      toast.success(result.message || "Lab test đã được khởi tạo thành công");
+      
+      // Extract WebSocket information from response
+      const websocketInfo = result.websocket;
+      if (websocketInfo && websocketInfo.url) {
+        // Configure terminal dialog
+        setTerminalConfig({
+          websocketUrl: websocketInfo.url,
+          podName: result.podName,
+          labName: result.labName || lab?.name || "Unknown Lab"
+        });
+        
+        // Open terminal dialog
+        setTerminalDialogOpen(true);
+        
+        console.log("WebSocket connection info:", websocketInfo);
+        console.log("Pod created:", result.podName);
+        console.log("Lab:", result.labName);
+      } else {
+        // Fallback if no WebSocket info provided
+        toast.warning("Pod created successfully but no WebSocket info available");
+        console.warn("No WebSocket info in response:", result);
+      }
+    } else {
+      // Show error toast if response indicates failure
+      toast.error(result.error || "Không thể tạo test pod");
+      console.error("Test failed:", result);
     }
-    catch (error) {
-      console.error("Failed to test setup step:", error);
-      toast.error(t('labs.setupStepTestError'));
+  } catch (error: any) {
+    console.error("Failed to test setup step:", error);
+    
+    // Handle different types of errors
+    if (error.message?.includes('404') || error.message?.includes('not found')) {
+      toast.error("Lab không tồn tại");
+    } else if (error.message?.includes('500') || error.message?.includes('server')) {
+      toast.error("Lỗi server: " + (error.message || "Không thể kết nối tới server"));
+    } else if (error.message?.includes('Network')) {
+      toast.error("Lỗi kết nối mạng: Không thể kết nối tới server");
+    } else if (error.message) {
+      toast.error("Lỗi: " + error.message);
+    } else {
+      toast.error("Có lỗi xảy ra khi test setup steps");
     }
-    finally {
-      setActionLoading(false);
+  } finally {
+    setActionLoading(false);
+  }
+}, [lab, labService, toast]);
+
+const handleTerminalDialogClose = useCallback(async () => {
+  if (terminalConfig?.podName && lab?.id) {
+    try {
+      // Optionally call API to stop the test pod
+      await labService.stopTestExecution(lab.id, terminalConfig.podName);
+      toast.success("Test pod đã được dừng");
+    } catch (error) {
+      console.warn("Failed to stop test pod:", error);
+      // Don't show error toast as this is cleanup
     }
-  }, [t, labService]);  // dependencies array : function se duoc tao khi cac thanh phan nay thay doi
+  }
+  
+  setTerminalDialogOpen(false);
+  setTerminalConfig(null);
+}, [terminalConfig, lab, labService, toast]);
+  
     
   
   // Delete setup step handler
@@ -532,6 +621,17 @@ export default function LabDetailPage() {
         }
         loading={actionLoading}
       />
+      {/* Terminal Dialog for live logs */}
+      {terminalConfig && (
+        <TerminalDialog
+          open={terminalDialogOpen}
+          onOpenChange={setTerminalDialogOpen}
+          websocketUrl={terminalConfig.websocketUrl}
+          podName={terminalConfig.podName}
+          labName={terminalConfig.labName}
+          onClose={handleTerminalDialogClose}
+        />
+      )}
     </div>
   );
 }

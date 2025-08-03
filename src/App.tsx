@@ -4,9 +4,9 @@ import { MainLayout } from "./layouts/MainLayout";
 
 import "./i18n"; 
 
-import Lab from "./app/labs/LabPage";
+import Lab from "./app/labs/lab-page";
 import HomePage from "./app/home";
-import LabDetail from "./app/labs/LabDetail";
+import LabDetail from "./app/labs/lab-detail";
 
 function App() {
   return (
