@@ -1,107 +1,151 @@
+// Enhanced LogMessage interface matching backend
+export interface LogMessage {
+  level: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
+  code: string;
+  message: string;
+  timestamp: number;
+  color: string;
+}
+
+// Terminal message interface
 export interface TerminalMessage {
   type: string;
   message: string;
-  data?: any;
+  data?: LogMessage | any; // Can be LogMessage or any other data
   timestamp: number;
 }
-export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
-export type ExecutionStatus = 'running' | 'completed' | 'failed' | 'unknown';
 
+// Connection and execution status types
+export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
+export type ExecutionStatus = 'idle' | 'running' | 'completed' | 'failed';
+
+// Terminal service configuration
+export interface TerminalConfig {
+  websocketUrl: string;
+  autoConnect?: boolean;
+  isPaused?: boolean;
+  reconnectAttempts?: number;
+  reconnectDelay?: number;
+}
+
+// Terminal service class
 export class TerminalService {
   private ws: WebSocket | null = null;
-  private messageHandlers: Set<(message: TerminalMessage) => void> = new Set();
-  private statusHandlers: Set<(status: ConnectionStatus) => void> = new Set();
-  private executionHandlers: Set<(status: ExecutionStatus) => void> = new Set();
+  private config: TerminalConfig;
+  private messageHandlers = new Set<(message: TerminalMessage) => void>();
+  private statusHandlers = new Set<(status: ConnectionStatus) => void>();
+  private executionHandlers = new Set<(status: ExecutionStatus) => void>();
+  private reconnectAttempts = 0;
+  private currentConnectionStatus: ConnectionStatus = 'disconnected';
+  private currentExecutionStatus: ExecutionStatus = 'idle';
 
-  constructor(private websocketUrl: string) {}
+  constructor(config: TerminalConfig) {
+    this.config = {
+      reconnectAttempts: 3,
+      reconnectDelay: 3000,
+      ...config
+    };
+  }
 
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.notifyStatus('connecting');
-      this.addMessage({
-        type: 'system',
-        message: ` Đang kết nối tới WebSocket...`,
-        timestamp: Date.now()
-      });
-
-      // khoi tao websocket va message de hien thi len terminal 
-      // resolve khi ket noi thanh cong
-      // reject neu co loi xay ra
-
-      this.ws = new WebSocket(this.websocketUrl);   // connect den socket server qua socketUrl 
-
-      this.ws.onopen = () => {
-        this.notifyStatus('connected');
-        this.addMessage({
-          type: 'system',
-          message: ` Kết nối WebSocket thành công`,
-          timestamp: Date.now()
-        });
+      if (this.ws?.readyState === WebSocket.OPEN) {
         resolve();
-      };
+        return;
+      }
 
-      this.ws.onmessage = (event) => {
-        this.handleMessage(event);
-      };
+      this.notifyStatus('connecting');
 
-      this.ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
+      try {
+        this.ws = new WebSocket(this.config.websocketUrl);
+
+        this.ws.onopen = () => {
+          console.log('Connected to WebSocket');
+          this.reconnectAttempts = 0;
+          this.notifyStatus('connected');
+          resolve();
+        };
+
+        this.ws.onmessage = (event) => {
+          if (this.config.isPaused) return;
+
+          try {
+            const message: TerminalMessage = JSON.parse(event.data);
+            
+            // Track execution status based on log codes
+            if (message.type === 'log' && message.data && 'code' in message.data) {
+              const logData = message.data as LogMessage;
+              this.updateExecutionStatus(logData.code);
+            }
+            
+            this.notifyMessage(message);
+          } catch (error) {
+            console.error('Error parsing WebSocket message:', error);
+          }
+        };
+
+        this.ws.onclose = (event) => {
+          console.log('WebSocket connection closed:', event.code, event.reason);
+          this.notifyStatus('disconnected');
+          this.ws = null;
+
+          // Auto-reconnect if not a manual close
+          if (event.code !== 1000 && this.reconnectAttempts < (this.config.reconnectAttempts || 3)) {
+            this.attemptReconnect();
+          }
+        };
+
+        this.ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+          this.notifyStatus('error');
+          reject(new Error('WebSocket connection failed'));
+        };
+
+      } catch (error) {
         this.notifyStatus('error');
-        this.addMessage({
-          type: 'error',
-          message: ` Lỗi WebSocket connection`,
-          timestamp: Date.now()
-        });
         reject(error);
-      };
-
-      this.ws.onclose = (event) => {
-        this.notifyStatus('disconnected');
-        const reason = event.reason || 'Kết nối bị đóng';
-        this.addMessage({
-          type: 'system',
-          message: ` WebSocket đã ngắt kết nối: ${reason}`,
-          timestamp: Date.now()
-        });
-      };
+      }
     });
   }
 
-  private handleMessage(event: MessageEvent) {
-    try {
-      const data = JSON.parse(event.data);
-      const message: TerminalMessage = {
-        type: data.type || 'log',
-        message: data.message || '',
-        data: data.data || null,
-        timestamp: data.timestamp || Date.now()
-      };
-
-      this.notifyMessage(message);
-      this.updateExecutionStatus(message);
-
-    } catch (error) {
-      console.error('Error parsing WebSocket message:', error);
-      this.addMessage({
-        type: 'error',
-        message: ` Lỗi parse message: ${event.data}`,
-        timestamp: Date.now()
+  private attemptReconnect() {
+    this.reconnectAttempts++;
+    console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.config.reconnectAttempts})`);
+    
+    setTimeout(() => {
+      this.connect().catch(error => {
+        console.error('Reconnection failed:', error);
       });
+    }, this.config.reconnectDelay);
+  }
+
+  private updateExecutionStatus(logCode: string) {
+    switch (logCode) {
+      case 'SETUP_START':
+        this.notifyExecution('running');
+        break;
+      case 'SETUP_COMPLETE':
+        this.notifyExecution('completed');
+        break;
+      case 'SETUP_PARTIAL':
+      case 'EXECUTION_STOPPED':
+      case 'ALL_ATTEMPTS_FAILED':
+        this.notifyExecution('failed');
+        break;
+      case 'POD_NOT_READY':
+      case 'SYSTEM_ERROR':
+        this.notifyExecution('failed');
+        break;
     }
   }
 
-  private updateExecutionStatus(message: TerminalMessage) {
-    if (message.type === 'success') {
-      this.notifyExecution('completed');
-    } else if (message.type === 'error' && message.message.includes('Stopping execution')) {
-      this.notifyExecution('failed');
-    } else if (message.type === 'start') {
-      this.notifyExecution('running');
+  disconnect() {
+    if (this.ws) {
+      this.ws.close(1000, 'Manual disconnect');
+      this.ws = null;
     }
-  }
-
-  private addMessage(message: TerminalMessage) {
-    this.notifyMessage(message);
+    this.notifyStatus('disconnected');
+    this.notifyExecution('idle');
   }
 
   private notifyMessage(message: TerminalMessage) {
@@ -109,13 +153,16 @@ export class TerminalService {
   }
 
   private notifyStatus(status: ConnectionStatus) {
+    this.currentConnectionStatus = status;
     this.statusHandlers.forEach(handler => handler(status));
   }
 
   private notifyExecution(status: ExecutionStatus) {
+    this.currentExecutionStatus = status;
     this.executionHandlers.forEach(handler => handler(status));
   }
 
+  // Event listeners
   onMessage(handler: (message: TerminalMessage) => void) {
     this.messageHandlers.add(handler);
     return () => this.messageHandlers.delete(handler);
@@ -131,22 +178,37 @@ export class TerminalService {
     return () => this.executionHandlers.delete(handler);
   }
 
-  disconnect() {
-    if (this.ws) {
-      this.ws.close();
-      this.ws = null;
-    }
-  }
-
+  // Getters
   isConnected(): boolean {
     return this.ws?.readyState === WebSocket.OPEN;
   }
+
+  getConnectionStatus(): ConnectionStatus {
+    return this.currentConnectionStatus;
+  }
+
+  getExecutionStatus(): ExecutionStatus {
+    return this.currentExecutionStatus;
+  }
+
+  // Update configuration
+  updateConfig(newConfig: Partial<TerminalConfig>) {
+    this.config = { ...this.config, ...newConfig };
+  }
 }
 
-// Export utility functions
+// Utility function to export logs with enhanced formatting
 export const exportLogs = (messages: TerminalMessage[], podName: string) => {
   const logContent = messages.map(msg => {
     const timestamp = new Date(msg.timestamp).toLocaleString();
+    
+    // Enhanced log formatting
+    if (msg.type === 'log' && msg.data && 'level' in msg.data) {
+      const logData = msg.data as LogMessage;
+      return `[${timestamp}] [${logData.level}] [${logData.code}] ${msg.message}`;
+    }
+    
+    // Fallback formatting
     return `[${timestamp}] [${msg.type.toUpperCase()}] ${msg.message}`;
   }).join('\n');
 
@@ -159,4 +221,24 @@ export const exportLogs = (messages: TerminalMessage[], podName: string) => {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+};
+
+// Helper function to get log level color
+export const getLogLevelColor = (level: string): string => {
+  switch (level) {
+    case 'ERROR': return '#dc3545';
+    case 'SUCCESS': return '#28a745';
+    case 'WARNING': return '#ffc107';
+    case 'INFO': 
+    default: return '#6c757d';
+  }
+};
+
+// Helper function to format log message for display
+export const formatLogMessage = (message: TerminalMessage): string => {
+  if (message.type === 'log' && message.data && 'level' in message.data) {
+    const logData = message.data as LogMessage;
+    return `[${logData.level}] ${message.message}`;
+  }
+  return message.message;
 };
