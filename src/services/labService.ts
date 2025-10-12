@@ -1,180 +1,120 @@
 import { CreateLabRequest, Lab, PaginatedResponse, PaginationParams, UpdateLabRequest } from "@/types/lab";
 import { LabTestResponse, LabTestStatusResponse, StopTestResponse, WebSocketConnectionInfo } from "@/types/labTest";
+import { api } from "@/lib/api";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/labs`
 export const labService = {
-  
-    getLabsPaginated: async (
-    params: PaginationParams & { 
+  /**
+   * Get a paginated list of labs
+   * @param params - Pagination and filter parameters
+   * @returns Promise with paginated lab list
+   */
+  getLabsPaginated: async (
+    params: PaginationParams & {
       isActivate?: Boolean;
-      search?: string; 
+      search?: string;
     }
   ): Promise<PaginatedResponse<Lab>> => {
-    const url = new URL(API_BASE_URL);
-    
-    
-    url.searchParams.append('page', params.page.toString());
-    url.searchParams.append('size', params.size.toString());
-    url.searchParams.append('sortBy', params.sortBy);
-    url.searchParams.append('sortDir', params.sortDir);
-    
-    
+    const queryParams: Record<string, any> = {
+      page: params.page.toString(),
+      size: params.size.toString(),
+      sortBy: params.sortBy,
+      sortDir: params.sortDir,
+    };
+
     if (params.isActivate !== undefined) {
-      url.searchParams.append('isActivate', params.isActivate.toString());
+      queryParams.isActivate = params.isActivate.toString();
     }
-    
-    
+
     if (params.search && params.search.trim()) {
-      url.searchParams.append('search', params.search.trim());
+      queryParams.search = params.search.trim();
     }
-    
-    const response = await fetch(url.toString());
-    if (!response.ok) {
-      throw new Error('Failed to fetch labs');
-    }
-    return response.json();
+
+    return api.get<PaginatedResponse<Lab>>('/labs', queryParams);
   },
 
-  // Create new lab
+  /**
+   * Create new lab
+   * @param lab - Lab creation data
+   * @returns Promise with created lab
+   */
   createLab: async (lab: CreateLabRequest): Promise<Lab> => {
-    const response = await fetch(API_BASE_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(lab),
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to create lab');
-    }
-    return response.json();
+    return api.post<Lab>('/labs', lab);
   },
 
-  // Update lab
+  /**
+   * Update lab
+   * @param id - Lab ID
+   * @param lab - Lab update data
+   * @returns Promise with updated lab
+   */
   updateLab: async (id: string, lab: UpdateLabRequest): Promise<Lab> => {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(lab),
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to update lab');
-    }
-    return response.json();
+    return api.put<Lab>(`/labs/${id}`, lab);
   },
 
-  // Delete lab
+  /**
+   * Delete lab
+   * @param id - Lab ID
+   * @returns Promise with deletion result
+   */
   deleteLab: async (id: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
-      method: 'DELETE',
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to delete lab');
-    }
+    return api.delete<void>(`/labs/${id}`);
   },
 
-  // Toggle lab status
+  /**
+   * Toggle lab status
+   * @param id - Lab ID
+   * @returns Promise with updated lab
+   */
   toggleLabStatus: async (id: string): Promise<Lab> => {
-    const response = await fetch(`${API_BASE_URL}/${id}/toggle-status`, {
-      method: 'PUT',
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to toggle lab status');
-    }
-    const result = await response.json();
+    const result = await api.put<{ lab: Lab }>(`/labs/${id}/toggle-status`);
     return result.lab;
   },
 
-  // Get lab setup steps
-
+  /**
+   * Get lab by ID
+   * @param id - Lab ID
+   * @returns Promise with lab details
+   */
   getLabById: async (id: string): Promise<Lab> => {
-    const response = await fetch(`${API_BASE_URL}/${id}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch lab');
-    }
-    return response.json();
+    return api.get<Lab>(`/labs/${id}`);
   },
- 
-   /**
+
+  /**
    * Khởi tạo test lab với setup steps execution
    * Trả về thông tin WebSocket để connect realtime logs
+   * @param labId - Lab ID
+   * @returns Promise with test response
    */
   testSetupStep: async (labId: string): Promise<LabTestResponse> => {
-    const response = await fetch(`${API_BASE_URL}/test/${labId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Network error' }));
-      throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    return response.json();
+    return api.post<LabTestResponse>(`/labs/test/${labId}`);
   },
 
   /**
    * Lấy trạng thái của pod test
+   * @param labId - Lab ID
+   * @param podName - Pod name
+   * @returns Promise with test status
    */
   getTestStatus: async (labId: string, podName: string): Promise<LabTestStatusResponse> => {
-    const url = new URL(`${API_BASE_URL}/test/${labId}/status`);
-    url.searchParams.append('podName', podName);
-
-    const response = await fetch(url.toString());
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Network error' }));
-      throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    return response.json();
+    return api.get<LabTestStatusResponse>(`/labs/test/${labId}/status`, { podName });
   },
 
   /**
    * Dừng và xóa pod test
+   * @param labId - Lab ID
+   * @param podName - Pod name
+   * @returns Promise with stop response
    */
   stopTestExecution: async (labId: string, podName: string): Promise<StopTestResponse> => {
-    const url = new URL(`${API_BASE_URL}/test/${labId}`);
-    url.searchParams.append('podName', podName);
-
-    const response = await fetch(url.toString(), {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Network error' }));
-      throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    return response.json();
+    return api.delete<StopTestResponse>(`/labs/test/${labId}?podName=${podName}`);
   },
 
   /**
    * Lấy thông tin kết nối WebSocket cho pod cụ thể
+   * @param podName - Pod name
+   * @returns Promise with WebSocket connection info
    */
   getWebSocketInfo: async (podName: string): Promise<WebSocketConnectionInfo> => {
-    const url = new URL(`${API_BASE_URL}/test/websocket-info`);
-    url.searchParams.append('podName', podName);
-
-    const response = await fetch(url.toString());
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Network error' }));
-      throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    return response.json();
+    return api.get<WebSocketConnectionInfo>('/labs/test/websocket-info', { podName });
   },
 };

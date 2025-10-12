@@ -42,6 +42,13 @@ export function LabFilterBar({
     setSearchValue(filters.search);
   }, [filters.search]);
 
+  // Auto-fetch when search is cleared
+  useEffect(() => {
+    if (searchValue === "" && filters.search !== "") {
+      onFiltersChange({ ...filters, search: "" });
+    }
+  }, [searchValue, filters, onFiltersChange]);
+
   const handleSearchInputChange = (value: string) => {
     setSearchValue(value);
   };

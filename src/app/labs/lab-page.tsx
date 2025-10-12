@@ -1,38 +1,42 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import { LabHeader } from "@/components/labs/index/lab-header";
-import { LabFilterBar, LabFilters } from "@/components/labs/index/lab-filter-bar";
+import { LabFilterBar } from "@/components/labs/index/lab-filter-bar";
 import { LabCard } from "@/components/labs/index/lab-card";
 import { LabEmptyState } from "@/components/labs/index/lab-empty-state";
 import { LabFormDialog } from "@/components/labs/index/lab-form-dialog";
 import { LabDeleteDialog } from "@/components/labs/index/lab-delete-dialog";
 import { Pagination } from "@/components/ui/pagination";
 
-import { Lab, CreateLabRequest, UpdateLabRequest, PaginatedResponse } from "@/types/lab";
-import { labService } from "@/services/labService";
+import { Lab, CreateLabRequest, UpdateLabRequest } from "@/types/lab";
+import { useLabPage } from "@/hooks/labs/use-lab-page";
 
 export default function LabPage() {
   const { t } = useTranslation('common');
 
-  const [labs, setLabs] = useState<Lab[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
+  // Use the custom hook for lab page logic
+  const {
+    labs,
+    loading,
+    actionLoading,
+    currentPage,
+    pageSize,
+    totalPages,
+    totalItems,
+    filters,
+    createLab,
+    updateLab,
+    deleteLab,
+    toggleLabStatus,
+    handleFiltersChange,
+    handlePageChange,
+    refresh,
+  } = useLabPage();
 
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(12);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
-
-  const [filters, setFilters] = useState<LabFilters>({
-    search: "",
-    status: undefined,
-    sortBy: "newest",
-  });
-
+  // Local UI state for dialogs
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editingLab, setEditingLab] = useState<Lab | null>(null);
@@ -48,167 +52,66 @@ export default function LabPage() {
     };
   }, []);
 
-  // Map sort options to API fields
-  const mapSortByToApi = (sortBy: string): string => {
-    switch (sortBy) {
-      case 'newest':
-      case 'oldest':
-        return 'createdAt';
-      case 'name':
-        return 'name';
-      default:
-        return 'createdAt';
-    }
-  };
-
-  
-  const loadLabs = useCallback(async (page = currentPage, customFilters = filters) => {
-    try {
-      setLoading(true);
-      
-      console.log("Loading labs with filters:", customFilters, "Page:", page);
-      
-      const sortBy = mapSortByToApi(customFilters.sortBy);
-      const sortDir = customFilters.sortBy === 'oldest' ? 'asc' : 'desc';
-      const isActivate = customFilters.status === undefined ? undefined : customFilters.status;
-      const search = customFilters.search.trim() || undefined;
-
-      
-      const response: PaginatedResponse<Lab> = await labService.getLabsPaginated({
-        page,
-        size: pageSize,
-        sortBy,
-        sortDir,
-        isActivate,
-        search, 
-      });
-
-      
-      setLabs(response.data);
-      setCurrentPage(response.currentPage);
-      setTotalPages(response.totalPages);
-      setTotalItems(response.totalItems);
-
-    } catch (error) {
-      console.error('Error loading labs:', error);
-      toast.error(t('labs.loadError'));
-      setLabs([]);
-      setTotalPages(0);
-      setTotalItems(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [pageSize, t]);
-
-  // Initial load
-  useEffect(() => {
-    loadLabs();
+  const handlePageSizeChange = useCallback((_size: number) => {
+    console.log('Page size change not implemented, keeping default 12');
   }, []);
 
-  const handleFiltersChange = useCallback((newFilters: LabFilters) => {
-    setFilters(newFilters);
-    console.log("Filters changed:", newFilters);
-    setCurrentPage(0); 
-    loadLabs(0, newFilters);
-  }, [loadLabs]);
-
-  // Handle page change
-  const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page);
-    loadLabs(page, filters);
-  }, [loadLabs, filters]);
-
-  const handlePageSizeChange = useCallback((size: number) => {
-    console.log('Page size change not implemented, keeping default 10');
-  }, []);
-
-  // Lab CRUD operations
+  // Lab CRUD operations with toast notifications
   const handleCreateLab = async (data: CreateLabRequest) => {
-    try {
-      setActionLoading(true);
-      const newLab = await labService.createLab(data);
-      
-      toast.success(t('labs.createSuccess', { name: newLab.name }));
-      handleFormDialogClose(() => setFormDialogOpen(false));
-      
-      // Reload current page
-      await loadLabs(currentPage, filters);
-    } catch (error: any) {
-      console.error('Error creating lab:', error);
-      toast.error(error.message || t('labs.createError'));
-    } finally {
-      setActionLoading(false);
-    }
+    await createLab(
+      data,
+      (newLab) => {
+        toast.success(t('labs.createSuccess', { name: newLab.name }));
+        handleFormDialogClose(() => setFormDialogOpen(false));
+      },
+      (error) => {
+        toast.error(error.message || t('labs.createError'));
+      }
+    );
   };
 
   const handleUpdateLab = async (data: UpdateLabRequest) => {
     if (!editingLab) return;
 
-    try {
-      setActionLoading(true);
-      const updatedLab = await labService.updateLab(editingLab.id, data);
-      
-      toast.success(t('labs.updateSuccess', { name: updatedLab.name }));
-      handleFormDialogClose(() => setFormDialogOpen(false));
-      
-      // Update labs list
-      setLabs(prevLabs => 
-        prevLabs.map(lab => lab.id === updatedLab.id ? updatedLab : lab)
-      );
-    } catch (error: any) {
-      console.error('Error updating lab:', error);
-      toast.error(error.message || t('labs.updateError'));
-    } finally {
-      setActionLoading(false);
-    }
+    await updateLab(
+      editingLab.id,
+      data,
+      (updatedLab) => {
+        toast.success(t('labs.updateSuccess', { name: updatedLab.name }));
+        handleFormDialogClose(() => setFormDialogOpen(false));
+      },
+      (error) => {
+        toast.error(error.message || t('labs.updateError'));
+      }
+    );
   };
 
   const handleDeleteLab = async () => {
     if (!deletingLab) return;
 
-    try {
-      setActionLoading(true);
-      await labService.deleteLab(deletingLab.id);
-      
-      toast.success(t('labs.deleteSuccess', { name: deletingLab.name }));
-      handleDeleteDialogClose(() => setDeleteDialogOpen(false));
-      
-      
-      const newTotalItems = totalItems - 1;
-      const newTotalPages = Math.ceil(newTotalItems / pageSize);
-      const shouldGoToPreviousPage = currentPage >= newTotalPages && currentPage > 0;
-      
-      if (shouldGoToPreviousPage) {
-        handlePageChange(currentPage - 1);
-      } else {
-        await loadLabs(currentPage, filters);
+    await deleteLab(
+      deletingLab.id,
+      () => {
+        toast.success(t('labs.deleteSuccess', { name: deletingLab.name }));
+        handleDeleteDialogClose(() => setDeleteDialogOpen(false));
+      },
+      (error) => {
+        toast.error(error.message || t('labs.deleteError'));
       }
-    } catch (error: any) {
-      console.error('Error deleting lab:', error);
-      toast.error(error.message || t('labs.deleteError'));
-    } finally {
-      setActionLoading(false);
-    }
+    );
   };
 
   const handleToggleStatus = async (lab: Lab) => {
-    try {
-      setActionLoading(true);
-      const updatedLab = await labService.toggleLabStatus(lab.id);
-      
-      const status = updatedLab.isActive ? t('labs.activated') : t('labs.deactivated');
-      toast.success(t('labs.toggleStatusSuccess', { name: updatedLab.name, status }));
-      
-      // Update labs list
-      setLabs(prevLabs => 
-        prevLabs.map(l => l.id === updatedLab.id ? updatedLab : l)
-      );
-    } catch (error: any) {
-      console.error('Error toggling lab status:', error);
-      toast.error(error.message || t('labs.toggleStatusError'));
-    } finally {
-      setActionLoading(false);
-    }
+    await toggleLabStatus(
+      lab,
+      (updatedLab) => {
+        const status = updatedLab.isActive ? t('labs.activated') : t('labs.deactivated');
+        toast.success(t('labs.toggleStatusSuccess', { name: updatedLab.name, status }));
+      },
+      (error) => {
+        toast.error(error.message || t('labs.toggleStatusError'));
+      }
+    );
   };
 
   // Enhanced dialog handlers
@@ -250,7 +153,7 @@ export default function LabPage() {
   };
 
   const handleRefresh = () => {
-    loadLabs(currentPage, filters);
+    refresh();
     toast.success(t('labs.refreshSuccess'));
   };
 
