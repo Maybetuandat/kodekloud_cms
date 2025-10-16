@@ -1,12 +1,5 @@
 import * as React from "react";
-import {
-  HelpCircleIcon,
-  Boxes,
-  
-  LayoutDashboardIcon,
-  
-  Home,
-} from "lucide-react";
+import { HelpCircleIcon, Boxes, LayoutDashboardIcon, Home } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -44,8 +37,6 @@ export function AppSidebar({
         icon: LayoutDashboardIcon,
         isActive: location.pathname === "/labs",
       },
-      
-    
     ],
     navSecondary: [
       {
@@ -58,7 +49,7 @@ export function AppSidebar({
 
   return (
     <Sidebar
-      collapsible="offcanvas"
+      collapsible="icon"
       variant={variant}
       {...props}
       className="border-sidebar-border bg-sidebar"
@@ -68,12 +59,13 @@ export function AppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
+              tooltip="Devops Infra"
               className="data-[slot=sidebar-menu-button]:!p-1.5 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             >
               <Link to="/">
                 <Boxes className="h-5 w-5 text-sidebar-primary" />
                 <span className="text-base font-semibold text-sidebar-foreground">
-                  TEST
+                  Devops Infra
                 </span>
               </Link>
             </SidebarMenuButton>
