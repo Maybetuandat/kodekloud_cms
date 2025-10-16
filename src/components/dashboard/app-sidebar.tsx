@@ -32,10 +32,10 @@ export function AppSidebar({
         isActive: location.pathname === "/" || location.pathname === "/home",
       },
       {
-        title: t("navigation.labs"),
-        url: "/labs",
+        title: t("navigation.courses"),
+        url: "/courses",
         icon: LayoutDashboardIcon,
-        isActive: location.pathname === "/labs",
+        isActive: location.pathname === "/courses",
       },
     ],
     navSecondary: [

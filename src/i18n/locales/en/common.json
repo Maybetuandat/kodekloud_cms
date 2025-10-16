@@ -2,7 +2,8 @@
   "navigation": {
     "home": "Home",
     "labs": "Labs",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "courses": "Courses"
   },
   "common": {
     "search": "Search",
@@ -20,7 +21,7 @@
     "close": "Close",
     "update": "Update"
   },
-   "settings": {
+  "settings": {
     "title": "Settings",
     "description": "Customize your application appearance and language",
     "appearance": {
@@ -53,10 +54,10 @@
     "openSettings": "Open settings",
     "customizePreferences": "Customize your preferences"
   },
-   "sidebar": {
+  "sidebar": {
     "account": "Account",
     "settings": "Settings",
-  
+
     "logout": "Logout",
     "light": "Light",
     "dark": "Dark",
@@ -150,7 +151,7 @@
     "noLabsFoundDescription": "No labs match the current filters. Try adjusting your search criteria or clearing the filters.",
     "noLabsYet": "No labs yet",
     "noLabsYetDescription": "Start by creating your first lab template. Labs help set up practice environments with automated configuration steps.",
-     "createLab": "Create New Lab",
+    "createLab": "Create New Lab",
     "editLab": "Edit Lab",
     "createLabDescription": "Create a new lab template for the system.",
     "editLabDescription": "Update your lab information.",
@@ -175,27 +176,27 @@
   },
   "setupSteps": {
     "editTitle": "Edit Setup Step",
-    "createTitle": "Create New Setup Step", 
+    "createTitle": "Create New Setup Step",
     "editDescription": "Update setup step information.",
     "createDescription": "Add a new setup step for the lab.",
     "createButton": "Create Setup Step",
-    
+
     "fields": {
       "title": "Title",
-      "description": "Description", 
+      "description": "Description",
       "setupCommand": "Setup Command",
       "expectedExitCode": "Expected Exit Code",
       "retryCount": "Retry Count",
       "timeout": "Timeout (seconds)",
       "continueOnFailure": "Continue on Failure"
     },
-    
+
     "placeholders": {
       "title": "e.g: Install Docker",
       "description": "Detailed description of this setup step...",
       "setupCommand": "sudo apt-get update && sudo apt-get install -y docker.io"
     },
-    
+
     "hints": {
       "description": "Brief description of this step's functionality.",
       "setupCommand": "Command to be executed for lab environment setup.",
@@ -204,12 +205,12 @@
       "timeout": "Maximum wait time (1-3600 seconds).",
       "continueOnFailure": "Allow subsequent steps to run even if this step fails."
     },
-    
+
     "sections": {
       "commandConfig": "Command Configuration",
       "executionConfig": "Execution Configuration"
     },
-    
+
     "validation": {
       "titleRequired": "Title is required",
       "commandRequired": "Setup command is required"
@@ -217,14 +218,14 @@
     "badges": {
       "exitCode": "Exit",
       "retry": "Retry",
-      "seconds": "s", 
+      "seconds": "s",
       "continueOnFailure": "Continue on failure"
     },
-    
+
     "tooltips": {
       "expectedExitCode": "Expected exit code",
       "retryCount": "Number of retry attempts on failure",
-      "timeout": "Timeout duration", 
+      "timeout": "Timeout duration",
       "continueOnFailure": "Continue execution when this step fails"
     }
   }
