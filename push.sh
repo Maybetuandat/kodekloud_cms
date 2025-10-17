@@ -1,3 +1,3 @@
 git add .
-git commit -m "update init logic for lab page - structure of this project"
+git commit -m "update ui for course page "
 git push origin main

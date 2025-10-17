@@ -1,139 +1,127 @@
-import React from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
+import { FC } from "react";
+import { CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Search, Filter, X } from "lucide-react";
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectContent,
+  SelectItem,
 } from "@/components/ui/select";
 
-interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
-  totalItems: number;
-  pageSize: number;
-  onPageChange: (page: number) => void;
-  onPageSizeChange: (size: number) => void;
-  loading?: boolean;
+interface FilterOption {
+  value: string;
+  label: string;
 }
 
-export function Pagination({
-  currentPage,
-  totalPages,
-  totalItems,
-  pageSize,
-  onPageChange,
-  onPageSizeChange,
-  loading = false,
-}: PaginationProps) {
-  const canGoPrevious = currentPage > 0;
-  const canGoNext = currentPage < totalPages - 1;
+interface DropdownFilter {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  options: FilterOption[];
+  widthClass?: string;
+}
 
-  // Generate page numbers to show
-  const getVisiblePages = () => {
-    const delta = 2;
-    const range = [];
-    const rangeWithDots = [];
+interface FilterBarProps {
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  onSearchSubmit?: () => void;
+  onSearchClear?: () => void;
+  filters?: DropdownFilter[];
+  placeholder?: string;
+}
 
-    for (
-      let i = Math.max(0, currentPage - delta);
-      i <= Math.min(totalPages - 1, currentPage + delta);
-      i++
-    ) {
-      range.push(i);
+const FilterBar: FC<FilterBarProps> = ({
+  searchTerm,
+  onSearchChange,
+  onSearchSubmit,
+  onSearchClear,
+  filters,
+  placeholder,
+}) => {
+  const handleClear = () => {
+    if (onSearchClear) {
+      onSearchClear();
+    } else {
+      onSearchChange("");
     }
-
-    if (range[0] > 0) {
-      if (range[0] > 1) {
-        rangeWithDots.push(0, "...");
-      } else {
-        rangeWithDots.push(0);
-      }
-    }
-
-    rangeWithDots.push(...range);
-
-    if (range[range.length - 1] < totalPages - 1) {
-      if (range[range.length - 1] < totalPages - 2) {
-        rangeWithDots.push("...", totalPages - 1);
-      } else {
-        rangeWithDots.push(totalPages - 1);
-      }
-    }
-
-    return rangeWithDots;
   };
 
-  if (totalPages <= 1) {
-    return null;
-  }
-  return (
-    <div className="flex items-center justify-center px-2 py-4">
-      <div className="flex items-center space-x-1">
-        <Button
-          variant="outline"
-          className="h-8 w-8 p-0"
-          onClick={() => onPageChange(0)}
-          disabled={!canGoPrevious || loading}
-        >
-          <span className="sr-only">Trang đầu</span>
-          <ChevronsLeft className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          className="h-8 w-8 p-0"
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={!canGoPrevious || loading}
-        >
-          <span className="sr-only">Trang trước</span>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && onSearchSubmit) {
+      onSearchSubmit();
+    }
+  };
 
-        {getVisiblePages().map((page, idx) => (
-          <React.Fragment key={idx}>
-            {page === "..." ? (
-              <span className="flex h-8 w-8 items-center justify-center text-sm">
-                ...
-              </span>
-            ) : (
+  return (
+    <div className="w-full">
+      <div className="flex flex-col lg:flex-row gap-4 w-full">
+        <div className="flex-1 lg:flex-[2]">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              placeholder={placeholder}
+              value={searchTerm}
+              onChange={(e) => {
+                const val = e.target.value;
+                onSearchChange(val);
+                if (val === "" && onSearchClear) {
+                  onSearchClear();
+                }
+              }}
+              onKeyDown={handleKeyDown}
+              className="pl-12 pr-12 py-3 text-base border-2 border-gray-200 hover:border-gray-300 focus:border-blue-500 transition-colors duration-200 rounded-lg shadow-sm"
+            />
+            {searchTerm && (
               <Button
-                variant={page === currentPage ? "default" : "outline"}
-                className="h-8 w-8 p-0"
-                onClick={() => onPageChange(page as number)}
-                disabled={loading}
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleClear}
+                className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 p-0 hover:bg-gray-100 rounded-full"
               >
-                {(page as number) + 1}
+                <X className="h-4 w-4 text-gray-400 hover:text-gray-600" />
               </Button>
             )}
-          </React.Fragment>
-        ))}
+          </div>
+        </div>
 
-        <Button
-          variant="outline"
-          className="h-8 w-8 p-0"
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={!canGoNext || loading}
-        >
-          <span className="sr-only">Trang sau</span>
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="outline"
-          className="h-8 w-8 p-0"
-          onClick={() => onPageChange(totalPages - 1)}
-          disabled={!canGoNext || loading}
-        >
-          <span className="sr-only">Trang cuối</span>
-          <ChevronsRight className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-3 lg:flex-shrink-0">
+          {(filters?.length ?? 0) > 0 && (
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <Filter className="h-4 w-4" />
+            </div>
+          )}
+          <div className="flex gap-2 flex-wrap sm:flex-nowrap">
+            {(filters ?? []).map((filter, idx) => (
+              <Select
+                key={idx}
+                value={filter.value}
+                onValueChange={filter.onChange}
+              >
+                <SelectTrigger
+                  className={`${
+                    filter.widthClass || "w-36"
+                  } border-2 border-gray-200 hover:border-gray-300 focus:border-blue-500 transition-colors duration-200`}
+                >
+                  <SelectValue placeholder={filter.placeholder} />
+                </SelectTrigger>
+                <SelectContent>
+                  {filter.options.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default FilterBar;

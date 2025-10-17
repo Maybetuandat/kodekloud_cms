@@ -1,6 +1,3 @@
-// src/layouts/MainLayout.tsx
-import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import { SiteHeader } from "@/components/dashboard/site-header";
 import {
   SidebarInset,
   SidebarProvider,
@@ -8,6 +5,8 @@ import {
 } from "@/components/ui/sidebar";
 import { useLocation } from "react-router-dom";
 import { useEffect, useRef } from "react";
+import { AppSidebar } from "@/components/side-bar/app-sidebar";
+import { SiteHeader } from "@/components/side-bar/site-header";
 
 // Component con để điều khiển sidebar
 function SidebarController({ children }: { children: React.ReactNode }) {

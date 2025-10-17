@@ -7,7 +7,7 @@ import "./i18n";
 import Lab from "./app/labs/lab-page";
 import HomePage from "./app/home";
 import LabDetail from "./app/labs/lab-detail";
-import CoursePage from "./app/courses/CoursePage";
+import CoursePage from "./app/courses/course-page";
 
 function App() {
   return (
