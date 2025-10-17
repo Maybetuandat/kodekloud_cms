@@ -22,6 +22,7 @@ export default function CoursePage() {
   const { t } = useTranslation("common");
   const navigate = useNavigate();
 
+  // THAY ĐỔI 1: Lấy các hàm setter mới từ hook
   const {
     courses,
     loading,
@@ -32,38 +33,37 @@ export default function CoursePage() {
     totalPages,
     totalItems,
     filters,
-    handleFiltersChange,
-    handlePageChange,
-    handlePageSizeChange, // Lấy hàm mới từ hook
+    setFilters, // <- Đổi từ handleFiltersChange
+    setCurrentPage, // <- Đổi từ handlePageChange
+    setPageSize, // <- Đổi từ handlePageSizeChange
     refresh,
   } = useCoursePage();
 
   // State cục bộ cho thanh tìm kiếm để không gọi API mỗi lần gõ phím
   const [localSearchTerm, setLocalSearchTerm] = useState(filters.search);
 
-  // Đồng bộ state cục bộ nếu filter từ hook thay đổi
+  // Đồng bộ state cục bộ nếu filter từ hook thay đổi (không cần thay đổi)
   useEffect(() => {
     setLocalSearchTerm(filters.search);
   }, [filters.search]);
 
-  // Các hàm "adapter" để kết nối FilterBar với hook
+  // THAY ĐỔI 2: Cập nhật các hàm "adapter" để dùng `setFilters`
   const handleSearchSubmit = () => {
-    handleFiltersChange({ ...filters, search: localSearchTerm });
+    setFilters({ search: localSearchTerm });
   };
 
   const handleSearchClear = () => {
     setLocalSearchTerm("");
-    handleFiltersChange({ ...filters, search: "" });
+    setFilters({ search: "" });
   };
 
   const handleStatusChange = (value: string) => {
-    handleFiltersChange({
-      ...filters,
+    setFilters({
       isActive: value === "all" ? undefined : value === "active",
     });
   };
 
-  // Các handler khác của trang
+  // Các handler khác của trang (không cần thay đổi)
   const handleViewCourse = (course: Course) => {
     navigate(`/courses/${course.id}`);
   };
@@ -96,7 +96,7 @@ export default function CoursePage() {
 
   return (
     <div className="min-h-screen w-full px-6 py-6 space-y-6 mb-10">
-      {/* Header */}
+      {/* Header (không thay đổi) */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-primary/10 rounded-lg">
@@ -133,7 +133,7 @@ export default function CoursePage() {
         </div>
       </div>
 
-      {/* Filter Bar */}
+      {/* Filter Bar (không thay đổi) */}
       <div className="p-4 border rounded-lg bg-card">
         <FilterBar
           placeholder="Search courses by title..."
@@ -162,7 +162,7 @@ export default function CoursePage() {
         />
       </div>
 
-      {/* Content */}
+      {/* Content (không thay đổi phần logic) */}
       {loading && courses.length === 0 ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -198,18 +198,18 @@ export default function CoursePage() {
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalElements={totalItems}
-              pageSize={pageSize}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
-              loading={loading}
-              showPageSizeSelector={true}
-            />
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalElements={totalItems}
+            pageSize={pageSize}
+            loading={loading}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={setPageSize}
+            showInfo={true}
+            showPageSizeSelector={true}
+            pageSizeOptions={[5, 10, 20, 50]}
+          />
         </>
       )}
     </div>

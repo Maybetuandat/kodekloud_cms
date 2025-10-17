@@ -9,10 +9,9 @@ import {
 export interface CourseFilters {
   search: string;
   isActive?: boolean;
-  sortBy: "newest" | "oldest";
+  sortBy: "newest" | "oldest"; // Giữ lại sortBy nếu bạn có ý định dùng trong tương lai
 }
 
-// 1. Update the interface
 interface UseCoursePage {
   courses: Course[];
   loading: boolean;
@@ -43,9 +42,10 @@ interface UseCoursePage {
     onSuccess?: (course: Course) => void,
     onError?: (error: Error) => void
   ) => Promise<void>;
-  handleFiltersChange: (newFilters: CourseFilters) => void;
-  handlePageChange: (page: number) => void;
-  handlePageSizeChange: (size: number) => void; // Add this line
+  // Các hàm handle chỉ cần set state, useEffect sẽ lo việc gọi API
+  setFilters: (newFilters: Partial<CourseFilters>) => void;
+  setCurrentPage: (page: number) => void;
+  setPageSize: (size: number) => void;
   refresh: () => void;
 }
 
@@ -53,63 +53,76 @@ export const useCoursePage = (): UseCoursePage => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1); // Use 1-based indexing for UI
-  const [pageSize, setPageSize] = useState(12); // 2. Make pageSize a state variable
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSizeState] = useState(12);
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
-  const [filters, setFilters] = useState<CourseFilters>({
+  const [filters, setFiltersState] = useState<CourseFilters>({
     search: "",
     isActive: undefined,
     sortBy: "newest",
   });
 
-  const loadCourses = useCallback(
-    async (page: number, size: number, customFilters: CourseFilters) => {
-      try {
-        setLoading(true);
-        // API often uses 0-based page index, so we subtract 1
-        const response = await courseService.getCoursesPaginated({
-          page: page - 1,
-          size: size,
-          search: customFilters.search || undefined,
-          isActive: customFilters.isActive,
-        });
+  // **THAY ĐỔI 1: TÁCH HÀM GỌI API RA ĐỘC LẬP**
+  // Hàm này chỉ có nhiệm vụ gọi API và cập nhật state, không phụ thuộc vào state bên ngoài.
+  const fetchCourses = useCallback(async () => {
+    setLoading(true);
+    try {
+      // Lấy state mới nhất ngay trước khi gọi API
+      // API dùng page index từ 0, UI dùng từ 1
+      const response = await courseService.getCoursesPaginated({
+        page: currentPage - 1,
+        pageSize: pageSize,
+        search: filters.search || undefined,
+        isActive: filters.isActive,
+      });
 
-        setCourses(response.data);
-        setTotalPages(response.totalPages);
-        setTotalItems(response.totalItems);
-        // API returns 0-based, so add 1 for the UI state
-        setCurrentPage(response.currentPage + 1);
-      } catch (error) {
-        console.error("Failed to load courses:", error);
-        // Handle error state if necessary
-      } finally {
-        setLoading(false);
-      }
-    },
-    [] // Dependencies are passed as arguments, so this is stable
-  );
+      setCourses(response.data);
+      setTotalPages(response.totalPages);
+      setTotalItems(response.totalItems);
+    } catch (error) {
+      console.error("Failed to load courses:", error);
+      // Có thể thêm logic xử lý lỗi ở đây, ví dụ: setCourses([])
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPage, pageSize, filters]); // Phụ thuộc vào các state quyết định việc fetch
 
+  // **THAY ĐỔI 2: DÙNG useEffect LÀM NGUỒN KÍCH HOẠT DUY NHẤT**
+  // Bất cứ khi nào currentPage, pageSize, hoặc filters thay đổi, useEffect này sẽ chạy lại
+  // và gọi hàm fetchCourses để lấy dữ liệu mới nhất.
   useEffect(() => {
-    // 3. Re-fetch data when filters or pageSize change
-    loadCourses(1, pageSize, filters); // Always fetch the first page
-  }, [filters, pageSize, loadCourses]);
+    fetchCourses();
+  }, [fetchCourses]); // fetchCourses đã có dependencies của nó, nên đây là cách clean nhất
+
+  const performActionAndRefresh = async (
+    action: () => Promise<any>,
+    onSuccessCallback: (result?: any) => void,
+    onErrorCallback?: (error: Error) => void
+  ) => {
+    setActionLoading(true);
+    try {
+      const result = await action();
+      onSuccessCallback(result);
+      // Tải lại trang hiện tại sau khi thực hiện hành động thành công
+      await fetchCourses();
+    } catch (error) {
+      onErrorCallback?.(error as Error);
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   const createCourse = async (
     data: CreateCourseRequest,
     onSuccess?: (course: Course) => void,
     onError?: (error: Error) => void
   ) => {
-    try {
-      setActionLoading(true);
-      const newCourse = await courseService.createCourse(data);
-      onSuccess?.(newCourse);
-      loadCourses(currentPage, pageSize, filters); // Refresh current page
-    } catch (error) {
-      onError?.(error as Error);
-    } finally {
-      setActionLoading(false);
-    }
+    await performActionAndRefresh(
+      () => courseService.createCourse(data),
+      (newCourse) => onSuccess?.(newCourse),
+      onError
+    );
   };
 
   const updateCourse = async (
@@ -118,16 +131,11 @@ export const useCoursePage = (): UseCoursePage => {
     onSuccess?: (course: Course) => void,
     onError?: (error: Error) => void
   ) => {
-    try {
-      setActionLoading(true);
-      const updatedCourse = await courseService.updateCourse(id, data);
-      onSuccess?.(updatedCourse);
-      loadCourses(currentPage, pageSize, filters); // Refresh current page
-    } catch (error) {
-      onError?.(error as Error);
-    } finally {
-      setActionLoading(false);
-    }
+    await performActionAndRefresh(
+      () => courseService.updateCourse(id, data),
+      (updatedCourse) => onSuccess?.(updatedCourse),
+      onError
+    );
   };
 
   const deleteCourse = async (
@@ -135,16 +143,11 @@ export const useCoursePage = (): UseCoursePage => {
     onSuccess?: () => void,
     onError?: (error: Error) => void
   ) => {
-    try {
-      setActionLoading(true);
-      await courseService.deleteCourse(id);
-      onSuccess?.();
-      loadCourses(currentPage, pageSize, filters); // Refresh current page
-    } catch (error) {
-      onError?.(error as Error);
-    } finally {
-      setActionLoading(false);
-    }
+    await performActionAndRefresh(
+      () => courseService.deleteCourse(id),
+      () => onSuccess?.(),
+      onError
+    );
   };
 
   const toggleCourseStatus = async (
@@ -152,39 +155,28 @@ export const useCoursePage = (): UseCoursePage => {
     onSuccess?: (course: Course) => void,
     onError?: (error: Error) => void
   ) => {
-    try {
-      setActionLoading(true);
-      const updatedCourse = await courseService.toggleCourseStatus(course.id);
-      onSuccess?.(updatedCourse);
-      loadCourses(currentPage, pageSize, filters); // Refresh current page
-    } catch (error) {
-      onError?.(error as Error);
-    } finally {
-      setActionLoading(false);
-    }
+    await performActionAndRefresh(
+      () => courseService.toggleCourseStatus(course.id),
+      (updatedCourse) => onSuccess?.(updatedCourse),
+      onError
+    );
   };
 
-  const handleFiltersChange = (newFilters: CourseFilters) => {
-    setFilters(newFilters);
-    setCurrentPage(1); // Reset to first page on filter change
+  // **THAY ĐỔI 3: ĐƠN GIẢN HÓA CÁC HÀM HANDLER**
+  // Các hàm này chỉ cần cập nhật state. useEffect sẽ tự động xử lý việc gọi lại API.
+
+  const setFilters = (newFilterValues: Partial<CourseFilters>) => {
+    // Khi filter thay đổi, luôn quay về trang 1
+    setFiltersState((prevFilters) => ({ ...prevFilters, ...newFilterValues }));
+    setCurrentPage(1);
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    loadCourses(page, pageSize, filters);
+  const setPageSize = (newSize: number) => {
+    // Khi kích thước trang thay đổi, luôn quay về trang 1
+    setPageSizeState(newSize);
+    setCurrentPage(1);
   };
 
-  // 4. Implement the new handler function
-  const handlePageSizeChange = (newSize: number) => {
-    setPageSize(newSize);
-    setCurrentPage(1); // Reset to first page when size changes
-  };
-
-  const refresh = () => {
-    loadCourses(currentPage, pageSize, filters);
-  };
-
-  // 5. Return the new handler
   return {
     courses,
     loading,
@@ -198,9 +190,9 @@ export const useCoursePage = (): UseCoursePage => {
     updateCourse,
     deleteCourse,
     toggleCourseStatus,
-    handleFiltersChange,
-    handlePageChange,
-    handlePageSizeChange, // Add to return object
-    refresh,
+    setFilters,
+    setCurrentPage,
+    setPageSize,
+    refresh: fetchCourses, // Hàm refresh chính là hàm fetchCourses
   };
 };
