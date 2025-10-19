@@ -8,6 +8,9 @@ import Lab from "./app/labs/lab-page";
 import HomePage from "./app/home";
 import LabDetail from "./app/labs/lab-detail";
 import CoursePage from "./app/courses/course-page";
+import NewCoursePage from "./app/courses/new-course-page";
+import LabPage from "./app/labs/lab-page";
+import CategoryPage from "./app/category/category-page";
 
 function App() {
   return (
@@ -37,6 +40,30 @@ function App() {
           element={
             <MainLayout>
               <CoursePage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/labs"
+          element={
+            <MainLayout>
+              <LabPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/courses/new"
+          element={
+            <MainLayout>
+              <NewCoursePage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/category"
+          element={
+            <MainLayout>
+              <CategoryPage />
             </MainLayout>
           }
         />

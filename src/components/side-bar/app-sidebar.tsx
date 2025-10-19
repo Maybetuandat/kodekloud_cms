@@ -1,5 +1,11 @@
 import * as React from "react";
-import { HelpCircleIcon, Boxes, LayoutDashboardIcon, Home } from "lucide-react";
+import {
+  HelpCircleIcon,
+  Boxes,
+  LayoutDashboardIcon,
+  Home,
+  Tags,
+} from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -36,6 +42,12 @@ export function AppSidebar({
         url: "/courses",
         icon: LayoutDashboardIcon,
         isActive: location.pathname === "/courses",
+      },
+      {
+        title: t("navigation.category"),
+        url: "/category",
+        icon: Tags,
+        isActive: location.pathname === "/category",
       },
     ],
     navSecondary: [

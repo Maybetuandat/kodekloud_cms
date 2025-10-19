@@ -3,7 +3,8 @@
     "home": "Home",
     "labs": "Labs",
     "feedback": "Feedback",
-    "courses": "Courses"
+    "courses": "Courses",
+    "category": " Category"
   },
   "common": {
     "search": "Search",

@@ -1,0 +1,45 @@
+{
+  "courses": {
+    "createTitle": "Create New Course",
+    "createDescription": "Fill in the information below to create a new course",
+    "editTitle": "Edit Course",
+    "editDescription": "Update the course information",
+    "createSuccess": "Course '{{name}}' created successfully!",
+    "createError": "Failed to create course",
+    "updateSuccess": "Course '{{name}}' updated successfully!",
+    "updateError": "Failed to update course",
+    "form": {
+      "basicInfo": "Basic Information",
+      "basicInfoDescription": "Enter the essential details about your course",
+      "title": "Title",
+      "titlePlaceholder": "Enter course title",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter detailed course description",
+      "descriptionHint": "Provide a comprehensive overview of what students will learn",
+      "shortDescription": "Short Description",
+      "shortDescriptionPlaceholder": "Brief overview of the course",
+      "shortDescriptionHint": "This will be displayed in course cards (keep it brief)",
+      "level": "Level",
+      "levelPlaceholder": "Select difficulty level",
+      "levelHint": "Choose the appropriate difficulty level for this course",
+      "duration": "Duration (minutes)",
+      "durationHint": "Estimated time to complete the course",
+      "active": "Active Status",
+      "activeHint": "Make this course visible and available to students"
+    },
+    "validation": {
+      "titleRequired": "Course title is required",
+      "durationMin": "Duration must be at least 1 minute",
+      "durationMax": "Duration cannot exceed 10000 minutes"
+    }
+  },
+  "common": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit"
+  }
+}

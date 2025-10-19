@@ -4,10 +4,9 @@ import { initReactI18next } from "react-i18next";
 // Import translation files
 import viCommon from "./locales/vi/common.json";
 
-
-
 import enCommon from "./locales/en/common.json";
-
+import viCourses from "./locales/vi/courses.json";
+import enCourses from "./locales/en/courses.json";
 
 // Configuration
 i18n.use(initReactI18next).init({
@@ -16,18 +15,18 @@ i18n.use(initReactI18next).init({
   fallbackLng: "en",
 
   // Namespaces
-  ns: ["common"],
+  ns: ["common", "courses"],
   defaultNS: "common",
 
   // Resources
   resources: {
     vi: {
       common: viCommon,
-     
+      courses: viCourses,
     },
     en: {
       common: enCommon,
-   
+      courses: enCourses,
     },
   },
 
