@@ -1,0 +1,71 @@
+{
+  "categories": {
+    "title": "Danh Mục",
+    "description": "Quản lý danh mục nội dung",
+    "createNew": "Tạo Danh Mục",
+    "createCategory": "Tạo Danh Mục Mới",
+    "editCategory": "Chỉnh Sửa Danh Mục",
+    "createCategoryDescription": "Thêm danh mục mới để tổ chức nội dung",
+    "editCategoryDescription": "Cập nhật thông tin danh mục",
+    "noCategories": "Không tìm thấy danh mục",
+    "noResultsFound": "Không tìm thấy danh mục",
+    "tryDifferentFilters": "Thử điều chỉnh bộ lọc",
+    "createFirstCategory": "Tạo danh mục đầu tiên để bắt đầu",
+    "searchPlaceholder": "Tìm kiếm danh mục...",
+    "statusFilter": "Trạng Thái",
+    "sortBy": "Sắp Xếp",
+    "showingResults": "Hiển thị {{count}} trong {{total}} danh mục",
+    "slug": "Đường dẫn",
+
+    "table": {
+      "title": "Tiêu Đề",
+      "slug": "Đường Dẫn",
+      "description": "Mô Tả",
+      "status": "Trạng Thái",
+      "updatedAt": "Cập Nhật",
+      "createdAt": "Tạo Lúc"
+    },
+
+    "form": {
+      "title": "Tiêu Đề",
+      "titlePlaceholder": "Nhập tiêu đề danh mục",
+      "slug": "Đường Dẫn",
+      "slugPlaceholder": "duong-dan-danh-muc",
+      "slugDescription": "Phiên bản thân thiện URL của tiêu đề",
+      "description": "Mô Tả",
+      "descriptionPlaceholder": "Nhập mô tả danh mục",
+      "isActive": "Trạng Thái Hoạt Động",
+      "isActiveDescription": "Bật hoặc tắt danh mục này"
+    },
+
+    "validation": {
+      "titleRequired": "Tiêu đề là bắt buộc"
+    },
+
+    "createSuccess": "Tạo danh mục '{{name}}' thành công",
+    "createError": "Tạo danh mục thất bại",
+    "updateSuccess": "Cập nhật danh mục '{{name}}' thành công",
+    "updateError": "Cập nhật danh mục thất bại",
+    "deleteSuccess": "Xóa danh mục '{{name}}' thành công",
+    "deleteError": "Xóa danh mục thất bại",
+
+    "deleteConfirmTitle": "Xóa Danh Mục",
+    "deleteConfirmDescription": "Bạn có chắc chắn muốn xóa '{{name}}'? Hành động này không thể hoàn tác."
+  },
+
+  "common": {
+    "active": "Hoạt Động",
+    "inactive": "Không Hoạt Động",
+    "allStatus": "Tất Cả Trạng Thái",
+    "sortNewest": "Mới Nhất",
+    "sortOldest": "Cũ Nhất",
+    "sortName": "Tên (A-Z)",
+    "loading": "Đang tải...",
+    "actions": "Hành Động",
+    "edit": "Chỉnh Sửa",
+    "delete": "Xóa",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "create": "Tạo"
+  }
+}

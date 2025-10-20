@@ -1,0 +1,71 @@
+{
+  "categories": {
+    "title": "Categories",
+    "description": "Manage your content categories",
+    "createNew": "Create Category",
+    "createCategory": "Create New Category",
+    "editCategory": "Edit Category",
+    "createCategoryDescription": "Add a new category to organize your content",
+    "editCategoryDescription": "Update category information",
+    "noCategories": "No categories found",
+    "noResultsFound": "No categories found",
+    "tryDifferentFilters": "Try adjusting your filters",
+    "createFirstCategory": "Create your first category to get started",
+    "searchPlaceholder": "Search categories...",
+    "statusFilter": "Status",
+    "sortBy": "Sort By",
+    "showingResults": "Showing {{count}} of {{total}} categories",
+    "slug": "Slug",
+
+    "table": {
+      "title": "Title",
+      "slug": "Slug",
+      "description": "Description",
+      "status": "Status",
+      "updatedAt": "Updated",
+      "createdAt": "Created"
+    },
+
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "Enter category title",
+      "slug": "Slug",
+      "slugPlaceholder": "category-slug",
+      "slugDescription": "URL-friendly version of the title",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter category description",
+      "isActive": "Active Status",
+      "isActiveDescription": "Enable or disable this category"
+    },
+
+    "validation": {
+      "titleRequired": "Title is required"
+    },
+
+    "createSuccess": "Category '{{name}}' created successfully",
+    "createError": "Failed to create category",
+    "updateSuccess": "Category '{{name}}' updated successfully",
+    "updateError": "Failed to update category",
+    "deleteSuccess": "Category '{{name}}' deleted successfully",
+    "deleteError": "Failed to delete category",
+
+    "deleteConfirmTitle": "Delete Category",
+    "deleteConfirmDescription": "Are you sure you want to delete '{{name}}'? This action cannot be undone."
+  },
+
+  "common": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "allStatus": "All Status",
+    "sortNewest": "Newest First",
+    "sortOldest": "Oldest First",
+    "sortName": "Name (A-Z)",
+    "loading": "Loading...",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save",
+    "create": "Create"
+  }
+}
