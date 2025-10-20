@@ -1,4 +1,3 @@
-// src/components/courses/course-header.tsx
 import React from "react";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";

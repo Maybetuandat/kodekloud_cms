@@ -1,4 +1,3 @@
-// src/hooks/categories/use-category-page.ts
 import { useState, useCallback, useEffect } from "react";
 import { categoryService } from "@/services/categoryService";
 import {

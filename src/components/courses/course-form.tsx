@@ -3,7 +3,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Loader2, GraduationCap } from "lucide-react";
+import { Loader2, GraduationCap, FolderTree } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -30,9 +30,11 @@ import {
   Course,
   CreateCourseRequest,
   UpdateCourseRequest,
+  CourseFormData,
 } from "@/types/course";
+import { useCategoryPage } from "@/app/category/use-category";
 
-// Schema validation
+// Schema validation for form data
 const createCourseFormSchema = (t: any) =>
   z.object({
     title: z.string().min(1, t("courses.validation.titleRequired")),
@@ -44,8 +46,22 @@ const createCourseFormSchema = (t: any) =>
       .min(1, t("courses.validation.durationMin"))
       .max(10000, t("courses.validation.durationMax"))
       .optional(),
+    categoryId: z.number().min(1, t("courses.validation.categoryRequired")),
     isActive: z.boolean().default(true),
   });
+
+// Helper function để transform form data thành request format
+const transformFormDataToRequest = (
+  formData: z.infer<ReturnType<typeof createCourseFormSchema>>
+): CreateCourseRequest | UpdateCourseRequest => {
+  const { categoryId, ...rest } = formData;
+  return {
+    ...rest,
+    category: {
+      id: categoryId,
+    },
+  };
+};
 
 interface CourseFormProps {
   course?: Course | null;
@@ -68,6 +84,11 @@ export function CourseForm({
   loading = false,
 }: CourseFormProps) {
   const { t } = useTranslation("courses");
+  const {
+    categories,
+    loading: categoriesLoading,
+    error: categoryError,
+  } = useCategoryPage();
 
   const courseFormSchema = createCourseFormSchema(t);
   type CourseFormData = z.infer<typeof courseFormSchema>;
@@ -80,17 +101,27 @@ export function CourseForm({
       shortDescription: course?.shortDescription || "",
       level: course?.level || "",
       durationMinutes: course?.durationMinutes || 60,
+      categoryId: course?.category?.id || 0,
       isActive: course?.isActive ?? true,
     },
   });
 
   const handleSubmit = async (data: CourseFormData) => {
-    await onSubmit(data as CreateCourseRequest | UpdateCourseRequest);
+    // Transform form data to API request format
+    const requestData = transformFormDataToRequest(data);
+    await onSubmit(requestData);
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        {/* Category Error Alert */}
+        {categoryError && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+            {categoryError}
+          </div>
+        )}
+
         {/* Title */}
         <FormField
           control={form.control}
@@ -109,6 +140,63 @@ export function CourseForm({
                   disabled={loading}
                 />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Category Dropdown */}
+        <FormField
+          control={form.control}
+          name="categoryId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-base">
+                {t("courses.form.category")}{" "}
+                <span className="text-destructive">*</span>
+              </FormLabel>
+              <Select
+                onValueChange={(value) => field.onChange(Number(value))}
+                value={field.value?.toString()}
+                disabled={loading || categoriesLoading}
+              >
+                <FormControl>
+                  <SelectTrigger className="text-base">
+                    <SelectValue
+                      placeholder={t("courses.form.categoryPlaceholder")}
+                    />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {categoriesLoading ? (
+                    <SelectItem value="0" disabled>
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        {t("courses.form.categoryLoading")}
+                      </div>
+                    </SelectItem>
+                  ) : categories.length === 0 ? (
+                    <SelectItem value="0" disabled>
+                      {t("courses.form.categoryEmpty")}
+                    </SelectItem>
+                  ) : (
+                    categories.map((category) => (
+                      <SelectItem
+                        key={category.id}
+                        value={category.id.toString()}
+                      >
+                        <div className="flex items-center gap-2">
+                          <FolderTree className="h-4 w-4" />
+                          {category.title}
+                        </div>
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                {t("courses.form.categoryHint")}
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -269,7 +357,7 @@ export function CourseForm({
           >
             {t("common.cancel")}
           </Button>
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading || categoriesLoading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {course ? t("common.update") : t("common.create")}
           </Button>

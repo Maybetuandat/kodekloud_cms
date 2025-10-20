@@ -8,7 +8,44 @@
     "createError": "Failed to create course",
     "updateSuccess": "Course '{{name}}' updated successfully!",
     "updateError": "Failed to update course",
+    "page": {
+      "title": "Courses",
+      "description": "Manage and organize your training courses",
+      "totalBadge": "{{count}} Total",
+      "refresh": "Refresh",
+      "addCourse": "Add Course",
+      "createCourse": "Create Course",
+      "searchPlaceholder": "Search courses by title...",
+      "statusFilter": "Status",
+      "statusOptions": {
+        "all": "All Statuses",
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "noCoursesTitle": "No courses found",
+      "noCoursesDescription": "Create your first course to get started",
+      "noCoursesSearchDescription": "Try adjusting your search criteria",
+      "deleteConfirm": "Are you sure you want to delete \"{{title}}\"?",
+      "deleteSuccess": "Course \"{{title}}\" deleted successfully",
+      "deleteError": "Failed to delete course: {{error}}",
+      "activateSuccess": "Course \"{{title}}\" activated successfully",
+      "deactivateSuccess": "Course \"{{title}}\" deactivated successfully",
+      "toggleStatusError": "Failed to update course status: {{error}}"
+    },
+    "card": {
+      "viewCourse": "View Course",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "inactive": "Inactive",
+      "notUpdated": "Not updated"
+    },
+    "levels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
     "form": {
+      "category": "Category",
       "basicInfo": "Basic Information",
       "basicInfoDescription": "Enter the essential details about your course",
       "title": "Title",

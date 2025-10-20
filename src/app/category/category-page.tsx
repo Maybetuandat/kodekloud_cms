@@ -9,7 +9,7 @@ import FilterBar from "@/components/ui/filter-bar";
 import { CategoryTable } from "@/components/categories/category-table";
 import { CategoryFormDialog } from "@/components/categories/category-form-dialog";
 import { CategoryDeleteDialog } from "@/components/categories/category-delete-dialog";
-import { useCategoryPage } from "@/hooks/categories/use-category-page";
+import { useCategoryPage } from "@/app/category/use-category";
 import {
   Category,
   CreateCategoryRequest,

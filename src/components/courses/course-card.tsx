@@ -3,16 +3,15 @@ import React from "react";
 import {
   Clock,
   Calendar,
-  PlayCircle,
   Edit,
   Trash2,
   Power,
-  Code,
-  Database,
-  Cloud,
-  Terminal,
-  Cpu,
-  Globe,
+  FolderOpen,
+  MoreVertical,
+  Container, // Docker icon
+  Terminal, // Linux icon
+  GitBranch, // Git icon
+  Code, // Default fallback icon
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Course } from "@/types/course";
 import { formatDistanceToNow } from "date-fns";
+import { useTranslation } from "react-i18next";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,7 +27,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical } from "lucide-react";
 
 interface CourseCardProps {
   course: Course;
@@ -46,6 +45,8 @@ export function CourseCard({
   onToggleStatus,
   className,
 }: CourseCardProps) {
+  const { t } = useTranslation(["courses", "common"]);
+
   const getLevelColor = (level?: string) => {
     switch (level?.toLowerCase()) {
       case "beginner":
@@ -59,17 +60,37 @@ export function CourseCard({
     }
   };
 
-  // Random icon based on course id
-  const getIcon = (id: number) => {
-    const icons = [
-      { Icon: Code, gradient: "from-blue-400 to-blue-600" },
-      { Icon: Database, gradient: "from-purple-400 to-purple-600" },
-      { Icon: Cloud, gradient: "from-cyan-400 to-cyan-600" },
-      { Icon: Terminal, gradient: "from-green-400 to-green-600" },
-      { Icon: Cpu, gradient: "from-orange-400 to-orange-600" },
-      { Icon: Globe, gradient: "from-pink-400 to-pink-600" },
-    ];
-    return icons[id % icons.length];
+  // Map category to icon and gradient color
+  const getCategoryIconAndGradient = (categorySlug?: string) => {
+    const categoryMap = {
+      docker: {
+        Icon: Container,
+        gradient: "from-blue-400 to-blue-600",
+        name: "Docker",
+      },
+      linux: {
+        Icon: Terminal,
+        gradient: "from-orange-400 to-orange-600",
+        name: "Linux",
+      },
+      git: {
+        Icon: GitBranch,
+        gradient: "from-red-400 to-red-600",
+        name: "Git",
+      },
+    };
+
+    // Get slug from category or use a default
+    const slug = categorySlug?.toLowerCase() || "default";
+
+    // Return category config or default
+    return (
+      categoryMap[slug as keyof typeof categoryMap] || {
+        Icon: Code,
+        gradient: "from-gray-400 to-gray-600",
+        name: "Programming",
+      }
+    );
   };
 
   const formatDuration = (minutes?: number) => {
@@ -83,16 +104,18 @@ export function CourseCard({
   };
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return "Not updated";
+    if (!dateString) return t("courses.card.notUpdated");
     try {
       const date = new Date(dateString);
       return formatDistanceToNow(date, { addSuffix: true });
     } catch {
-      return "Not updated";
+      return t("courses.card.notUpdated");
     }
   };
 
-  const { Icon: CourseIcon, gradient } = getIcon(course.id);
+  const { Icon: CourseIcon, gradient } = getCategoryIconAndGradient(
+    course.category?.slug
+  );
 
   return (
     <Card
@@ -116,13 +139,15 @@ export function CourseCard({
           {onEdit && (
             <DropdownMenuItem onClick={() => onEdit(course)}>
               <Edit className="mr-2 h-4 w-4" />
-              Edit
+              {t("common.edit")}
             </DropdownMenuItem>
           )}
           {onToggleStatus && (
             <DropdownMenuItem onClick={() => onToggleStatus(course)}>
               <Power className="mr-2 h-4 w-4" />
-              {course.isActive ? "Deactivate" : "Activate"}
+              {course.isActive
+                ? t("courses.card.deactivate")
+                : t("courses.card.activate")}
             </DropdownMenuItem>
           )}
           {onDelete && (
@@ -133,14 +158,14 @@ export function CourseCard({
                 className="text-destructive"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete
+                {t("common.delete")}
               </DropdownMenuItem>
             </>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Icon Section with gradient background */}
+      {/* Icon Section with gradient background based on category */}
       <div className={cn("h-40 bg-gradient-to-br", gradient, "relative")}>
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute inset-0 flex items-center justify-center">
@@ -149,12 +174,12 @@ export function CourseCard({
           </div>
         </div>
 
-        {/* Duration Badge */}
+        {/* Duration Badge - Top Left */}
         {formatDuration(course.durationMinutes) && (
-          <div className="absolute bottom-2 right-2">
+          <div className="absolute top-2 left-2">
             <Badge
               variant="secondary"
-              className="bg-black/20 text-white backdrop-blur-sm border-0"
+              className="bg-black/30 text-white backdrop-blur-sm border-0 font-medium"
             >
               <Clock className="h-3 w-3 mr-1" />
               {formatDuration(course.durationMinutes)}
@@ -165,8 +190,9 @@ export function CourseCard({
 
       {/* Content */}
       <CardContent className="p-4 space-y-3">
+        {/* Title & Description */}
         <div>
-          <h3 className="font-semibold text-base line-clamp-2 mb-1">
+          <h3 className="font-semibold text-base line-clamp-2 mb-1.5">
             {course.title}
           </h3>
           {course.shortDescription && (
@@ -176,29 +202,48 @@ export function CourseCard({
           )}
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          {course.level && (
-            <Badge
-              variant="outline"
-              className={cn("text-xs", getLevelColor(course.level))}
-            >
-              {course.level}
-            </Badge>
+        {/* Meta Information - All in one row */}
+        <div className="flex items-center justify-between gap-2 text-xs">
+          {/* Left side: Category */}
+          {course.category && (
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <FolderOpen className="h-3.5 w-3.5 flex-shrink-0" />
+              <span className="font-medium truncate">
+                {course.category.title}
+              </span>
+            </div>
           )}
-          {!course.isActive && (
-            <Badge variant="destructive" className="text-xs">
-              Inactive
-            </Badge>
-          )}
+
+          {/* Right side: Level & Status */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {course.level && (
+              <Badge
+                variant="outline"
+                className={cn(
+                  "text-xs px-2 py-0.5",
+                  getLevelColor(course.level)
+                )}
+              >
+                {t(`courses.levels.${course.level.toLowerCase()}`)}
+              </Badge>
+            )}
+            {!course.isActive && (
+              <Badge variant="destructive" className="text-xs px-2 py-0.5">
+                {t("courses.card.inactive")}
+              </Badge>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center text-xs text-muted-foreground">
-          <Calendar className="h-3 w-3 mr-1" />
+        {/* Updated Date */}
+        <div className="flex items-center text-xs text-muted-foreground pt-1 border-t">
+          <Calendar className="h-3 w-3 mr-1.5" />
           <span>{formatDate(course.updatedAt)}</span>
         </div>
 
+        {/* View Button */}
         <Button onClick={() => onView?.(course)} className="w-full" size="sm">
-          View Course
+          {t("courses.card.viewCourse")}
         </Button>
       </CardContent>
     </Card>

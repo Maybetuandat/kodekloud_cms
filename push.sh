@@ -1,4 +1,4 @@
 git add .
-git commit -m "feat: add category page and sidebar link"
+git commit -m "feat: add logic and ui for add new course and remove edit course functionality"
 git push origin main
 clear

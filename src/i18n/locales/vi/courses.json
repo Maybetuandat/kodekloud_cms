@@ -1,45 +1,82 @@
 {
   "courses": {
-    "createTitle": "Create New Course",
-    "createDescription": "Fill in the information below to create a new course",
-    "editTitle": "Edit Course",
-    "editDescription": "Update the course information",
-    "createSuccess": "Course '{{name}}' created successfully!",
-    "createError": "Failed to create course",
-    "updateSuccess": "Course '{{name}}' updated successfully!",
-    "updateError": "Failed to update course",
+    "createTitle": "Tạo khóa học mới",
+    "createDescription": "Điền thông tin bên dưới để tạo khóa học mới",
+    "editTitle": "Chỉnh sửa khóa học",
+    "editDescription": "Cập nhật thông tin khóa học",
+    "createSuccess": "Khóa học '{{name}}' được tạo thành công!",
+    "createError": "Không thể tạo khóa học",
+    "updateSuccess": "Khóa học '{{name}}' được cập nhật thành công!",
+    "updateError": "Không thể cập nhật khóa học",
+    "page": {
+      "title": "Khóa học",
+      "description": "Quản lý và tổ chức các khóa đào tạo của bạn",
+      "totalBadge": "Tổng cộng {{count}}",
+      "refresh": "Làm mới",
+      "addCourse": "Thêm khóa học",
+      "createCourse": "Tạo khóa học",
+      "searchPlaceholder": "Tìm kiếm khóa học theo tiêu đề...",
+      "statusFilter": "Trạng thái",
+      "statusOptions": {
+        "all": "Tất cả trạng thái",
+        "active": "Đang hoạt động",
+        "inactive": "Không hoạt động"
+      },
+      "noCoursesTitle": "Không tìm thấy khóa học",
+      "noCoursesDescription": "Tạo khóa học đầu tiên của bạn để bắt đầu",
+      "noCoursesSearchDescription": "Thử điều chỉnh tiêu chí tìm kiếm của bạn",
+      "deleteConfirm": "Bạn có chắc chắn muốn xóa \"{{title}}\"?",
+      "deleteSuccess": "Khóa học \"{{title}}\" đã được xóa thành công",
+      "deleteError": "Không thể xóa khóa học: {{error}}",
+      "activateSuccess": "Khóa học \"{{title}}\" đã được kích hoạt thành công",
+      "deactivateSuccess": "Khóa học \"{{title}}\" đã bị vô hiệu hóa thành công",
+      "toggleStatusError": "Không thể cập nhật trạng thái khóa học: {{error}}"
+    },
+    "card": {
+      "viewCourse": "Xem khóa học",
+      "activate": "Kích hoạt",
+      "deactivate": "Vô hiệu hóa",
+      "inactive": "Không hoạt động",
+      "notUpdated": "Chưa cập nhật"
+    },
+    "levels": {
+      "beginner": "Cơ bản",
+      "intermediate": "Trung cấp",
+      "advanced": "Nâng cao"
+    },
     "form": {
-      "basicInfo": "Basic Information",
-      "basicInfoDescription": "Enter the essential details about your course",
-      "title": "Title",
-      "titlePlaceholder": "Enter course title",
-      "description": "Description",
-      "descriptionPlaceholder": "Enter detailed course description",
-      "descriptionHint": "Provide a comprehensive overview of what students will learn",
-      "shortDescription": "Short Description",
-      "shortDescriptionPlaceholder": "Brief overview of the course",
-      "shortDescriptionHint": "This will be displayed in course cards (keep it brief)",
-      "level": "Level",
-      "levelPlaceholder": "Select difficulty level",
-      "levelHint": "Choose the appropriate difficulty level for this course",
-      "duration": "Duration (minutes)",
-      "durationHint": "Estimated time to complete the course",
-      "active": "Active Status",
-      "activeHint": "Make this course visible and available to students"
+      "category": "Danh mục",
+      "basicInfo": "Thông tin cơ bản",
+      "basicInfoDescription": "Nhập thông tin chi tiết về khóa học của bạn",
+      "title": "Tiêu đề",
+      "titlePlaceholder": "Nhập tiêu đề khóa học",
+      "description": "Mô tả",
+      "descriptionPlaceholder": "Nhập mô tả chi tiết về khóa học",
+      "descriptionHint": "Cung cấp tổng quan đầy đủ về những gì học viên sẽ học được",
+      "shortDescription": "Mô tả ngắn",
+      "shortDescriptionPlaceholder": "Tóm tắt ngắn gọn về khóa học",
+      "shortDescriptionHint": "Sẽ được hiển thị trên thẻ khóa học (giữ ngắn gọn)",
+      "level": "Cấp độ",
+      "levelPlaceholder": "Chọn cấp độ khó",
+      "levelHint": "Chọn cấp độ phù hợp cho khóa học này",
+      "duration": "Thời lượng (phút)",
+      "durationHint": "Thời gian ước tính để hoàn thành khóa học",
+      "active": "Trạng thái hoạt động",
+      "activeHint": "Làm cho khóa học này hiển thị và có sẵn cho học viên"
     },
     "validation": {
-      "titleRequired": "Course title is required",
-      "durationMin": "Duration must be at least 1 minute",
-      "durationMax": "Duration cannot exceed 10000 minutes"
+      "titleRequired": "Tiêu đề khóa học là bắt buộc",
+      "durationMin": "Thời lượng phải ít nhất 1 phút",
+      "durationMax": "Thời lượng không được vượt quá 10000 phút"
     }
   },
   "common": {
-    "back": "Back",
-    "cancel": "Cancel",
-    "create": "Create",
-    "update": "Update",
-    "save": "Save",
-    "delete": "Delete",
-    "edit": "Edit"
+    "back": "Quay lại",
+    "cancel": "Hủy",
+    "create": "Tạo",
+    "update": "Cập nhật",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "edit": "Sửa"
   }
 }

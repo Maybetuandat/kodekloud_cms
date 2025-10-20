@@ -1,5 +1,4 @@
 // src/app/courses/new-course-page.tsx
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -8,28 +7,26 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CourseHeader } from "@/components/courses/course-header";
 import { CourseForm } from "@/components/courses/course-form";
 import { CreateCourseRequest } from "@/types/course";
-import { courseService } from "@/services/courseService";
+import { useCoursePage } from "@/app/courses/index-page/use-course-page";
 
 export default function NewCoursePage() {
   const { t } = useTranslation("courses");
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const { createCourse, actionLoading } = useCoursePage();
 
   const handleCreateCourse = async (data: CreateCourseRequest) => {
-    setLoading(true);
-    try {
-      const newCourse = await courseService.createCourse(data);
-      toast.success(t("courses.createSuccess", { name: newCourse.title }));
-
-      // Navigate to course detail after success
-      navigate(`/courses/${newCourse.id}`);
-    } catch (error: any) {
-      console.error("Error creating course:", error);
-      toast.error(error.message || t("courses.createError"));
-      throw error; // Re-throw to prevent form from resetting
-    } finally {
-      setLoading(false);
-    }
+    await createCourse(
+      data,
+      (newCourse) => {
+        toast.success(t("courses.createSuccess", { name: newCourse.title }));
+        navigate(`/courses`);
+      },
+      (error) => {
+        console.error("Error creating course:", error);
+        toast.error(error.message || t("courses.createError"));
+        throw error; // Re-throw to prevent form from resetting
+      }
+    );
   };
 
   const handleCancel = () => {
@@ -42,7 +39,7 @@ export default function NewCoursePage() {
       <CourseHeader
         title={t("courses.createTitle")}
         description={t("courses.createDescription")}
-        loading={loading}
+        loading={actionLoading}
       />
 
       {/* Main Form Card */}
@@ -51,7 +48,7 @@ export default function NewCoursePage() {
           <CourseForm
             onSubmit={handleCreateCourse}
             onCancel={handleCancel}
-            loading={loading}
+            loading={actionLoading}
           />
         </CardContent>
       </Card>

@@ -4,11 +4,10 @@ import { MainLayout } from "./layouts/MainLayout";
 
 import "./i18n";
 
-import Lab from "./app/labs/lab-page";
 import HomePage from "./app/home";
 import LabDetail from "./app/labs/lab-detail";
-import CoursePage from "./app/courses/course-page";
-import NewCoursePage from "./app/courses/new-course-page";
+import CoursePage from "./app/courses/index-page/course-page";
+import NewCoursePage from "./app/courses/new-course-page/new-course-page";
 import LabPage from "./app/labs/lab-page";
 import CategoryPage from "./app/category/category-page";
 

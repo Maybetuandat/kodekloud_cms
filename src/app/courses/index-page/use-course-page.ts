@@ -9,7 +9,7 @@ import {
 export interface CourseFilters {
   search: string;
   isActive?: boolean;
-  sortBy: "newest" | "oldest"; // Giữ lại sortBy nếu bạn có ý định dùng trong tương lai
+  sortBy: "newest" | "oldest";
 }
 
 interface UseCoursePage {
@@ -63,8 +63,6 @@ export const useCoursePage = (): UseCoursePage => {
     sortBy: "newest",
   });
 
-  // **THAY ĐỔI 1: TÁCH HÀM GỌI API RA ĐỘC LẬP**
-  // Hàm này chỉ có nhiệm vụ gọi API và cập nhật state, không phụ thuộc vào state bên ngoài.
   const fetchCourses = useCallback(async () => {
     setLoading(true);
     try {
@@ -88,9 +86,6 @@ export const useCoursePage = (): UseCoursePage => {
     }
   }, [currentPage, pageSize, filters]); // Phụ thuộc vào các state quyết định việc fetch
 
-  // **THAY ĐỔI 2: DÙNG useEffect LÀM NGUỒN KÍCH HOẠT DUY NHẤT**
-  // Bất cứ khi nào currentPage, pageSize, hoặc filters thay đổi, useEffect này sẽ chạy lại
-  // và gọi hàm fetchCourses để lấy dữ liệu mới nhất.
   useEffect(() => {
     fetchCourses();
   }, [fetchCourses]); // fetchCourses đã có dependencies của nó, nên đây là cách clean nhất
@@ -118,6 +113,7 @@ export const useCoursePage = (): UseCoursePage => {
     onSuccess?: (course: Course) => void,
     onError?: (error: Error) => void
   ) => {
+    console.log("Creating course with data:", data);
     await performActionAndRefresh(
       () => courseService.createCourse(data),
       (newCourse) => onSuccess?.(newCourse),
@@ -161,9 +157,6 @@ export const useCoursePage = (): UseCoursePage => {
       onError
     );
   };
-
-  // **THAY ĐỔI 3: ĐƠN GIẢN HÓA CÁC HÀM HANDLER**
-  // Các hàm này chỉ cần cập nhật state. useEffect sẽ tự động xử lý việc gọi lại API.
 
   const setFilters = (newFilterValues: Partial<CourseFilters>) => {
     // Khi filter thay đổi, luôn quay về trang 1
