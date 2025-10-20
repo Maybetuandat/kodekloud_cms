@@ -42,7 +42,6 @@ interface UseCoursePage {
     onSuccess?: (course: Course) => void,
     onError?: (error: Error) => void
   ) => Promise<void>;
-  // Các hàm handle chỉ cần set state, useEffect sẽ lo việc gọi API
   setFilters: (newFilters: Partial<CourseFilters>) => void;
   setCurrentPage: (page: number) => void;
   setPageSize: (size: number) => void;
@@ -66,8 +65,6 @@ export const useCoursePage = (): UseCoursePage => {
   const fetchCourses = useCallback(async () => {
     setLoading(true);
     try {
-      // Lấy state mới nhất ngay trước khi gọi API
-      // API dùng page index từ 0, UI dùng từ 1
       const response = await courseService.getCoursesPaginated({
         page: currentPage - 1,
         pageSize: pageSize,
@@ -80,15 +77,14 @@ export const useCoursePage = (): UseCoursePage => {
       setTotalItems(response.totalItems);
     } catch (error) {
       console.error("Failed to load courses:", error);
-      // Có thể thêm logic xử lý lỗi ở đây, ví dụ: setCourses([])
     } finally {
       setLoading(false);
     }
-  }, [currentPage, pageSize, filters]); // Phụ thuộc vào các state quyết định việc fetch
+  }, [currentPage, pageSize, filters]);
 
   useEffect(() => {
     fetchCourses();
-  }, [fetchCourses]); // fetchCourses đã có dependencies của nó, nên đây là cách clean nhất
+  }, [fetchCourses]);
 
   const performActionAndRefresh = async (
     action: () => Promise<any>,
@@ -99,7 +95,7 @@ export const useCoursePage = (): UseCoursePage => {
     try {
       const result = await action();
       onSuccessCallback(result);
-      // Tải lại trang hiện tại sau khi thực hiện hành động thành công
+
       await fetchCourses();
     } catch (error) {
       onErrorCallback?.(error as Error);

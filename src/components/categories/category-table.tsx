@@ -1,5 +1,3 @@
-// src/components/categories/category-table.tsx
-import React from "react";
 import { Edit, Trash2, MoreVertical } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { formatDistanceToNow } from "date-fns";
@@ -13,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
