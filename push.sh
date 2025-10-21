@@ -1,4 +1,4 @@
 git add .
-git commit -m "feat: add logic and ui for add new course and remove edit course functionality"
-git push origin detail-course-ui
+git commit -m "refractor code(course page): update course page layout and styles"
+git push origin main
 clear
