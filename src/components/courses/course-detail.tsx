@@ -80,7 +80,7 @@ export function CourseDetail() {
             <Card className="p-6">
               <h2 className="text-2xl font-bold mb-4">Mô tả chi tiết</h2>
               <div
-                className="text-foreground leading-relaxed"
+                className="prose max-w-none dark:prose-invert text-foreground leading-relaxed"
                 dangerouslySetInnerHTML={{
                   __html: safeCourse.description as string,
                 }}

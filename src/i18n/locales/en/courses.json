@@ -46,6 +46,8 @@
     },
     "form": {
       "category": "Category",
+      "categoryHint": " Select the category that best fits this course",
+      "categoryEmpty": "-- Select Category --",
       "basicInfo": "Basic Information",
       "basicInfoDescription": "Enter the essential details about your course",
       "title": "Title",

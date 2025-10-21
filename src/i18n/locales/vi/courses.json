@@ -46,6 +46,8 @@
     },
     "form": {
       "category": "Danh mục",
+      "categoryHint": " Chọn danh mục phù hợp nhất với khóa học này",
+      "categoryEmpty": "-- Chọn danh mục --",
       "basicInfo": "Thông tin cơ bản",
       "basicInfoDescription": "Nhập thông tin chi tiết về khóa học của bạn",
       "title": "Tiêu đề",
