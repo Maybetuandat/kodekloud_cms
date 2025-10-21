@@ -16,8 +16,9 @@ export interface CreateCategoryRequest {
 
 export interface UpdateCategoryRequest extends CreateCategoryRequest {}
 
-export interface CategoryFilters {
+export interface CourseFilters {
   search: string;
-  status: null | true | false;
-  sortBy: "newest" | "oldest" | "name";
+  isActive?: boolean;
+  categorySlug?: string;
+  sortBy: "newest" | "oldest";
 }

@@ -10,7 +10,7 @@ import CoursePage from "./app/courses/index-page/course-page";
 import NewCoursePage from "./app/courses/new-course-page/new-course-page";
 import LabPage from "./app/labs/lab-page";
 import CategoryPage from "./app/category/category-page";
-import { CourseDetail } from "./components/courses/course-detail";
+import { CourseDetail } from "./app/courses/detail-page/course-detail";
 
 function App() {
   return (

@@ -58,7 +58,7 @@ export const courseService = {
     id: number,
     data: UpdateCourseRequest
   ): Promise<Course> => {
-    const response = await api.put<Course>(`/courses/${id}`, data);
+    const response = await api.patch<Course>(`/courses/${id}`, data);
     return response;
   },
 

@@ -2,17 +2,14 @@ import { useState, useCallback, useEffect } from "react";
 import { courseService } from "@/services/courseService";
 import {
   Course,
+  CourseFilters,
   CreateCourseRequest,
   UpdateCourseRequest,
 } from "@/types/course";
+import { categoryService } from "@/services/categoryService";
+import { Category } from "@/types/category";
 
-export interface CourseFilters {
-  search: string;
-  isActive?: boolean;
-  sortBy: "newest" | "oldest";
-}
-
-interface UseCoursePage {
+export interface UseCoursePage {
   courses: Course[];
   loading: boolean;
   actionLoading: boolean;
@@ -26,6 +23,7 @@ interface UseCoursePage {
     onSuccess?: (course: Course) => void,
     onError?: (error: Error) => void
   ) => Promise<void>;
+  fetchCategories: () => Promise<Category[]>;
   updateCourse: (
     id: number,
     data: UpdateCourseRequest,
@@ -117,6 +115,15 @@ export const useCoursePage = (): UseCoursePage => {
     );
   };
 
+  const fetchCategories = async () => {
+    try {
+      const categories = await categoryService.getAllCategories();
+      return categories;
+    } catch (error) {
+      console.error("Failed to load categories:", error);
+      return [];
+    }
+  };
   const updateCourse = async (
     id: number,
     data: UpdateCourseRequest,
@@ -175,6 +182,7 @@ export const useCoursePage = (): UseCoursePage => {
     totalPages,
     totalItems,
     filters,
+    fetchCategories,
     createCourse,
     updateCourse,
     deleteCourse,

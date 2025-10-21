@@ -176,11 +176,11 @@ export function CourseCard({
           <h3 className="font-semibold text-base line-clamp-2 mb-1.5">
             {course.title}
           </h3>
-          {course.shortDescription && (
+          <div className="h-10">
             <p className="text-sm text-muted-foreground line-clamp-2">
-              {course.shortDescription}
+              {course.shortDescription || "\u00A0"}
             </p>
-          )}
+          </div>
         </div>
 
         {/* Meta Information - All in one row */}

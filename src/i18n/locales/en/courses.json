@@ -32,6 +32,22 @@
       "deactivateSuccess": "Course \"{{title}}\" deactivated successfully",
       "toggleStatusError": "Failed to update course status: {{error}}"
     },
+    "detail": {
+      "backButton": "Back",
+      "tabs": {
+        "overview": "Overview",
+        "labs": "Labs"
+      },
+      "overview": {
+        "detailTitle": "Detailed Description"
+      },
+      "labs": {
+        "title": "Labs",
+        "createButton": "Create Lab",
+        "noLabs": "No labs yet",
+        "createFirstLab": "Create first lab"
+      }
+    },
     "card": {
       "viewCourse": "View Course",
       "activate": "Activate",
@@ -70,6 +86,24 @@
       "titleRequired": "Course title is required",
       "durationMin": "Duration must be at least 1 minute",
       "durationMax": "Duration cannot exceed 10000 minutes"
+    }
+  },
+  "detail": {
+    "backButton": "Back",
+    "tabs": {
+      "overview": "Overview",
+      "labs": "Labs"
+    },
+    "overview": {
+      "detailTitle": "Detailed Description",
+      "editTitle": "Edit Description",
+      "editDescription": "Update the detailed description for this course"
+    },
+    "labs": {
+      "title": "Labs",
+      "createButton": "Create Lab",
+      "noLabs": "No labs yet",
+      "createFirstLab": "Create first lab"
     }
   },
   "common": {

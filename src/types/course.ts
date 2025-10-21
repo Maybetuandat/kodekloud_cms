@@ -49,3 +49,9 @@ export interface CourseFormData {
   isActive: boolean;
   categoryId: number;
 }
+
+export interface CourseFilters {
+  search: string;
+  isActive?: boolean;
+  sortBy: "newest" | "oldest";
+}

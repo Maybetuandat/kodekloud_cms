@@ -32,6 +32,22 @@
       "deactivateSuccess": "Khóa học \"{{title}}\" đã bị vô hiệu hóa thành công",
       "toggleStatusError": "Không thể cập nhật trạng thái khóa học: {{error}}"
     },
+    "detail": {
+      "backButton": "Quay lại",
+      "tabs": {
+        "overview": "Tổng quan",
+        "labs": "Bài thực hành"
+      },
+      "overview": {
+        "detailTitle": "Mô tả chi tiết"
+      },
+      "labs": {
+        "title": "Bài thực hành",
+        "createButton": "Tạo bài thực hành",
+        "noLabs": "Chưa có bài thực hành nào",
+        "createFirstLab": "Tạo bài thực hành đầu tiên"
+      }
+    },
     "card": {
       "viewCourse": "Xem khóa học",
       "activate": "Kích hoạt",
@@ -70,6 +86,24 @@
       "titleRequired": "Tiêu đề khóa học là bắt buộc",
       "durationMin": "Thời lượng phải ít nhất 1 phút",
       "durationMax": "Thời lượng không được vượt quá 10000 phút"
+    }
+  },
+  "detail": {
+    "backButton": "Quay lại",
+    "tabs": {
+      "overview": "Tổng quan",
+      "labs": "Bài thực hành"
+    },
+    "overview": {
+      "detailTitle": "Mô tả chi tiết",
+      "editTitle": "Chỉnh sửa mô tả",
+      "editDescription": "Cập nhật mô tả chi tiết cho khóa học"
+    },
+    "labs": {
+      "title": "Bài thực hành",
+      "createButton": "Tạo bài thực hành",
+      "noLabs": "Chưa có bài thực hành nào",
+      "createFirstLab": "Tạo bài thực hành đầu tiên"
     }
   },
   "common": {

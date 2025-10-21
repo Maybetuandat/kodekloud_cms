@@ -1,3 +1,4 @@
+import { BasicInfoFormData } from "@/components/courses/edit-basic-info-modal";
 import { courseService } from "@/services/courseService";
 import { Course } from "@/types/course";
 import { Lab } from "@/types/lab";
@@ -21,5 +22,32 @@ export const useCourseDetailPage = (courseId: number) => {
     fetchCourse();
   }, [courseId]);
 
-  return { course, labs };
+  const updateDescriptionCourse = async (newDescription: string) => {
+    if (course) {
+      course.description = newDescription;
+      const response = await courseService.updateCourse(courseId, course);
+      console.log(response);
+      setCourse(response);
+    }
+  };
+  const updateBasicInfoCourse = async (updatedCourse: BasicInfoFormData) => {
+    if (course) {
+      if (updatedCourse.title !== undefined) {
+        course.title = updatedCourse.title;
+      }
+      if (updatedCourse.shortDescription !== undefined) {
+        course.shortDescription = updatedCourse.shortDescription;
+      }
+      if (updatedCourse.level !== undefined) {
+        course.level = updatedCourse.level;
+      }
+      if (updatedCourse.durationMinutes !== undefined) {
+        course.durationMinutes = updatedCourse.durationMinutes;
+      }
+      const response = await courseService.updateCourse(courseId, course);
+      setCourse(response);
+    }
+  };
+
+  return { course, labs, updateDescriptionCourse, updateBasicInfoCourse };
 };

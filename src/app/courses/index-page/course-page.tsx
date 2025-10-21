@@ -18,7 +18,7 @@ import FilterBar from "@/components/ui/filter-bar";
 import { Button } from "@/components/ui/button";
 
 export default function CoursePage() {
-  const { t } = useTranslation(["courses", "common"]);
+  const { t } = useTranslation("courses");
   const navigate = useNavigate();
 
   const {
@@ -35,13 +35,27 @@ export default function CoursePage() {
     setCurrentPage,
     setPageSize,
     refresh,
+    fetchCategories,
   } = useCoursePage();
 
   const [localSearchTerm, setLocalSearchTerm] = useState(filters.search);
 
+  const [categorySlugList, setCategorySlugList] = useState<string[]>([]);
+
   useEffect(() => {
     setLocalSearchTerm(filters.search);
-  }, [filters.search]);
+
+    const loadCategories = async () => {
+      const categories = await fetchCategories();
+      setCategorySlugList(
+        categories
+          .map((category) => category.slug || "")
+          .filter((slug) => slug !== "")
+      );
+    };
+
+    loadCategories();
+  }, [filters.search, fetchCategories]);
 
   const handleSearchSubmit = () => {
     setFilters({ search: localSearchTerm });
