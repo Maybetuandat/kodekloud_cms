@@ -8,9 +8,6 @@ import {
   Power,
   FolderOpen,
   MoreVertical,
-  Container, // Docker icon
-  Terminal, // Linux icon
-  GitBranch, // Git icon
   Code, // Default fallback icon
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +24,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+import { categoryMap } from "@/constants/category-map";
 
 interface CourseCardProps {
   course: Course;
@@ -62,24 +61,6 @@ export function CourseCard({
 
   // Map category to icon and gradient color
   const getCategoryIconAndGradient = (categorySlug?: string) => {
-    const categoryMap = {
-      docker: {
-        Icon: Container,
-        gradient: "from-blue-400 to-blue-600",
-        name: "Docker",
-      },
-      linux: {
-        Icon: Terminal,
-        gradient: "from-orange-400 to-orange-600",
-        name: "Linux",
-      },
-      git: {
-        Icon: GitBranch,
-        gradient: "from-red-400 to-red-600",
-        name: "Git",
-      },
-    };
-
     // Get slug from category or use a default
     const slug = categorySlug?.toLowerCase() || "default";
 

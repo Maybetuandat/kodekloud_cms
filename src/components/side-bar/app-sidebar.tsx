@@ -5,6 +5,7 @@ import {
   LayoutDashboardIcon,
   Home,
   Tags,
+  BookOpen,
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -40,14 +41,14 @@ export function AppSidebar({
       {
         title: t("navigation.courses"),
         url: "/courses",
-        icon: LayoutDashboardIcon,
-        isActive: location.pathname === "/courses",
+        icon: BookOpen,
+        isActive: location.pathname.startsWith("/courses"),
       },
       {
         title: t("navigation.category"),
         url: "/category",
         icon: Tags,
-        isActive: location.pathname === "/category",
+        isActive: location.pathname.startsWith("/category"),
       },
     ],
     navSecondary: [

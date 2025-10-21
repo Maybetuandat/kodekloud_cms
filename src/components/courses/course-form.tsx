@@ -1,11 +1,11 @@
 // src/components/courses/course-form.tsx
-import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2, GraduationCap, FolderTree } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import {
   Form,
   FormControl,
@@ -16,7 +16,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -30,7 +29,6 @@ import {
   Course,
   CreateCourseRequest,
   UpdateCourseRequest,
-  CourseFormData,
 } from "@/types/course";
 import { useCategoryPage } from "@/app/category/use-category";
 
@@ -236,14 +234,24 @@ export function CourseForm({
               <FormLabel className="text-base">
                 {t("courses.form.description")}
               </FormLabel>
+
               <FormControl>
-                <Textarea
-                  placeholder={t("courses.form.descriptionPlaceholder")}
-                  className="resize-none min-h-[150px] text-base"
-                  {...field}
-                  disabled={loading}
-                />
+                <div
+                  className="min-h-[150px] overflow-y-auto"
+                  data-color-mode="light"
+                >
+                  <ReactQuill
+                    theme="snow"
+                    value={field.value || ""}
+                    onChange={(html) => {
+                      field.onChange(html);
+                      console.log("🌐 HTML content:", html);
+                    }}
+                    className="h-[100px]"
+                  />
+                </div>
               </FormControl>
+
               <FormDescription>
                 {t("courses.form.descriptionHint")}
               </FormDescription>

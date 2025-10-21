@@ -10,70 +10,34 @@ import CoursePage from "./app/courses/index-page/course-page";
 import NewCoursePage from "./app/courses/new-course-page/new-course-page";
 import LabPage from "./app/labs/lab-page";
 import CategoryPage from "./app/category/category-page";
+import { CourseDetail } from "./components/courses/course-detail";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Protected routes */}
-        <Route
-          path="/home"
-          element={
-            <MainLayout>
-              <HomePage />
-            </MainLayout>
-          }
-        />
+        {/* Root Layout */}
+        <Route path="/" element={<MainLayout />}>
+          {/* Home */}
+          <Route index element={<HomePage />} />
+          <Route path="home" element={<HomePage />} />
 
-        <Route
-          path="/"
-          element={
-            <MainLayout>
-              <HomePage />
-            </MainLayout>
-          }
-        />
+          {/* Courses Section */}
+          <Route path="courses">
+            <Route index element={<CoursePage />} />
+            <Route path="new" element={<NewCoursePage />} />
+            <Route path=":id" element={<CourseDetail />} />
+          </Route>
 
-        <Route
-          path="/courses"
-          element={
-            <MainLayout>
-              <CoursePage />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/labs"
-          element={
-            <MainLayout>
-              <LabPage />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/courses/new"
-          element={
-            <MainLayout>
-              <NewCoursePage />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/category"
-          element={
-            <MainLayout>
-              <CategoryPage />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/labs/:id"
-          element={
-            <MainLayout>
-              <LabDetail />
-            </MainLayout>
-          }
-        />
+          {/* Labs Section */}
+          <Route path="labs">
+            <Route index element={<LabPage />} />
+            <Route path=":id" element={<LabDetail />} />
+          </Route>
+
+          {/* Category Section */}
+          <Route path="category" element={<CategoryPage />} />
+        </Route>
       </Routes>
     </Router>
   );

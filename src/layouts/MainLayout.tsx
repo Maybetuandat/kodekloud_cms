@@ -3,7 +3,7 @@ import {
   SidebarProvider,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { AppSidebar } from "@/components/side-bar/app-sidebar";
 import { SiteHeader } from "@/components/side-bar/site-header";
@@ -69,10 +69,12 @@ function SidebarController({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function MainLayout({ children }: { children: React.ReactNode }) {
+export function MainLayout() {
   return (
     <SidebarProvider>
-      <SidebarController>{children}</SidebarController>
+      <SidebarController>
+        <Outlet />
+      </SidebarController>
     </SidebarProvider>
   );
 }
