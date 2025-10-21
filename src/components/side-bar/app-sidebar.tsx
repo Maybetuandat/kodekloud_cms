@@ -1,12 +1,5 @@
 import * as React from "react";
-import {
-  HelpCircleIcon,
-  Boxes,
-  LayoutDashboardIcon,
-  Home,
-  Tags,
-  BookOpen,
-} from "lucide-react";
+import { HelpCircleIcon, Boxes, Home, Tags, BookOpen } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 

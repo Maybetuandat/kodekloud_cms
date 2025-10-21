@@ -1,10 +1,12 @@
 import { courseService } from "@/services/courseService";
 import { Course } from "@/types/course";
+import { Lab } from "@/types/lab";
 
 import { useEffect, useState } from "react";
 
 export const useCourseDetailPage = (courseId: number) => {
   const [course, setCourse] = useState<Course | null>(null);
+  const [labs, setLabs] = useState<Lab[]>([]);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -19,5 +21,5 @@ export const useCourseDetailPage = (courseId: number) => {
     fetchCourse();
   }, [courseId]);
 
-  return { course };
+  return { course, labs };
 };

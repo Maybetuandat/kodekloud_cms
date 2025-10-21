@@ -16,7 +16,6 @@ import { useCoursePage } from "@/app/courses/index-page/use-course-page";
 import { Pagination } from "@/components/ui/pagination";
 import FilterBar from "@/components/ui/filter-bar";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 export default function CoursePage() {
   const { t } = useTranslation(["courses", "common"]);

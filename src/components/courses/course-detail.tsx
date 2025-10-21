@@ -7,13 +7,14 @@ import { categoryMap } from "@/constants/category-map";
 import { useParams } from "react-router-dom";
 import { useCourseDetailPage } from "@/app/courses/detail-page/use-course-detail";
 import { Course } from "@/types/course";
+import { LabList } from "../labs/lists/lab-list";
 // import { CreateLabModal } from "@/components/labs/create-lab-modal";
 // import { LabList } from "@/components/labs/lab-list";
 
 export function CourseDetail() {
   const { id } = useParams<{ id: string }>();
 
-  const { course } = useCourseDetailPage(Number(id));
+  const { course, labs } = useCourseDetailPage(Number(id));
 
   const safeCourse: Course = course || {
     id: 0,
@@ -36,7 +37,10 @@ export function CourseDetail() {
     listCourseUser: [],
   };
 
-  //   const [labs, setLabs] = useState<any[]>([]);
+  const handleDeleteLab = (labId: string) => {
+    //TODO
+    console.log("Delete lab with ID:", labId);
+  };
   //   const [isCreateLabOpen, setIsCreateLabOpen] = useState(false);
 
   const onBack = () => window.history.back();
@@ -101,21 +105,21 @@ export function CourseDetail() {
               </Button>
             </div>
 
-            {/* {labs.length > 0 ? (
+            {labs && labs.length > 0 ? (
               <LabList labs={labs} onDeleteLab={handleDeleteLab} />
-            ) : ( */}
-            <Card className="p-12 text-center">
-              <p className="text-muted-foreground mb-4">
-                Chưa có bài thực hành nào
-              </p>
-              <Button
-                // onClick={() => setIsCreateLabOpen(true)}
-                variant="outline"
-              >
-                Tạo bài thực hành đầu tiên
-              </Button>
-            </Card>
-            {/* )} */}
+            ) : (
+              <Card className="p-12 text-center">
+                <p className="text-muted-foreground mb-4">
+                  Chưa có bài thực hành nào
+                </p>
+                <Button
+                  // onClick={() => setIsCreateLabOpen(true)}
+                  variant="outline"
+                >
+                  Tạo bài thực hành đầu tiên
+                </Button>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>
