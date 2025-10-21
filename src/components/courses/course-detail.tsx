@@ -8,11 +8,17 @@ import { useParams } from "react-router-dom";
 import { useCourseDetailPage } from "@/app/courses/detail-page/use-course-detail";
 import { Course } from "@/types/course";
 import { LabList } from "../labs/lists/lab-list";
+import { useState } from "react";
+import { CreateLabModal } from "../labs/modal/create-lab-modal";
+import { Lab } from "@/types/lab";
+
 // import { CreateLabModal } from "@/components/labs/create-lab-modal";
 // import { LabList } from "@/components/labs/lab-list";
 
 export function CourseDetail() {
   const { id } = useParams<{ id: string }>();
+
+  const [isCreateLabOpen, setIsCreateLabOpen] = useState(false);
 
   const { course, labs } = useCourseDetailPage(Number(id));
 
@@ -41,7 +47,12 @@ export function CourseDetail() {
     //TODO
     console.log("Delete lab with ID:", labId);
   };
-  //   const [isCreateLabOpen, setIsCreateLabOpen] = useState(false);
+
+  const handleCreateLab = (newLab: Lab) => {
+    //TODO
+    console.log("Create new lab:", newLab);
+    setIsCreateLabOpen(false);
+  };
 
   const onBack = () => window.history.back();
 
@@ -97,7 +108,7 @@ export function CourseDetail() {
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">Bài thực hành</h2>
               <Button
-                // onClick={() => setIsCreateLabOpen(true)}
+                onClick={() => setIsCreateLabOpen(true)}
                 className="gap-2"
               >
                 <Plus className="w-4 h-4" />
@@ -113,7 +124,7 @@ export function CourseDetail() {
                   Chưa có bài thực hành nào
                 </p>
                 <Button
-                  // onClick={() => setIsCreateLabOpen(true)}
+                  onClick={() => setIsCreateLabOpen(true)}
                   variant="outline"
                 >
                   Tạo bài thực hành đầu tiên
@@ -124,11 +135,11 @@ export function CourseDetail() {
         </Tabs>
       </div>
 
-      {/* <CreateLabModal
+      <CreateLabModal
         isOpen={isCreateLabOpen}
         onClose={() => setIsCreateLabOpen(false)}
         onSubmit={handleCreateLab}
-      /> */}
+      />
     </div>
   );
 }
