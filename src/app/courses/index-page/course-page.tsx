@@ -164,6 +164,31 @@ export default function CoursePage() {
                 },
               ],
             },
+            {
+              value:
+                filters.isActive === undefined
+                  ? "all"
+                  : filters.isActive
+                  ? "active"
+                  : "inactive",
+              onChange: handleStatusChange,
+              placeholder: t("courses.page.statusFilter"),
+              widthClass: "w-[140px]",
+              options: [
+                {
+                  value: "all",
+                  label: t("courses.page.statusOptions.all"),
+                },
+                {
+                  value: "active",
+                  label: t("courses.page.statusOptions.active"),
+                },
+                {
+                  value: "inactive",
+                  label: t("courses.page.statusOptions.inactive"),
+                },
+              ],
+            },
           ]}
         />
       </div>
