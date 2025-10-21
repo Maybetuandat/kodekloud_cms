@@ -57,6 +57,7 @@ export const useCoursePage = (): UseCoursePage => {
   const [filters, setFiltersState] = useState<CourseFilters>({
     search: "",
     isActive: undefined,
+    categorySlug: undefined, // Filter cho category
     sortBy: "newest",
   });
 
@@ -68,6 +69,7 @@ export const useCoursePage = (): UseCoursePage => {
         pageSize: pageSize,
         search: filters.search || undefined,
         isActive: filters.isActive,
+        categorySlug: filters.categorySlug || undefined,
       });
 
       setCourses(response.data);
@@ -115,7 +117,7 @@ export const useCoursePage = (): UseCoursePage => {
     );
   };
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       const categories = await categoryService.getAllCategories();
       return categories;
@@ -123,7 +125,8 @@ export const useCoursePage = (): UseCoursePage => {
       console.error("Failed to load categories:", error);
       return [];
     }
-  };
+  }, []);
+
   const updateCourse = async (
     id: number,
     data: UpdateCourseRequest,
@@ -190,6 +193,6 @@ export const useCoursePage = (): UseCoursePage => {
     setFilters,
     setCurrentPage,
     setPageSize,
-    refresh: fetchCourses, // Hàm refresh chính là hàm fetchCourses
+    refresh: fetchCourses,
   };
 };

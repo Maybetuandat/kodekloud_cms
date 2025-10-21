@@ -12,6 +12,7 @@ export const courseService = {
     pageSize?: number;
     search?: string;
     isActive?: boolean;
+    categorySlug?: string;
   }): Promise<CourseResponse> => {
     console.log("PARAMS", params);
 

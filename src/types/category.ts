@@ -15,10 +15,3 @@ export interface CreateCategoryRequest {
 }
 
 export interface UpdateCategoryRequest extends CreateCategoryRequest {}
-
-export interface CourseFilters {
-  search: string;
-  isActive?: boolean;
-  categorySlug?: string;
-  sortBy: "newest" | "oldest";
-}

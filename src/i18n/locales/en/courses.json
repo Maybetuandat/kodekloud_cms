@@ -22,6 +22,9 @@
         "active": "Active",
         "inactive": "Inactive"
       },
+      "categoryOptions": {
+        "all": "All Categories"
+      },
       "noCoursesTitle": "No courses found",
       "noCoursesDescription": "Create your first course to get started",
       "noCoursesSearchDescription": "Try adjusting your search criteria",

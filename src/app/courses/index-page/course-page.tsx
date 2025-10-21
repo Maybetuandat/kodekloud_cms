@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 import { CourseCard } from "@/components/courses/course-card";
 import { Course } from "@/types/course";
+import { Category } from "@/types/category";
 import { useCoursePage } from "@/app/courses/index-page/use-course-page";
 import { Pagination } from "@/components/ui/pagination";
 import FilterBar from "@/components/ui/filter-bar";
@@ -39,23 +40,22 @@ export default function CoursePage() {
   } = useCoursePage();
 
   const [localSearchTerm, setLocalSearchTerm] = useState(filters.search);
+  const [categories, setCategories] = useState<Category[]>([]);
 
-  const [categorySlugList, setCategorySlugList] = useState<string[]>([]);
-
+  // Load categories một lần khi component mount
   useEffect(() => {
-    setLocalSearchTerm(filters.search);
-
     const loadCategories = async () => {
-      const categories = await fetchCategories();
-      setCategorySlugList(
-        categories
-          .map((category) => category.slug || "")
-          .filter((slug) => slug !== "")
-      );
+      const categoriesData = await fetchCategories();
+      setCategories(categoriesData.filter((cat) => cat.slug));
     };
 
     loadCategories();
-  }, [filters.search, fetchCategories]);
+  }, [fetchCategories]);
+
+  // Sync local search term với filters
+  useEffect(() => {
+    setLocalSearchTerm(filters.search);
+  }, [filters.search]);
 
   const handleSearchSubmit = () => {
     setFilters({ search: localSearchTerm });
@@ -69,6 +69,12 @@ export default function CoursePage() {
   const handleStatusChange = (value: string) => {
     setFilters({
       isActive: value === "all" ? undefined : value === "active",
+    });
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setFilters({
+      categorySlug: value === "all" ? undefined : value,
     });
   };
 
@@ -153,6 +159,7 @@ export default function CoursePage() {
           onSearchSubmit={handleSearchSubmit}
           onSearchClear={handleSearchClear}
           filters={[
+            // Status Filter
             {
               value:
                 filters.isActive === undefined
@@ -178,29 +185,21 @@ export default function CoursePage() {
                 },
               ],
             },
+            // Category Filter
             {
-              value:
-                filters.isActive === undefined
-                  ? "all"
-                  : filters.isActive
-                  ? "active"
-                  : "inactive",
-              onChange: handleStatusChange,
-              placeholder: t("courses.page.statusFilter"),
-              widthClass: "w-[140px]",
+              value: filters.categorySlug || "all",
+              onChange: handleCategoryChange,
+              placeholder: t("courses.page.categoryFilter"),
+              widthClass: "w-[180px]",
               options: [
                 {
                   value: "all",
-                  label: t("courses.page.statusOptions.all"),
+                  label: t("courses.page.categoryOptions.all"),
                 },
-                {
-                  value: "active",
-                  label: t("courses.page.statusOptions.active"),
-                },
-                {
-                  value: "inactive",
-                  label: t("courses.page.statusOptions.inactive"),
-                },
+                ...categories.map((category) => ({
+                  value: category.slug!,
+                  label: category.title,
+                })),
               ],
             },
           ]}

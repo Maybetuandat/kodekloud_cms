@@ -54,4 +54,5 @@ export interface CourseFilters {
   search: string;
   isActive?: boolean;
   sortBy: "newest" | "oldest";
+  categorySlug?: string;
 }
