@@ -12,32 +12,31 @@ export const courseService = {
     pageSize?: number;
     search?: string;
     isActive?: boolean;
-    categorySlug?: string;
+    slugCategory?: string;
   }): Promise<CourseResponse> => {
-    console.log("PARAMS", params);
-
-    // 1. Tạo một đối tượng cơ bản với các tham số bắt buộc
     const queryParams: {
       page: number;
       pageSize: number;
-      search?: string; // Đánh dấu là tùy chọn
-      isActive?: boolean; // Đánh dấu là tùy chọn
+      search?: string;
+      isActive?: boolean;
+      slugCategory?: string;
     } = {
       page: params.page || 0,
       pageSize: params.pageSize || 12,
     };
 
-    // 2. Chỉ thêm 'search' nếu nó có giá trị (không phải null, undefined, hoặc chuỗi rỗng)
     if (params.search) {
       queryParams.search = params.search;
     }
 
-    // 3. Chỉ thêm 'isActive' nếu nó không phải là null hoặc undefined (cho phép giá trị false)
+    if (params.slugCategory) {
+      queryParams.slugCategory = params.slugCategory;
+    }
+
     if (params.isActive != null) {
       queryParams.isActive = params.isActive;
     }
 
-    // 4. Gọi API với đối tượng queryParams đã được xây dựng hoàn chỉnh
     const response = await api.get<CourseResponse>("/courses", queryParams);
 
     return response;

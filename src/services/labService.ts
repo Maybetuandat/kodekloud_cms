@@ -1,10 +1,55 @@
-import { CreateLabRequest, Lab, PaginatedResponse, PaginationParams, UpdateLabRequest } from "@/types/lab";
-import { LabTestResponse, LabTestStatusResponse, StopTestResponse, WebSocketConnectionInfo } from "@/types/labTest";
+import {
+  CreateLabRequest,
+  Lab,
+  PaginatedResponse,
+  PaginationParams,
+  UpdateLabRequest,
+} from "@/types/lab";
+import {
+  LabTestResponse,
+  LabTestStatusResponse,
+  StopTestResponse,
+  WebSocketConnectionInfo,
+} from "@/types/labTest";
 import { api } from "@/lib/api";
 
 export const labService = {
   /**
-   * Get a paginated list of labs
+   * Get a paginated list of labs by course ID
+   * @param courseId - Course ID
+   * @param params - Pagination and filter parameters
+   * @returns Promise with paginated lab list
+   */
+  getLabsByCourseId: async (
+    courseId: number,
+    params: {
+      page?: number;
+      size?: number;
+      search?: string;
+      isActive?: boolean;
+    }
+  ): Promise<PaginatedResponse<Lab>> => {
+    const queryParams: Record<string, any> = {
+      page: (params.page ?? 0).toString(),
+      size: (params.size ?? 10).toString(),
+    };
+
+    if (params.isActive !== undefined) {
+      queryParams.isActive = params.isActive.toString();
+    }
+
+    if (params.search && params.search.trim()) {
+      queryParams.search = params.search.trim();
+    }
+
+    return api.get<PaginatedResponse<Lab>>(
+      `/courses/${courseId}/labs`,
+      queryParams
+    );
+  },
+
+  /**
+   * Get a paginated list of labs (legacy method - for backward compatibility)
    * @param params - Pagination and filter parameters
    * @returns Promise with paginated lab list
    */
@@ -12,8 +57,20 @@ export const labService = {
     params: PaginationParams & {
       isActivate?: Boolean;
       search?: string;
+      courseId?: number;
     }
   ): Promise<PaginatedResponse<Lab>> => {
+    // If courseId is provided, use the new API
+    if (params.courseId) {
+      return labService.getLabsByCourseId(params.courseId, {
+        page: params.page,
+        size: params.size,
+        search: params.search,
+        isActive: params.isActivate as boolean | undefined,
+      });
+    }
+
+    // Fallback to old API structure if no courseId
     const queryParams: Record<string, any> = {
       page: params.page.toString(),
       size: params.size.toString(),
@@ -29,16 +86,29 @@ export const labService = {
       queryParams.search = params.search.trim();
     }
 
-    return api.get<PaginatedResponse<Lab>>('/labs', queryParams);
+    return api.get<PaginatedResponse<Lab>>("/labs", queryParams);
   },
 
   /**
-   * Create new lab
+   * Create new lab for a course
+   * @param courseId - Course ID
+   * @param lab - Lab creation data
+   * @returns Promise with created lab
+   */
+  createLabForCourse: async (
+    courseId: number,
+    lab: CreateLabRequest
+  ): Promise<Lab> => {
+    return api.post<Lab>(`/courses/${courseId}/labs`, lab);
+  },
+
+  /**
+   * Create new lab (legacy method)
    * @param lab - Lab creation data
    * @returns Promise with created lab
    */
   createLab: async (lab: CreateLabRequest): Promise<Lab> => {
-    return api.post<Lab>('/labs', lab);
+    return api.post<Lab>("/labs", lab);
   },
 
   /**
@@ -95,8 +165,13 @@ export const labService = {
    * @param podName - Pod name
    * @returns Promise with test status
    */
-  getTestStatus: async (labId: string, podName: string): Promise<LabTestStatusResponse> => {
-    return api.get<LabTestStatusResponse>(`/labs/test/${labId}/status`, { podName });
+  getTestStatus: async (
+    labId: string,
+    podName: string
+  ): Promise<LabTestStatusResponse> => {
+    return api.get<LabTestStatusResponse>(`/labs/test/${labId}/status`, {
+      podName,
+    });
   },
 
   /**
@@ -105,8 +180,13 @@ export const labService = {
    * @param podName - Pod name
    * @returns Promise with stop response
    */
-  stopTestExecution: async (labId: string, podName: string): Promise<StopTestResponse> => {
-    return api.delete<StopTestResponse>(`/labs/test/${labId}?podName=${podName}`);
+  stopTestExecution: async (
+    labId: string,
+    podName: string
+  ): Promise<StopTestResponse> => {
+    return api.delete<StopTestResponse>(
+      `/labs/test/${labId}?podName=${podName}`
+    );
   },
 
   /**
@@ -114,7 +194,11 @@ export const labService = {
    * @param podName - Pod name
    * @returns Promise with WebSocket connection info
    */
-  getWebSocketInfo: async (podName: string): Promise<WebSocketConnectionInfo> => {
-    return api.get<WebSocketConnectionInfo>('/labs/test/websocket-info', { podName });
+  getWebSocketInfo: async (
+    podName: string
+  ): Promise<WebSocketConnectionInfo> => {
+    return api.get<WebSocketConnectionInfo>("/labs/test/websocket-info", {
+      podName,
+    });
   },
 };

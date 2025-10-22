@@ -4,8 +4,8 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { CourseHeader } from "@/components/courses/course-header";
-import { CourseForm } from "@/components/courses/course-form";
+import { CourseHeader } from "@/components/courses/create-course/create-course-header";
+import { CourseForm } from "@/components/courses/create-course/course-form";
 import { CreateCourseRequest } from "@/types/course";
 import { useCoursePage } from "@/app/courses/index-page/use-course-page";
 

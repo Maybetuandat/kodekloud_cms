@@ -69,7 +69,7 @@ export const useCoursePage = (): UseCoursePage => {
         pageSize: pageSize,
         search: filters.search || undefined,
         isActive: filters.isActive,
-        categorySlug: filters.categorySlug || undefined,
+        slugCategory: filters.categorySlug || undefined,
       });
 
       setCourses(response.data);

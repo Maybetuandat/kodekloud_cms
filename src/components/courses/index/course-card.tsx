@@ -1,5 +1,3 @@
-// src/components/courses/course-card.tsx
-import React from "react";
 import {
   Clock,
   Calendar,
@@ -8,7 +6,7 @@ import {
   Power,
   FolderOpen,
   MoreVertical,
-  Code, // Default fallback icon
+  Code,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

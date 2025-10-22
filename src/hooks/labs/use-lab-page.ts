@@ -1,16 +1,21 @@
-import { useState, useCallback, useEffect } from 'react';
-import { labService } from '@/services/labService';
+import { useState, useCallback, useEffect } from "react";
+import { labService } from "@/services/labService";
 import {
   Lab,
   PaginatedResponse,
   CreateLabRequest,
   UpdateLabRequest,
-} from '@/types/lab';
+} from "@/types/lab";
 
 export interface LabFilters {
   search: string;
   status: undefined | true | false;
   sortBy: "newest" | "oldest";
+}
+
+interface UseLabPageOptions {
+  courseId?: number;
+  autoLoad?: boolean;
 }
 
 interface UseLabPageState {
@@ -26,6 +31,8 @@ interface UseLabPageState {
   pageSize: number;
   totalPages: number;
   totalItems: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
 
   // Filter state
   filters: LabFilters;
@@ -36,16 +43,36 @@ interface UseLabPageState {
 
 interface UseLabPageActions {
   // Data fetching
-  loadLabs: (page?: number, customFilters?: LabFilters) => Promise<void>;
+  loadLabs: (
+    page?: number,
+    customFilters?: Partial<LabFilters>
+  ) => Promise<void>;
 
   // CRUD operations
-  createLab: (data: CreateLabRequest, onSuccess?: (lab: Lab) => void, onError?: (error: Error) => void) => Promise<void>;
-  updateLab: (id: string, data: UpdateLabRequest, onSuccess?: (lab: Lab) => void, onError?: (error: Error) => void) => Promise<void>;
-  deleteLab: (id: string, onSuccess?: () => void, onError?: (error: Error) => void) => Promise<void>;
-  toggleLabStatus: (lab: Lab, onSuccess?: (lab: Lab) => void, onError?: (error: Error) => void) => Promise<void>;
+  createLab: (
+    data: CreateLabRequest,
+    onSuccess?: (lab: Lab) => void,
+    onError?: (error: Error) => void
+  ) => Promise<void>;
+  updateLab: (
+    id: string,
+    data: UpdateLabRequest,
+    onSuccess?: (lab: Lab) => void,
+    onError?: (error: Error) => void
+  ) => Promise<void>;
+  deleteLab: (
+    id: string,
+    onSuccess?: () => void,
+    onError?: (error: Error) => void
+  ) => Promise<void>;
+  toggleLabStatus: (
+    lab: Lab,
+    onSuccess?: (lab: Lab) => void,
+    onError?: (error: Error) => void
+  ) => Promise<void>;
 
   // Filter & Pagination handlers
-  handleFiltersChange: (newFilters: LabFilters) => void;
+  handleFiltersChange: (newFilters: Partial<LabFilters>) => void;
   handlePageChange: (page: number) => void;
 
   // Utility functions
@@ -55,113 +82,119 @@ interface UseLabPageActions {
 }
 
 const initialFilters: LabFilters = {
-  search: '',
+  search: "",
   status: undefined,
-  sortBy: 'newest',
+  sortBy: "newest",
 };
 
 const initialState: UseLabPageState = {
   labs: [],
-  loading: true,
+  loading: false,
   actionLoading: false,
   currentPage: 0,
-  pageSize: 12,
+  pageSize: 10,
   totalPages: 0,
   totalItems: 0,
+  hasNext: false,
+  hasPrevious: false,
   filters: initialFilters,
   error: null,
-};
-
-/**
- * Map sort options to API fields
- */
-const mapSortByToApi = (sortBy: string): string => {
-  switch (sortBy) {
-    case 'newest':
-    case 'oldest':
-      return 'createdAt';
-    case 'name':
-      return 'name';
-    default:
-      return 'createdAt';
-  }
 };
 
 /**
  * Custom hook for managing lab page operations
  * Handles fetching lab list, pagination, filtering, and CRUD operations
  *
- * @param options - Configuration options
+ * @param options - Configuration options including courseId
  * @returns Object containing lab page state and action functions
  */
-export const useLabPage = (): UseLabPageState & UseLabPageActions => {
+export const useLabPage = (
+  options: UseLabPageOptions = {}
+): UseLabPageState & UseLabPageActions => {
+  const { courseId, autoLoad = true } = options;
   const [state, setState] = useState<UseLabPageState>(initialState);
 
   /**
    * Load labs with pagination and filters
    */
   const loadLabs = useCallback(
-    async (page = state.currentPage, customFilters = state.filters): Promise<void> => {
+    async (page = 0, customFilters?: Partial<LabFilters>): Promise<void> => {
+      // If no courseId is provided, skip loading
+      if (!courseId) {
+        console.warn("useLabPage: courseId is required to load labs");
+        return;
+      }
+
       try {
-        setState(prev => ({ ...prev, loading: true, error: null }));
+        setState((prev) => ({ ...prev, loading: true, error: null }));
 
-        const sortBy = mapSortByToApi(customFilters.sortBy);
-        const sortDir = customFilters.sortBy === 'oldest' ? 'asc' : 'desc';
-        const isActivate = customFilters.status === undefined ? undefined : customFilters.status;
-        const search = customFilters.search.trim() || undefined;
+        const filters = customFilters
+          ? { ...state.filters, ...customFilters }
+          : state.filters;
+        const isActive =
+          filters.status === undefined ? undefined : filters.status;
+        const search = filters.search.trim() || undefined;
 
-        const response: PaginatedResponse<Lab> = await labService.getLabsPaginated({
-          page,
-          size: state.pageSize,
-          sortBy,
-          sortDir,
-          isActivate,
-          search,
-        });
+        const response: PaginatedResponse<Lab> =
+          await labService.getLabsByCourseId(courseId, {
+            page,
+            size: state.pageSize,
+            isActive,
+            search,
+          });
 
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
           labs: response.data,
           currentPage: response.currentPage,
           totalPages: response.totalPages,
           totalItems: response.totalItems,
+          hasNext: response.hasNext,
+          hasPrevious: response.hasPrevious,
           loading: false,
+          filters,
         }));
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to load labs';
-        setState(prev => ({
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to load labs";
+        setState((prev) => ({
           ...prev,
           error: errorMessage,
           labs: [],
           totalPages: 0,
           totalItems: 0,
+          hasNext: false,
+          hasPrevious: false,
           loading: false,
         }));
       }
     },
-    [state.currentPage, state.filters, state.pageSize]
+    [courseId, state.filters, state.pageSize]
   );
 
   /**
-   * Initial load on mount
+   * Initial load on mount if autoLoad is enabled and courseId is provided
    */
   useEffect(() => {
-    loadLabs();
-  }, []);
+    if (autoLoad && courseId) {
+      loadLabs();
+    }
+  }, [courseId, autoLoad]);
 
   /**
    * Handle filter changes
    */
   const handleFiltersChange = useCallback(
-    (newFilters: LabFilters) => {
-      setState(prev => ({
+    (newFilters: Partial<LabFilters>) => {
+      const updatedFilters = { ...state.filters, ...newFilters };
+      setState((prev) => ({
         ...prev,
-        filters: newFilters,
+        filters: updatedFilters,
         currentPage: 0, // Reset to first page when filters change
       }));
-      loadLabs(0, newFilters);
+      loadLabs(0, updatedFilters);
     },
-    [loadLabs]
+    [loadLabs, state.filters]
   );
 
   /**
@@ -169,10 +202,10 @@ export const useLabPage = (): UseLabPageState & UseLabPageActions => {
    */
   const handlePageChange = useCallback(
     (page: number) => {
-      setState(prev => ({ ...prev, currentPage: page }));
-      loadLabs(page, state.filters);
+      setState((prev) => ({ ...prev, currentPage: page }));
+      loadLabs(page);
     },
-    [loadLabs, state.filters]
+    [loadLabs]
   );
 
   /**
@@ -184,20 +217,27 @@ export const useLabPage = (): UseLabPageState & UseLabPageActions => {
       onSuccess?: (lab: Lab) => void,
       onError?: (error: Error) => void
     ): Promise<void> => {
-      setState(prev => ({ ...prev, actionLoading: true, error: null }));
+      if (!courseId) {
+        const error = new Error("courseId is required to create lab");
+        if (onError) onError(error);
+        return;
+      }
+
+      setState((prev) => ({ ...prev, actionLoading: true, error: null }));
 
       try {
-        const newLab = await labService.createLab(data);
+        const newLab = await labService.createLabForCourse(courseId, data);
 
         // Reload current page after creation
-        await loadLabs(state.currentPage, state.filters);
+        await loadLabs(state.currentPage);
 
-        setState(prev => ({ ...prev, actionLoading: false }));
+        setState((prev) => ({ ...prev, actionLoading: false }));
 
         if (onSuccess) onSuccess(newLab);
       } catch (err) {
-        const error = err instanceof Error ? err : new Error('Failed to create lab');
-        setState(prev => ({
+        const error =
+          err instanceof Error ? err : new Error("Failed to create lab");
+        setState((prev) => ({
           ...prev,
           error: error.message,
           actionLoading: false,
@@ -206,7 +246,7 @@ export const useLabPage = (): UseLabPageState & UseLabPageActions => {
         if (onError) onError(error);
       }
     },
-    [loadLabs, state.currentPage, state.filters]
+    [courseId, loadLabs, state.currentPage]
   );
 
   /**
@@ -219,22 +259,25 @@ export const useLabPage = (): UseLabPageState & UseLabPageActions => {
       onSuccess?: (lab: Lab) => void,
       onError?: (error: Error) => void
     ): Promise<void> => {
-      setState(prev => ({ ...prev, actionLoading: true, error: null }));
+      setState((prev) => ({ ...prev, actionLoading: true, error: null }));
 
       try {
         const updatedLab = await labService.updateLab(id, data);
 
         // Update the lab in the current list
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
-          labs: prev.labs.map(lab => (lab.id === updatedLab.id ? updatedLab : lab)),
+          labs: prev.labs.map((lab) =>
+            lab.id === updatedLab.id ? updatedLab : lab
+          ),
           actionLoading: false,
         }));
 
         if (onSuccess) onSuccess(updatedLab);
       } catch (err) {
-        const error = err instanceof Error ? err : new Error('Failed to update lab');
-        setState(prev => ({
+        const error =
+          err instanceof Error ? err : new Error("Failed to update lab");
+        setState((prev) => ({
           ...prev,
           error: error.message,
           actionLoading: false,
@@ -255,7 +298,7 @@ export const useLabPage = (): UseLabPageState & UseLabPageActions => {
       onSuccess?: () => void,
       onError?: (error: Error) => void
     ): Promise<void> => {
-      setState(prev => ({ ...prev, actionLoading: true, error: null }));
+      setState((prev) => ({ ...prev, actionLoading: true, error: null }));
 
       try {
         await labService.deleteLab(id);
@@ -263,22 +306,24 @@ export const useLabPage = (): UseLabPageState & UseLabPageActions => {
         // Calculate new pagination state after deletion
         const newTotalItems = state.totalItems - 1;
         const newTotalPages = Math.ceil(newTotalItems / state.pageSize);
-        const shouldGoToPreviousPage = state.currentPage >= newTotalPages && state.currentPage > 0;
+        const shouldGoToPreviousPage =
+          state.currentPage >= newTotalPages && state.currentPage > 0;
 
         if (shouldGoToPreviousPage) {
           // Go to previous page if current page no longer exists
-          await loadLabs(state.currentPage - 1, state.filters);
+          await loadLabs(state.currentPage - 1);
         } else {
           // Reload current page
-          await loadLabs(state.currentPage, state.filters);
+          await loadLabs(state.currentPage);
         }
 
-        setState(prev => ({ ...prev, actionLoading: false }));
+        setState((prev) => ({ ...prev, actionLoading: false }));
 
         if (onSuccess) onSuccess();
       } catch (err) {
-        const error = err instanceof Error ? err : new Error('Failed to delete lab');
-        setState(prev => ({
+        const error =
+          err instanceof Error ? err : new Error("Failed to delete lab");
+        setState((prev) => ({
           ...prev,
           error: error.message,
           actionLoading: false,
@@ -287,7 +332,7 @@ export const useLabPage = (): UseLabPageState & UseLabPageActions => {
         if (onError) onError(error);
       }
     },
-    [loadLabs, state.currentPage, state.filters, state.totalItems, state.pageSize]
+    [loadLabs, state.currentPage, state.totalItems, state.pageSize]
   );
 
   /**
@@ -299,22 +344,23 @@ export const useLabPage = (): UseLabPageState & UseLabPageActions => {
       onSuccess?: (lab: Lab) => void,
       onError?: (error: Error) => void
     ): Promise<void> => {
-      setState(prev => ({ ...prev, actionLoading: true, error: null }));
+      setState((prev) => ({ ...prev, actionLoading: true, error: null }));
 
       try {
         const updatedLab = await labService.toggleLabStatus(lab.id);
 
         // Update the lab in the current list
-        setState(prev => ({
+        setState((prev) => ({
           ...prev,
-          labs: prev.labs.map(l => (l.id === updatedLab.id ? updatedLab : l)),
+          labs: prev.labs.map((l) => (l.id === updatedLab.id ? updatedLab : l)),
           actionLoading: false,
         }));
 
         if (onSuccess) onSuccess(updatedLab);
       } catch (err) {
-        const error = err instanceof Error ? err : new Error('Failed to toggle lab status');
-        setState(prev => ({
+        const error =
+          err instanceof Error ? err : new Error("Failed to toggle lab status");
+        setState((prev) => ({
           ...prev,
           error: error.message,
           actionLoading: false,
@@ -330,7 +376,7 @@ export const useLabPage = (): UseLabPageState & UseLabPageActions => {
    * Clear error message
    */
   const clearError = useCallback((): void => {
-    setState(prev => ({ ...prev, error: null }));
+    setState((prev) => ({ ...prev, error: null }));
   }, []);
 
   /**
@@ -344,8 +390,8 @@ export const useLabPage = (): UseLabPageState & UseLabPageActions => {
    * Refresh current page
    */
   const refresh = useCallback((): void => {
-    loadLabs(state.currentPage, state.filters);
-  }, [loadLabs, state.currentPage, state.filters]);
+    loadLabs(state.currentPage);
+  }, [loadLabs, state.currentPage]);
 
   return {
     // State
