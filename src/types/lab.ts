@@ -1,15 +1,15 @@
 export interface Lab {
   id: number;
-  name: string;
+  title: string;
   description?: string;
-  baseImage: string;
+
   estimatedTime: number;
   isActive: boolean;
   createdAt: string;
 }
 
 export interface CreateLabRequest {
-  name: string;
+  title: string;
   description?: string;
   estimatedTime: number;
 }

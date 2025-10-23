@@ -1,5 +1,5 @@
 import { BasicInfoFormData } from "@/components/courses/detail/edit-basic-info-modal";
-import { useLabPage, LabFilters } from "@/app/labs/use-lab";
+import { useLabPage, LabFilters } from "@/hooks/labs/use-lab";
 import { courseService } from "@/services/courseService";
 import { Course } from "@/types/course";
 import { useEffect, useState } from "react";

@@ -120,7 +120,7 @@
     "status": "Trạng thái",
     "active": "Hoạt động",
     "inactive": "Tạm dừng",
-    "labName": "Tên Lab",
+    "labTitle": "Tiêu đề",
     "description": "Mô tả",
     "technicalSpecs": "Cấu hình kỹ thuật",
     "baseDockerImage": "Base Docker Image",

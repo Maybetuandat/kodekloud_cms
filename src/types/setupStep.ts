@@ -1,6 +1,6 @@
 // src/types/setupStep.ts
 export interface SetupStep {
-  id: string;
+  id: number;
   stepOrder: number;
   title: string;
   description?: string;

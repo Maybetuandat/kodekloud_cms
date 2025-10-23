@@ -1,0 +1,21 @@
+{
+  "active": "Active",
+  "inactive": "Inactive",
+  "deactivate": "Deactivate",
+  "activate": "Activate",
+  "edit": "Edit",
+  "delete": "Delete",
+
+  "labInfo": "Lab Information",
+  "labInfoDescription": "Detailed overview of the lab's core properties and specifications.",
+  "labId": "Lab ID",
+  "status": "Status",
+  "labName": "Lab Name",
+  "description": "Description",
+  "technicalSpecs": "Technical Specifications",
+  "estimatedTime": "Estimated Time",
+  "minutes": "minutes",
+  "otherInfo": "Other Information",
+  "createdDate": "Created Date",
+  "unknownDate": "Unknown Date"
+}

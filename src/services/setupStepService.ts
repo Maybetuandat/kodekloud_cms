@@ -6,12 +6,13 @@ import {
 import { LabTestResponse } from "@/types/labTest";
 import { api } from "@/lib/api";
 
-const SETUP_STEPS_ENDPOINT = "/labs/setup-steps";
+const SETUP_STEPS_ENDPOINT = "/labs";
 
 export const setupStepService = {
   // Get setup steps for a lab
-  getLabSetupSteps: async (labId: number): Promise<SetupStep[]> => {
-    return api.get<SetupStep[]>(`${SETUP_STEPS_ENDPOINT}/${labId}`);
+  getSetupStepsByLabId: async (labId: number): Promise<SetupStep[]> => {
+    console.log(`${SETUP_STEPS_ENDPOINT}/${labId}/setup-steps`);
+    return api.get<SetupStep[]>(`${SETUP_STEPS_ENDPOINT}/${labId}/setup-steps`);
   },
 
   // Create setup step for a lab
@@ -42,7 +43,7 @@ export const setupStepService = {
   },
 
   // Delete setup step
-  deleteSetupStep: async (setupStepId: string): Promise<void> => {
+  deleteSetupStep: async (setupStepId: number): Promise<void> => {
     return api.delete<void>(`${SETUP_STEPS_ENDPOINT}/${setupStepId}`);
   },
 

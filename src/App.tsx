@@ -5,12 +5,13 @@ import { MainLayout } from "./layouts/MainLayout";
 import "./i18n";
 
 import HomePage from "./app/home";
-import LabDetail from "./app/labs/lab-detail";
+
 import CoursePage from "./app/courses/index-page/course-page";
 import NewCoursePage from "./app/courses/new-course-page/new-course-page";
-import LabPage from "./app/labs/lab-page";
+
 import CategoryPage from "./app/category/category-page";
 import { CourseDetail } from "./app/courses/detail-page/course-detail";
+import { LabDetail } from "./app/labs/lab-detail";
 
 function App() {
   return (

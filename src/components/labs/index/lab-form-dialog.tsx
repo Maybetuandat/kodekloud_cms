@@ -28,7 +28,7 @@ import { Lab, CreateLabRequest, UpdateLabRequest } from "@/types/lab";
 
 const createLabFormSchema = (t: any) =>
   z.object({
-    name: z.string().min(1, t("labs.validation.nameRequired")),
+    title: z.string().min(1, t("labs.validation.nameRequired")),
     description: z.string().optional(),
     estimatedTime: z
       .number()
@@ -61,7 +61,7 @@ export function LabFormDialog({
   const form = useForm<LabFormData>({
     resolver: zodResolver(labFormSchema),
     defaultValues: {
-      name: "",
+      title: "",
       description: "",
       estimatedTime: 60,
     },
@@ -70,13 +70,13 @@ export function LabFormDialog({
   useEffect(() => {
     if (open && lab) {
       form.reset({
-        name: lab.name,
+        title: lab.title,
         description: lab.description || "",
         estimatedTime: lab.estimatedTime,
       });
     } else if (open && !lab) {
       form.reset({
-        name: "",
+        title: "",
         description: "",
         estimatedTime: 60,
       });
@@ -149,13 +149,13 @@ export function LabFormDialog({
           >
             <FormField
               control={form.control}
-              name="name"
+              name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("labs.labName")} *</FormLabel>
+                  <FormLabel>{t("labs.labTitle")} *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("labs.labNamePlaceholder")}
+                      placeholder={t("labs.labTitlePlaceholder")}
                       {...field}
                       disabled={loading}
                       autoComplete="off"

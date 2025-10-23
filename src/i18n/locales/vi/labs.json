@@ -1,0 +1,21 @@
+{
+  "active": "Đang hoạt động",
+  "inactive": "Không hoạt động",
+  "deactivate": "Ngừng hoạt động",
+  "activate": "Kích hoạt",
+  "edit": "Chỉnh sửa",
+  "delete": "Xóa",
+
+  "labInfo": "Thông tin Lab",
+  "labInfoDescription": "Tổng quan chi tiết về các thuộc tính và thông số kỹ thuật cốt lõi của lab.",
+  "labId": "Mã Lab",
+  "status": "Trạng thái",
+  "labName": "Tên Lab",
+  "description": "Mô tả",
+  "technicalSpecs": "Thông số kỹ thuật",
+  "estimatedTime": "Thời gian ước tính",
+  "minutes": "phút",
+  "otherInfo": "Thông tin khác",
+  "createdDate": "Ngày tạo",
+  "unknownDate": "Ngày không xác định"
+}
