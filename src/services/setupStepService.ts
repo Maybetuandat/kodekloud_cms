@@ -1,98 +1,63 @@
-// src/services/setupStepService.ts
-import { SetupStep, CreateSetupStepRequest, UpdateSetupStepRequest } from '@/types/setupStep';
+import {
+  SetupStep,
+  CreateSetupStepRequest,
+  UpdateSetupStepRequest,
+} from "@/types/setupStep";
+import { LabTestResponse } from "@/types/labTest";
+import { api } from "@/lib/api";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/labs/setup-steps`
+const SETUP_STEPS_ENDPOINT = "/labs/setup-steps";
 
 export const setupStepService = {
-    getLabSetupSteps: async (id: string): Promise<any[]> => {
-      const response = await fetch(`${API_BASE_URL}/${id}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch setup steps');
-      }
-      return response.json();
-    },
+  // Get setup steps for a lab
+  getLabSetupSteps: async (labId: number): Promise<SetupStep[]> => {
+    return api.get<SetupStep[]>(`${SETUP_STEPS_ENDPOINT}/${labId}`);
+  },
+
   // Create setup step for a lab
-  createSetupStep: async (labId: string, setupStep: CreateSetupStepRequest): Promise<SetupStep> => {
-    const response = await fetch(`${API_BASE_URL}/${labId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(setupStep),
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to create setup step');
-    }
-    return response.json();
+  createSetupStep: async (
+    labId: number,
+    data: CreateSetupStepRequest
+  ): Promise<SetupStep> => {
+    return api.post<SetupStep>(`${SETUP_STEPS_ENDPOINT}/${labId}`, data);
   },
 
   // Create multiple setup steps
-  createBatchSetupSteps: async (labId: string, setupSteps: CreateSetupStepRequest[]): Promise<SetupStep[]> => {
-    const response = await fetch(`${API_BASE_URL}/batch/${labId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(setupSteps),
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to create batch setup steps');
-    }
-    const result = await response.json();
+  createBatchSetupSteps: async (
+    labId: number,
+    setupSteps: CreateSetupStepRequest[]
+  ): Promise<SetupStep[]> => {
+    const result = await api.post<{ setupSteps: SetupStep[] }>(
+      `${SETUP_STEPS_ENDPOINT}/batch/${labId}`,
+      setupSteps
+    );
     return result.setupSteps;
   },
 
   // Update setup step
-  updateSetupStep: async (setupStep: UpdateSetupStepRequest): Promise<SetupStep> => {
-    const response = await fetch(`${API_BASE_URL}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(setupStep),
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to update setup step');
-    }
-    return response.json();
+  updateSetupStep: async (
+    setupStep: UpdateSetupStepRequest
+  ): Promise<SetupStep> => {
+    return api.put<SetupStep>(SETUP_STEPS_ENDPOINT, setupStep);
   },
 
   // Delete setup step
   deleteSetupStep: async (setupStepId: string): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/${setupStepId}`, {
-      method: 'DELETE',
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to delete setup step');
-    }
+    return api.delete<void>(`${SETUP_STEPS_ENDPOINT}/${setupStepId}`);
   },
 
   // Delete multiple setup steps
   deleteBatchSetupSteps: async (setupStepIds: string[]): Promise<number> => {
-    const response = await fetch(`${API_BASE_URL}/batch`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(setupStepIds),
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to delete batch setup steps');
-    }
-    const result = await response.json();
+    const result = await api.delete<{ deletedCount: number }>(
+      `${SETUP_STEPS_ENDPOINT}/batch`
+    );
     return result.deletedCount;
   },
-  // testSetupStep : async (labId : string): Promise<string> =>{
-  //   const response = await fetch(`${API_BASE_URL}/`)
-  // }
+
+  // Test setup step
+  testSetupStep: async (setupStepId: string): Promise<LabTestResponse> => {
+    return api.post<LabTestResponse>(
+      `${SETUP_STEPS_ENDPOINT}/${setupStepId}/test`
+    );
+  },
 };

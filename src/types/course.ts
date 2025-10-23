@@ -1,4 +1,3 @@
-// src/types/course.ts
 import { Lab } from "@/types/lab";
 import { Category } from "./category";
 

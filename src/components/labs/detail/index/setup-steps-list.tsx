@@ -21,8 +21,8 @@ interface SetupStepsListProps {
   onMoveStepUp: (step: SetupStep) => void;
   onMoveStepDown: (step: SetupStep) => void;
   loading?: boolean;
-  testSetupStep : (labId : string) => void;
-  labId : string;
+  testSetupStep: (labId: number) => void;
+  labId: number;
 }
 
 export function SetupStepsList({
@@ -33,10 +33,10 @@ export function SetupStepsList({
   onMoveStepUp,
   onMoveStepDown,
   loading = false,
-  testSetupStep, 
-  labId
+  testSetupStep,
+  labId,
 }: SetupStepsListProps) {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
   const sortedSteps = [...steps].sort((a, b) => a.stepOrder - b.stepOrder);
 
   return (
@@ -46,25 +46,19 @@ export function SetupStepsList({
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2">
               <ListOrdered className="h-5 w-5" />
-              {t('labs.setupSteps')}
+              {t("labs.setupSteps")}
               {steps.length > 0 && (
                 <span className="text-sm font-normal text-muted-foreground">
-                  ({steps.length} {t('labs.steps')})
+                  ({steps.length} {t("labs.steps")})
                 </span>
               )}
             </CardTitle>
-            <CardDescription>
-              {t('labs.setupStepsDescription')}
-            </CardDescription>
+            <CardDescription>{t("labs.setupStepsDescription")}</CardDescription>
           </div>
-          
-          <Button
-            onClick={onCreateStep}
-            disabled={loading}
-            className="gap-2"
-          >
+
+          <Button onClick={onCreateStep} disabled={loading} className="gap-2">
             <Plus className="h-4 w-4" />
-            {t('labs.addStep')}
+            {t("labs.addStep")}
           </Button>
         </div>
       </CardHeader>
@@ -87,28 +81,18 @@ export function SetupStepsList({
                 loading={loading}
               />
             ))}
-            
+
             {/* Add step hint */}
             <div className="flex justify-center pt-4 ">
-             
-
-
-            <Button
+              <Button
                 variant="outline"
                 onClick={() => testSetupStep(labId)}
                 disabled={loading}
                 className="ml-6 bg-primary text-primary-foreground"
               >
-               
-                {t('labs.testSetupSteps')}
+                {t("labs.testSetupSteps")}
               </Button>
-
-
-
             </div>
-
-            
-
           </div>
         )}
       </CardContent>
@@ -116,46 +100,38 @@ export function SetupStepsList({
   );
 }
 
-function EmptyStepsState({ 
-  onCreateStep, 
-  loading 
-}: { 
+function EmptyStepsState({
+  onCreateStep,
+  loading,
+}: {
   onCreateStep: () => void;
   loading: boolean;
 }) {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
 
   return (
     <div className="text-center py-12">
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mx-auto mb-4">
         <ListOrdered className="h-8 w-8 text-muted-foreground" />
       </div>
-      
-      <h3 className="text-lg font-semibold mb-2">
-        {t('labs.noSetupSteps')}
-      </h3>
-      
+
+      <h3 className="text-lg font-semibold mb-2">{t("labs.noSetupSteps")}</h3>
+
       <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-        {t('labs.noSetupStepsDescription')}
+        {t("labs.noSetupStepsDescription")}
       </p>
-      
-      <Button 
-        onClick={onCreateStep}
-        disabled={loading}
-        className="gap-2"
-      >
+
+      <Button onClick={onCreateStep} disabled={loading} className="gap-2">
         <Plus className="h-4 w-4" />
-        {t('labs.createFirstStep')}
+        {t("labs.createFirstStep")}
       </Button>
-      
+
       <div className="mt-8 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 max-w-md mx-auto">
         <div className="flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
           <div className="text-sm text-blue-800 dark:text-blue-200">
-            <p className="font-medium mb-1">{t('labs.tip')}:</p>
-            <p>
-              {t('labs.setupStepsTip')}
-            </p>
+            <p className="font-medium mb-1">{t("labs.tip")}:</p>
+            <p>{t("labs.setupStepsTip")}</p>
           </div>
         </div>
       </div>

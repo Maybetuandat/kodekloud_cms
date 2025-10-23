@@ -10,7 +10,7 @@ import { DeleteLabConfirmDialog } from "@/components/courses/detail/delete-lab-c
 interface CourseLabsTabProps {
   labs: Lab[];
   onCreateLab: () => void;
-  onDeleteLab: (labId: string) => Promise<void>;
+  onDeleteLab: (labId: number) => Promise<void>;
   isLoading?: boolean;
   // Pagination props
   currentPage: number;
@@ -87,7 +87,7 @@ export function CourseLabsTab({
     });
   };
 
-  const handleDeleteClick = (labId: string) => {
+  const handleDeleteClick = (labId: number) => {
     const lab = labs.find((l) => l.id === labId);
     if (lab) {
       setLabToDelete(lab);

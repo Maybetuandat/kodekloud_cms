@@ -1,5 +1,5 @@
 export interface Lab {
-  id: string;
+  id: number;
   name: string;
   description?: string;
   baseImage: string;
@@ -11,7 +11,6 @@ export interface Lab {
 export interface CreateLabRequest {
   name: string;
   description?: string;
-  baseImage: string;
   estimatedTime: number;
 }
 
@@ -20,7 +19,7 @@ export interface PaginationParams {
   page: number;
   size: number;
   sortBy: string;
-  sortDir: 'asc' | 'desc';
+  sortDir: "asc" | "desc";
 }
 
 export interface PaginatedResponse<T> {

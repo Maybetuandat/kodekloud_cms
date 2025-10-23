@@ -8,10 +8,10 @@ import { type Lab } from "@/types/lab";
 import { useState } from "react";
 import FilterBar from "@/components/ui/filter-bar";
 import { Pagination } from "@/components/ui/pagination";
-
+import { useNavigate, useParams } from "react-router-dom";
 interface LabListProps {
   labs: Lab[];
-  onDeleteLab: (labId: string) => void;
+  onDeleteLab: (labId: number) => void;
   // Pagination props
   currentPage?: number;
   totalPages?: number;
@@ -53,6 +53,13 @@ export function LabList({
     if (onSearchChange) {
       onSearchChange(value);
     }
+  };
+  const navigate = useNavigate();
+  const { courseId } = useParams<{ courseId: string }>();
+  const handleNavigateToLabDetail = (labId: number, courseId: number) => {
+    // Navigate to lab detail page
+    console.log("Navigating to lab detail:", labId, courseId);
+    navigate(`/courses/${courseId}/labs/${labId}`);
   };
 
   const handleSearchClear = () => {
@@ -119,6 +126,7 @@ export function LabList({
         {labs.map((lab) => (
           <Card
             key={lab.id}
+            onClick={() => handleNavigateToLabDetail(lab.id, Number(courseId))}
             className="p-6 hover:shadow-lg transition-all duration-200 border-2"
           >
             <div className="flex items-start justify-between gap-4">
@@ -131,9 +139,9 @@ export function LabList({
                   <Badge
                     className={`${
                       lab.isActive
-                        ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-                        : "bg-gray-100 text-gray-800 hover:bg-gray-100"
-                    } px-3 py-1 text-sm font-medium`}
+                        ? "bg-green-500 text-white hover:bg-green-600 shadow-md"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    } px-3 py-1 text-sm font-medium rounded-full transition-all duration-200`}
                   >
                     {lab.isActive ? "Active" : "Inactive"}
                   </Badge>
@@ -152,7 +160,7 @@ export function LabList({
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Zap className="w-4 h-4" />
-                    <span>Tạo: {formatDate(lab.createdAt)}</span>
+                    <span>Create at: {formatDate(lab.createdAt)}</span>
                   </div>
                 </div>
               </div>

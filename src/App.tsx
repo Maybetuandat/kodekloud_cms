@@ -26,13 +26,8 @@ function App() {
           <Route path="courses">
             <Route index element={<CoursePage />} />
             <Route path="new" element={<NewCoursePage />} />
-            <Route path=":id" element={<CourseDetail />} />
-          </Route>
-
-          {/* Labs Section */}
-          <Route path="labs">
-            <Route index element={<LabPage />} />
-            <Route path=":id" element={<LabDetail />} />
+            <Route path=":courseId" element={<CourseDetail />} />
+            <Route path=":courseId/labs/:labId" element={<LabDetail />} />
           </Route>
 
           {/* Category Section */}

@@ -1,22 +1,15 @@
-
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/ui/dialog";
-
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import { exportLogs } from "@/services/terminalService";
 import { useScrollToBottom } from "@/hooks/labs/details/terminal/scrollToBottom";
-import { useTerminal } from "@/hooks/labs/details/terminal/terminal";
+import { useTerminal } from "@/hooks/labs/details/terminal/use-terminal";
 import { TerminalControls } from "./terminal-control";
 import { TerminalFooter } from "./terminal-footer";
 import { TerminalHeader } from "./terminal-header";
 import { TerminalOutput } from "./terminal-output";
-
-
 
 interface TerminalDialogProps {
   open: boolean;
@@ -35,8 +28,8 @@ export function TerminalDialog({
   labName,
   onClose,
 }: TerminalDialogProps) {
-  const { t } = useTranslation('common');
-  
+  const { t } = useTranslation("common");
+
   // Local state for UI controls
   const [isScrollLocked, setIsScrollLocked] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
@@ -102,10 +95,7 @@ export function TerminalDialog({
           onExportLogs={handleExportLogs}
         />
 
-        <TerminalOutput
-          messages={messages}
-          scrollRef={scrollRef}
-        />
+        <TerminalOutput messages={messages} scrollRef={scrollRef} />
 
         <TerminalFooter
           messageCount={messages.length}
@@ -118,9 +108,9 @@ export function TerminalDialog({
 }
 
 // Export all terminal components
-export * from './terminal-header';
-export * from './terminal-control';
-export * from './terminal-output';
-export * from './terminal-footer';
-export * from './terminal-status-badge';
-export * from './terminal-message-item';
+export * from "./terminal-header";
+export * from "./terminal-control";
+export * from "./terminal-output";
+export * from "./terminal-footer";
+export * from "./terminal-status-badge";
+export * from "./terminal-message-item";

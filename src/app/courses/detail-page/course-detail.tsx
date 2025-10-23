@@ -15,7 +15,7 @@ import { useParams } from "react-router-dom";
 import { useCourseDetailPage } from "./use-course-detail";
 
 export function CourseDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { courseId } = useParams<{ courseId: string }>();
   const { t } = useTranslation(["courses", "common"]);
 
   const [isCreateLabOpen, setIsCreateLabOpen] = useState(false);
@@ -38,7 +38,7 @@ export function CourseDetail() {
     handlePageChange,
     handlePageSizeChange,
     handleFiltersChange,
-  } = useCourseDetailPage(Number(id));
+  } = useCourseDetailPage(Number(courseId));
 
   const safeCourse: Course = course || {
     id: 0,
@@ -61,7 +61,7 @@ export function CourseDetail() {
     listCourseUser: [],
   };
 
-  const handleDeleteLab = (labId: string) => {
+  const handleDeleteLab = async (labId: number) => {
     deleteLab(
       labId,
       () => {

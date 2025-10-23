@@ -117,7 +117,7 @@ export const labService = {
    * @param lab - Lab update data
    * @returns Promise with updated lab
    */
-  updateLab: async (id: string, lab: UpdateLabRequest): Promise<Lab> => {
+  updateLab: async (id: number, lab: UpdateLabRequest): Promise<Lab> => {
     return api.put<Lab>(`/labs/${id}`, lab);
   },
 
@@ -126,7 +126,7 @@ export const labService = {
    * @param id - Lab ID
    * @returns Promise with deletion result
    */
-  deleteLab: async (id: string): Promise<void> => {
+  deleteLab: async (id: number): Promise<void> => {
     return api.delete<void>(`/labs/${id}`);
   },
 
@@ -135,7 +135,7 @@ export const labService = {
    * @param id - Lab ID
    * @returns Promise with updated lab
    */
-  toggleLabStatus: async (id: string): Promise<Lab> => {
+  toggleLabStatus: async (id: number): Promise<Lab> => {
     const result = await api.put<{ lab: Lab }>(`/labs/${id}/toggle-status`);
     return result.lab;
   },
@@ -145,8 +145,8 @@ export const labService = {
    * @param id - Lab ID
    * @returns Promise with lab details
    */
-  getLabById: async (id: string): Promise<Lab> => {
-    return api.get<Lab>(`/labs/${id}`);
+  getLabById: async (labId: number): Promise<Lab> => {
+    return api.get<Lab>(`/labs/${labId}`);
   },
 
   /**
@@ -155,7 +155,7 @@ export const labService = {
    * @param labId - Lab ID
    * @returns Promise with test response
    */
-  testSetupStep: async (labId: string): Promise<LabTestResponse> => {
+  testSetupStep: async (labId: number): Promise<LabTestResponse> => {
     return api.post<LabTestResponse>(`/labs/test/${labId}`);
   },
 
@@ -181,7 +181,7 @@ export const labService = {
    * @returns Promise with stop response
    */
   stopTestExecution: async (
-    labId: string,
+    labId: number,
     podName: string
   ): Promise<StopTestResponse> => {
     return api.delete<StopTestResponse>(

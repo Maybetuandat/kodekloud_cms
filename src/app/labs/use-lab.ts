@@ -55,13 +55,13 @@ interface UseLabPageActions {
     onError?: (error: Error) => void
   ) => Promise<void>;
   updateLab: (
-    id: string,
+    id: number,
     data: UpdateLabRequest,
     onSuccess?: (lab: Lab) => void,
     onError?: (error: Error) => void
   ) => Promise<void>;
   deleteLab: (
-    id: string,
+    id: number,
     onSuccess?: () => void,
     onError?: (error: Error) => void
   ) => Promise<void>;
@@ -254,7 +254,7 @@ export const useLabPage = (
    */
   const updateLab = useCallback(
     async (
-      id: string,
+      id: number,
       data: UpdateLabRequest,
       onSuccess?: (lab: Lab) => void,
       onError?: (error: Error) => void
@@ -294,7 +294,7 @@ export const useLabPage = (
    */
   const deleteLab = useCallback(
     async (
-      id: string,
+      id: number,
       onSuccess?: () => void,
       onError?: (error: Error) => void
     ): Promise<void> => {
