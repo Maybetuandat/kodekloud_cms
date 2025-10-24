@@ -2,14 +2,9 @@ import { LabFormDialog } from "@/components/labs/index/lab-form-dialog";
 import { LabDeleteDialog } from "@/components/labs/index/lab-delete-dialog";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Lab, UpdateLabRequest } from "@/types/lab";
-import {
-  CreateSetupStepRequest,
-  UpdateSetupStepRequest,
-  SetupStep,
-} from "@/types/setupStep";
+import { UpdateLabRequest } from "@/types/lab";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -21,7 +16,6 @@ import { LabInfoSection } from "../../components/labs/detail/index/lab-info-sect
 import { LabQuestionsTab } from "../../components/labs/detail/index/lab-question-tab";
 import { LabSetupStepsTab } from "../../components/labs/detail/index/lab-setup-step-tab";
 import { QuestionFilters, useLabDetailPage } from "./use-lab-detail-page";
-import { useSetupSteps } from "@/hooks/setup-steps/use-setup-step";
 
 export function LabDetail() {
   const { labId } = useParams<{ labId: string }>();
@@ -30,18 +24,12 @@ export function LabDetail() {
 
   const [isEditLabOpen, setIsEditLabOpen] = useState(false);
   const [isDeleteLabOpen, setIsDeleteLabOpen] = useState(false);
-  const [isCreateSetupStepOpen, setIsCreateSetupStepOpen] = useState(false);
   const [isCreateQuestionOpen, setIsCreateQuestionOpen] = useState(false);
-  const [editingSetupStep, setEditingSetupStep] = useState<SetupStep | null>(
-    null
-  );
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
 
   const {
     lab,
     isLoadingLab,
-
-    isLoadingSetupSteps,
     questions,
     isLoadingQuestions,
     currentPage,
@@ -51,13 +39,7 @@ export function LabDetail() {
     updateLab,
     toggleLabStatus,
     deleteLab,
-    createSetupStep,
-    updateSetupStep,
-    deleteSetupStep,
-    moveSetupStepUp,
-    moveSetupStepDown,
   } = useLabDetailPage(Number(labId));
-  const { setupSteps } = useSetupSteps({ labId: Number(labId) });
 
   // Handle Lab Operations
   const handleUpdateLab = async (data: UpdateLabRequest) => {
@@ -101,42 +83,6 @@ export function LabDetail() {
       // Error already handled in callback
     }
   };
-
-  const handleDeleteSetupStep = async (stepId: number) => {
-    try {
-      await deleteSetupStep(
-        stepId,
-        () => {
-          toast.success(t("labs.setupStepDeleteSuccess"));
-        },
-        (error) => {
-          toast.error(t("labs.setupStepDeleteError"));
-        }
-      );
-    } catch (error) {
-      // Error already handled
-    }
-  };
-
-  const handleMoveStepUp = async (stepId: number) => {
-    try {
-      await moveSetupStepUp(stepId);
-      toast.success(t("labs.moveStepUpSuccess"));
-    } catch (error) {
-      toast.error(t("labs.moveStepError"));
-    }
-  };
-
-  const handleMoveStepDown = async (stepId: number) => {
-    try {
-      await moveSetupStepDown(stepId);
-      toast.success(t("labs.moveStepDownSuccess"));
-    } catch (error) {
-      toast.error(t("labs.moveStepError"));
-    }
-  };
-
-  // Handle Question Operations
 
   const onBack = () => window.history.back();
 
@@ -209,7 +155,7 @@ export function LabDetail() {
         <Tabs defaultValue="setup-steps" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mx-auto">
             <TabsTrigger value="setup-steps">
-              {t("labs.detail.tabs.setupSteps")}
+              {t("setupSteps.title")}
             </TabsTrigger>
             <TabsTrigger value="questions">
               {t("labs.detail.tabs.questions")}
@@ -218,17 +164,7 @@ export function LabDetail() {
 
           {/* Setup Steps Tab */}
           <TabsContent value="setup-steps" className="mt-6">
-            <LabSetupStepsTab
-              setupSteps={setupSteps}
-              onCreateStep={() => setIsCreateSetupStepOpen(true)}
-              onEditStep={(step) => {
-                setEditingSetupStep(step);
-              }}
-              onDeleteStep={handleDeleteSetupStep}
-              onMoveStepUp={handleMoveStepUp}
-              onMoveStepDown={handleMoveStepDown}
-              isLoading={isLoadingSetupSteps}
-            />
+            <LabSetupStepsTab labId={Number(labId)} />
           </TabsContent>
 
           {/* Questions Tab */}
@@ -270,8 +206,6 @@ export function LabDetail() {
         onConfirm={handleDeleteLab}
         loading={false}
       />
-
-      {/* Setup Step Form Modal */}
     </div>
   );
 }

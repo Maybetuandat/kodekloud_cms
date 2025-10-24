@@ -1,4 +1,3 @@
-// src/types/setupStep.ts
 export interface SetupStep {
   id: number;
   stepOrder: number;
@@ -23,5 +22,5 @@ export interface CreateSetupStepRequest {
 }
 
 export interface UpdateSetupStepRequest extends CreateSetupStepRequest {
-  id: string;
+  id: number;
 }

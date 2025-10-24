@@ -17,5 +17,51 @@
   "minutes": "minutes",
   "otherInfo": "Other Information",
   "createdDate": "Created Date",
-  "unknownDate": "Unknown Date"
+  "unknownDate": "Unknown Date",
+
+  "setupSteps": {
+    "title": "Setup Steps",
+    "description": "Define the sequence of commands or actions required to set up the lab environment.",
+    "addStep": "Add Step",
+    "createStep": "Create Setup Step",
+    "editStep": "Edit Setup Step",
+    "createStepDescription": "Add a new step to configure the lab environment. Define commands and execution parameters.",
+    "editStepDescription": "Modify the setup step configuration and execution parameters.",
+    "noSetupSteps": "No Setup Steps Defined",
+    "noSetupStepsDescription": "Start by adding the first step to guide users on how to prepare their lab environment.",
+    "createFirstStep": "Create First Step",
+    "tip": "The step order is automatically managed by moving steps up or down. The commands are executed sequentially.",
+    "deleteConfirmation": "This action cannot be undone. This will permanently remove the setup step from the lab.",
+
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "e.g., Install Docker, Configure Network, Setup Database",
+      "description": "Description",
+      "descriptionPlaceholder": "Provide additional context or instructions for this step...",
+      "setupCommand": "Setup Command",
+      "setupCommandPlaceholder": "#!/bin/bash\napt-get update\napt-get install -y docker.io",
+      "setupCommandDescription": "Shell command or script to execute for this setup step",
+      "expectedExitCode": "Expected Exit Code",
+      "expectedExitCodeDescription": "The expected exit code for successful execution (usually 0)",
+      "retryCount": "Retry Count",
+      "retryCountDescription": "Number of times to retry on failure (1-10)",
+      "timeoutSeconds": "Timeout (seconds)",
+      "timeoutSecondsDescription": "Maximum execution time in seconds (1-3600)",
+      "continueOnFailure": "Continue on Failure",
+      "continueOnFailureDescription": "Continue to next step even if this step fails"
+    }
+  },
+
+  "common": {
+    "cancel": "Cancel",
+    "create": "Create",
+    "update": "Update",
+    "save": "Save",
+    "delete": "Delete",
+    "confirmDelete": "Confirm Delete",
+    "loading": "Loading...",
+    "tip": "Tip",
+    "activated": "Activated",
+    "deactivated": "Deactivated"
+  }
 }

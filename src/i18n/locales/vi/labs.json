@@ -1,21 +1,54 @@
 {
-  "active": "Đang hoạt động",
+  "active": "Hoạt động",
   "inactive": "Không hoạt động",
-  "deactivate": "Ngừng hoạt động",
+  "deactivate": "Vô hiệu hóa",
   "activate": "Kích hoạt",
   "edit": "Chỉnh sửa",
   "delete": "Xóa",
 
-  "labInfo": "Thông tin Lab",
-  "labInfoDescription": "Tổng quan chi tiết về các thuộc tính và thông số kỹ thuật cốt lõi của lab.",
-  "labId": "Mã Lab",
-  "status": "Trạng thái",
-  "labName": "Tên Lab",
-  "description": "Mô tả",
-  "technicalSpecs": "Thông số kỹ thuật",
-  "estimatedTime": "Thời gian ước tính",
-  "minutes": "phút",
-  "otherInfo": "Thông tin khác",
-  "createdDate": "Ngày tạo",
-  "unknownDate": "Ngày không xác định"
+  "setupSteps": {
+    "title": "Các Bước Cài Đặt",
+    "description": "Định nghĩa chuỗi các lệnh hoặc hành động cần thiết để thiết lập môi trường lab.",
+    "addStep": "Thêm Bước",
+    "createStep": "Tạo Bước Cài Đặt",
+    "editStep": "Chỉnh Sửa Bước Cài Đặt",
+    "createStepDescription": "Thêm một bước mới để cấu hình môi trường lab. Định nghĩa lệnh và các tham số thực thi.",
+    "editStepDescription": "Sửa đổi cấu hình bước cài đặt và các tham số thực thi.",
+    "noSetupSteps": "Chưa Có Bước Cài Đặt",
+    "noSetupStepsDescription": "Bắt đầu bằng cách thêm bước đầu tiên để hướng dẫn người dùng cách chuẩn bị môi trường lab.",
+    "createFirstStep": "Tạo Bước Đầu Tiên",
+    "tip": "Thứ tự các bước được quản lý tự động bằng cách di chuyển lên hoặc xuống. Các lệnh được thực thi tuần tự.",
+    "deleteConfirmation": "Hành động này không thể hoàn tác. Bước cài đặt sẽ bị xóa vĩnh viễn khỏi lab.",
+
+    "form": {
+      "title": "Tiêu đề",
+      "titlePlaceholder": "VD: Cài đặt Docker, Cấu hình Mạng, Thiết lập CSDL",
+      "description": "Mô tả",
+      "descriptionPlaceholder": "Cung cấp ngữ cảnh hoặc hướng dẫn bổ sung cho bước này...",
+      "setupCommand": "Lệnh Cài Đặt",
+      "setupCommandPlaceholder": "#!/bin/bash\napt-get update\napt-get install -y docker.io",
+      "setupCommandDescription": "Lệnh shell hoặc script để thực thi cho bước cài đặt này",
+      "expectedExitCode": "Mã Thoát Mong Đợi",
+      "expectedExitCodeDescription": "Mã thoát mong đợi khi thực thi thành công (thường là 0)",
+      "retryCount": "Số Lần Thử Lại",
+      "retryCountDescription": "Số lần thử lại khi thất bại (1-10)",
+      "timeoutSeconds": "Thời gian chờ (giây)",
+      "timeoutSecondsDescription": "Thời gian thực thi tối đa tính bằng giây (1-3600)",
+      "continueOnFailure": "Tiếp tục khi Thất bại",
+      "continueOnFailureDescription": "Tiếp tục bước tiếp theo ngay cả khi bước này thất bại"
+    }
+  },
+
+  "common": {
+    "cancel": "Hủy",
+    "create": "Tạo",
+    "update": "Cập nhật",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "confirmDelete": "Xác Nhận Xóa",
+    "loading": "Đang tải...",
+    "tip": "Mẹo",
+    "activated": "Đã kích hoạt",
+    "deactivated": "Đã vô hiệu hóa"
+  }
 }

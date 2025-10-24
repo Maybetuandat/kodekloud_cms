@@ -20,7 +20,11 @@ export const setupStepService = {
     labId: number,
     data: CreateSetupStepRequest
   ): Promise<SetupStep> => {
-    return api.post<SetupStep>(`${SETUP_STEPS_ENDPOINT}/${labId}`, data);
+    return api.post<SetupStep>(`/labs/${labId}/setup-steps`, data);
+  },
+
+  swapSetupSteps: async (fromSetupStepId: number, toSetupStepId: number) => {
+    return api.post(`/setup-steps/swap`, { fromSetupStepId, toSetupStepId });
   },
 
   // Create multiple setup steps
@@ -39,12 +43,12 @@ export const setupStepService = {
   updateSetupStep: async (
     setupStep: UpdateSetupStepRequest
   ): Promise<SetupStep> => {
-    return api.put<SetupStep>(SETUP_STEPS_ENDPOINT, setupStep);
+    return api.put<SetupStep>(`/setup-steps/${setupStep.id}`, setupStep);
   },
 
   // Delete setup step
   deleteSetupStep: async (setupStepId: number): Promise<void> => {
-    return api.delete<void>(`${SETUP_STEPS_ENDPOINT}/${setupStepId}`);
+    return api.delete<void>(`/setup-steps/${setupStepId}`);
   },
 
   // Delete multiple setup steps
