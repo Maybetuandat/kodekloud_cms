@@ -27,19 +27,8 @@ export function LabDetail() {
   const [isCreateQuestionOpen, setIsCreateQuestionOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
 
-  const {
-    lab,
-    isLoadingLab,
-    questions,
-    isLoadingQuestions,
-    currentPage,
-    totalPages,
-    totalItems,
-    pageSize,
-    updateLab,
-    toggleLabStatus,
-    deleteLab,
-  } = useLabDetailPage(Number(labId));
+  const { lab, isLoadingLab, updateLab, toggleLabStatus, deleteLab } =
+    useLabDetailPage(Number(labId));
 
   // Handle Lab Operations
   const handleUpdateLab = async (data: UpdateLabRequest) => {
@@ -118,22 +107,6 @@ export function LabDetail() {
     );
   }
 
-  function handleDeleteQuestion(questionId: number): void {
-    throw new Error("Function not implemented.");
-  }
-
-  function handlePageChange(page: number): void {
-    throw new Error("Function not implemented.");
-  }
-
-  function handlePageSizeChange(size: number): void {
-    throw new Error("Function not implemented.");
-  }
-
-  function handleFiltersChange(filters: Partial<QuestionFilters>): void {
-    throw new Error("Function not implemented.");
-  }
-
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -157,9 +130,7 @@ export function LabDetail() {
             <TabsTrigger value="setup-steps">
               {t("setupSteps.title")}
             </TabsTrigger>
-            <TabsTrigger value="questions">
-              {t("labs.detail.tabs.questions")}
-            </TabsTrigger>
+            <TabsTrigger value="questions">{t("questions.title")}</TabsTrigger>
           </TabsList>
 
           {/* Setup Steps Tab */}
@@ -169,22 +140,7 @@ export function LabDetail() {
 
           {/* Questions Tab */}
           <TabsContent value="questions" className="mt-6">
-            <LabQuestionsTab
-              questions={questions}
-              onCreateQuestion={() => setIsCreateQuestionOpen(true)}
-              onEditQuestion={(question) => {
-                setEditingQuestion(question);
-              }}
-              onDeleteQuestion={handleDeleteQuestion}
-              isLoading={isLoadingQuestions}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              pageSize={pageSize}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
-              onFiltersChange={handleFiltersChange}
-            />
+            <LabQuestionsTab labId={Number(labId)} />
           </TabsContent>
         </Tabs>
       </div>

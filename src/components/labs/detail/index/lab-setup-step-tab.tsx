@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useSetupSteps } from "@/hooks/setup-steps/use-setup-step";
+import { useSetupSteps } from "@/app/labs/use-setup-step";
 import { SetupStepDeleteDialog } from "./setup-step/setup-step-delete-dialog";
 import { SetupStepFormDialog } from "./setup-step/setup-step-form-dialog";
 import { SetupStepHeader } from "./setup-step/setup-step-header";
