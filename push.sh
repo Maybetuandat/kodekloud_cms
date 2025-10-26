@@ -1,4 +1,4 @@
 git add .
-git commit -m "feat(question labs): refactor lab question components to use hooks and improve structure , add ui lab question tab"
+git commit -m "feat(ui for lab details): add UI for lab details page"
 git push origin  main
 clear

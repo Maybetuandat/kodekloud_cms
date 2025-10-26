@@ -1,7 +1,7 @@
 // components/labs/detail/setup-steps/setup-step-header.tsx
 import { Button } from "@/components/ui/button";
 import { CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, FlaskConical } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface SetupStepHeaderProps {
@@ -15,6 +15,11 @@ export function SetupStepHeader({
 }: SetupStepHeaderProps) {
   const { t } = useTranslation("labs");
 
+  const handleTestClick = () => {
+    console.log("Test setup steps clicked");
+    // TODO: Implement test logic later
+  };
+
   return (
     <CardHeader>
       <div className="flex items-center justify-between">
@@ -26,10 +31,21 @@ export function SetupStepHeader({
             {t("setupSteps.description")}
           </p>
         </div>
-        <Button onClick={onCreateClick} className="gap-2" disabled={disabled}>
-          <Plus className="h-4 w-4" />
-          {t("setupSteps.addStep")}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleTestClick}
+            variant="outline"
+            className="gap-2"
+            disabled={disabled}
+          >
+            <FlaskConical className="h-4 w-4" />
+            Test Setup
+          </Button>
+          <Button onClick={onCreateClick} className="gap-2" disabled={disabled}>
+            <Plus className="h-4 w-4" />
+            Add Step
+          </Button>
+        </div>
       </div>
     </CardHeader>
   );

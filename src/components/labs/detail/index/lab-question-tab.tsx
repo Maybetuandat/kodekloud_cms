@@ -5,6 +5,7 @@ import { LoadingState } from "./question/lab-loading-state";
 import { LabQuestionsFilters } from "./question/lab-question-filter";
 import { LabQuestionsHeader } from "./question/lab-question-header";
 import { LabQuestionsList } from "./question/lab-question-list";
+import { LabUploadExcelDialog } from "./question/lab-upload-excel-dialog";
 
 interface LabQuestionsTabProps {
   labId: number;
@@ -29,6 +30,9 @@ export function LabQuestionsTab({ labId }: LabQuestionsTabProps) {
     handleDeleteQuestion,
     handleConfirmDelete,
     handleCancelDelete,
+    uploadExcelDialogOpen,
+    setUploadExcelDialogOpen,
+    handleUploadExcel,
   } = useLabQuestions({ labId });
 
   const handleSortChange = (value: string) => {
@@ -42,7 +46,9 @@ export function LabQuestionsTab({ labId }: LabQuestionsTabProps) {
   return (
     <>
       <Card>
-        <LabQuestionsHeader onCreateQuestion={handleCreateQuestion} />
+        <LabQuestionsHeader
+          onUploadExcel={() => setUploadExcelDialogOpen(true)}
+        />
 
         <CardContent>
           <LabQuestionsFilters
@@ -67,6 +73,11 @@ export function LabQuestionsTab({ labId }: LabQuestionsTabProps) {
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         loading={actionLoading}
+      />
+      <LabUploadExcelDialog
+        open={uploadExcelDialogOpen}
+        onClose={() => setUploadExcelDialogOpen(false)}
+        onUpload={handleUploadExcel}
       />
     </>
   );

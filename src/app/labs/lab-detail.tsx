@@ -1,5 +1,4 @@
-import { LabFormDialog } from "@/components/labs/index/lab-form-dialog";
-import { LabDeleteDialog } from "@/components/labs/index/lab-delete-dialog";
+import { LabFormDialog } from "@/components/courses/detail/lab-tab/lab-form-dialog";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UpdateLabRequest } from "@/types/lab";
@@ -16,6 +15,7 @@ import { LabInfoSection } from "../../components/labs/detail/index/lab-info-sect
 import { LabQuestionsTab } from "../../components/labs/detail/index/lab-question-tab";
 import { LabSetupStepsTab } from "../../components/labs/detail/index/lab-setup-step-tab";
 import { QuestionFilters, useLabDetailPage } from "./use-lab-detail-page";
+import { LabDeleteDialog } from "@/components/labs/detail/index/lab-delete-dialog";
 
 export function LabDetail() {
   const { labId } = useParams<{ labId: string }>();

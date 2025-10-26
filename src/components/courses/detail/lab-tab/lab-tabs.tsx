@@ -1,11 +1,11 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { LabList } from "@/components/courses/detail/lab-list";
+import { LabList } from "@/components/courses/detail/lab-tab/lab-list";
 import { Lab } from "@/types/lab";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { DeleteLabConfirmDialog } from "@/components/courses/detail/delete-lab-confirm-dialog";
+import { DeleteLabConfirmDialog } from "@/components/courses/detail/lab-tab/delete-lab-confirm-dialog";
 
 interface CourseLabsTabProps {
   labs: Lab[];

@@ -2,10 +2,10 @@ import { CourseDetailHeader } from "@/components/courses/detail/course-detail-he
 import {
   BasicInfoFormData,
   EditBasicInfoModal,
-} from "@/components/courses/detail/edit-basic-info-modal";
-import { CourseLabsTab } from "@/components/courses/detail/lab-tabs";
-import { CourseOverviewTab } from "@/components/courses/detail/overview-tab";
-import { LabFormDialog } from "@/components/labs/index/lab-form-dialog";
+} from "@/components/courses/detail/overview-tab/edit-basic-info-modal";
+import { CourseLabsTab } from "@/components/courses/detail/lab-tab/lab-tabs";
+import { CourseOverviewTab } from "@/components/courses/detail/overview-tab/overview-tab";
+import { LabFormDialog } from "@/components/courses/detail/lab-tab/lab-form-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Course } from "@/types/course";
 import { CreateLabRequest, UpdateLabRequest } from "@/types/lab";

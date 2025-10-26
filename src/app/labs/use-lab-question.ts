@@ -5,10 +5,17 @@ import {
   CreateQuestionRequest,
   UpdateQuestionRequest,
 } from "@/types/question";
+import { ExcelQuestionRow } from "@/services/excelService";
 
 export interface QuestionFilters {
   search?: string;
   sortBy?: "newest" | "oldest";
+}
+
+export interface UploadResult {
+  success: number;
+  failed: number;
+  errors: Array<{ question: string; error: string }>;
 }
 
 export interface UseLabQuestions {
@@ -16,6 +23,10 @@ export interface UseLabQuestions {
   loading: boolean;
   actionLoading: boolean;
   currentPage: number;
+  uploadExcelDialogOpen: boolean;
+  uploadResult: UploadResult | null;
+  setUploadExcelDialogOpen: (open: boolean) => void;
+  handleUploadExcel: (questions: ExcelQuestionRow[]) => Promise<UploadResult>;
   pageSize: number;
   totalPages: number;
   totalItems: number;
@@ -74,10 +85,57 @@ export const useLabQuestions = ({
   const [totalItems, setTotalItems] = useState(0);
   const [deleteQuestionId, setDeleteQuestionId] = useState<number | null>(null);
   const [searchValue, setSearchValue] = useState("");
+  const [uploadExcelDialogOpen, setUploadExcelDialogOpen] = useState(false);
+  const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [filters, setFiltersState] = useState<QuestionFilters>({
     search: "",
     sortBy: "newest",
   });
+
+  const handleUploadExcel = async (
+    questions: ExcelQuestionRow[]
+  ): Promise<UploadResult> => {
+    setActionLoading(true);
+    setUploadResult(null);
+
+    try {
+      const result = await questionService.bulkCreateQuestionsFromExcel(
+        labId,
+        questions
+      );
+
+      setUploadResult(result);
+
+      // Refresh questions list
+      await fetchQuestions();
+
+      // Chỉ đóng dialog nếu upload hoàn toàn thành công
+      if (result.failed === 0) {
+        setTimeout(() => {
+          setUploadExcelDialogOpen(false);
+          setUploadResult(null);
+        }, 1500);
+      }
+
+      return result;
+    } catch (error) {
+      console.error("Failed to upload questions:", error);
+      const errorResult: UploadResult = {
+        success: 0,
+        failed: questions.length,
+        errors: [
+          {
+            question: "All questions",
+            error: error instanceof Error ? error.message : "Unknown error",
+          },
+        ],
+      };
+      setUploadResult(errorResult);
+      throw error;
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   const fetchQuestions = useCallback(async () => {
     if (!labId) return;
@@ -149,7 +207,7 @@ export const useLabQuestions = ({
     onError?: (error: Error) => void
   ) => {
     await performActionAndRefresh(
-      () => questionService.createQuestion(data),
+      () => questionService.createQuestion(labId, data),
       (newQuestion) => onSuccess?.(newQuestion),
       onError
     );
@@ -257,6 +315,8 @@ export const useLabQuestions = ({
     filters,
     searchValue,
     deleteQuestionId,
+    uploadExcelDialogOpen,
+    uploadResult,
 
     // CRUD Operations
     createQuestion,
@@ -270,6 +330,7 @@ export const useLabQuestions = ({
     setPageSize,
     setSearchValue,
     setDeleteQuestionId,
+    setUploadExcelDialogOpen,
 
     // UI Handlers
     handleSearchChange,
@@ -279,6 +340,7 @@ export const useLabQuestions = ({
     handleDeleteQuestion,
     handleConfirmDelete,
     handleCancelDelete,
+    handleUploadExcel,
 
     // Utility
     refresh: fetchQuestions,

@@ -14,7 +14,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Lab } from "@/types/lab";
 
-
 interface LabDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -60,15 +59,12 @@ export function LabDeleteDialog({
 
         <AlertDialogDescription className="text-left space-y-3">
           <p>
-            Bạn có chắc chắn muốn xóa lab <strong>"{lab.name}"</strong> không?
+            Bạn có chắc chắn muốn xóa lab <strong>"{lab.title}"</strong> không?
           </p>
-          
+
           <div className="bg-muted/50 p-3 rounded-lg space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Base Image:</span>
-              <Badge variant="outline" className="font-mono text-xs">
-                {lab.baseImage}
-              </Badge>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Thời gian ước tính:</span>
@@ -90,8 +86,8 @@ export function LabDeleteDialog({
                   Hành động này không thể hoàn tác!
                 </p>
                 <p className="text-destructive/80">
-                  Tất cả dữ liệu liên quan đến lab này sẽ bị xóa vĩnh viễn, 
-                  bao gồm các setup steps và execution logs.
+                  Tất cả dữ liệu liên quan đến lab này sẽ bị xóa vĩnh viễn, bao
+                  gồm các setup steps và execution logs.
                 </p>
               </div>
             </div>
@@ -99,9 +95,7 @@ export function LabDeleteDialog({
         </AlertDialogDescription>
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>
-            Hủy bỏ
-          </AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>Hủy bỏ</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={loading}

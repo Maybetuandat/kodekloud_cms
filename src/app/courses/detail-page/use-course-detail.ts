@@ -1,4 +1,4 @@
-import { BasicInfoFormData } from "@/components/courses/detail/edit-basic-info-modal";
+import { BasicInfoFormData } from "@/components/courses/detail/overview-tab/edit-basic-info-modal";
 import { useLabPage, LabFilters } from "@/hooks/labs/use-lab";
 import { courseService } from "@/services/courseService";
 import { Course } from "@/types/course";

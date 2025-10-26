@@ -36,9 +36,3 @@ export interface LabFilters {
   status: null | true | false;
   sortBy: "newest" | "oldest" | "name" | "estimatedTime";
 }
-
-// Update existing LabFilters to include pagination
-export interface ExtendedLabFilters extends LabFilters {
-  page: number;
-  size: number;
-}

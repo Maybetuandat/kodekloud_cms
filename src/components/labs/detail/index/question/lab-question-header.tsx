@@ -1,32 +1,23 @@
+// src/components/question/lab-question-header.tsx
 import { Button } from "@/components/ui/button";
+import { Plus, Upload } from "lucide-react";
 import { CardHeader, CardTitle } from "@/components/ui/card";
-import { useTranslation } from "react-i18next";
-import { Plus } from "lucide-react";
 
 interface LabQuestionsHeaderProps {
-  onCreateQuestion: () => void;
+  onUploadExcel: () => void;
 }
 
-export function LabQuestionsHeader({
-  onCreateQuestion,
-}: LabQuestionsHeaderProps) {
-  const { t } = useTranslation("labs");
-
+export function LabQuestionsHeader({ onUploadExcel }: LabQuestionsHeaderProps) {
   return (
     <CardHeader>
       <div className="flex items-center justify-between">
-        <div>
-          <CardTitle className="text-lg font-semibold">
-            {t("questions.title")}
-          </CardTitle>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t("questions.description")}
-          </p>
+        <CardTitle>Questions</CardTitle>
+        <div className="flex gap-2">
+          <Button onClick={onUploadExcel} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Create Question
+          </Button>
         </div>
-        <Button onClick={onCreateQuestion} className="gap-2">
-          <Plus className="h-4 w-4" />
-          {t("questions.addQuestion")}
-        </Button>
       </div>
     </CardHeader>
   );
