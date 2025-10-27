@@ -3,11 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Lab } from "@/types/lab";
-import { Edit, Trash2, Power, Eye, Clock, BookOpen } from "lucide-react";
+import { Trash2, Power, Clock, BookOpen } from "lucide-react";
 
 interface LabCardProps {
   lab: Lab;
-  onEdit?: (lab: Lab) => void;
   onDelete?: (lab: Lab) => void;
   onToggleStatus?: (lab: Lab) => void;
   onView?: (lab: Lab) => void;
@@ -15,13 +14,28 @@ interface LabCardProps {
 
 export const LabCard: FC<LabCardProps> = ({
   lab,
-  onEdit,
   onDelete,
   onToggleStatus,
   onView,
 }) => {
+  // Handle card click
+  const handleCardClick = () => {
+    if (onView) {
+      onView(lab);
+    }
+  };
+
+  // Prevent event bubbling for action buttons
+  const handleActionClick = (e: React.MouseEvent, action: () => void) => {
+    e.stopPropagation();
+    action();
+  };
+
   return (
-    <Card className="hover:shadow-lg transition-shadow duration-200">
+    <Card
+      className="hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+      onClick={handleCardClick}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -55,31 +69,11 @@ export const LabCard: FC<LabCardProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {onView && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onView(lab)}
-                className="h-8 w-8 p-0"
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-            )}
-            {onEdit && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onEdit(lab)}
-                className="h-8 w-8 p-0"
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-            )}
             {onToggleStatus && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onToggleStatus(lab)}
+                onClick={(e) => handleActionClick(e, () => onToggleStatus(lab))}
                 className="h-8 w-8 p-0"
               >
                 <Power
@@ -93,7 +87,7 @@ export const LabCard: FC<LabCardProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onDelete(lab)}
+                onClick={(e) => handleActionClick(e, () => onDelete(lab))}
                 className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
               >
                 <Trash2 className="h-4 w-4" />

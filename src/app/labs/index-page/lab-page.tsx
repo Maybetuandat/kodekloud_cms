@@ -40,12 +40,6 @@ export default function LabPage() {
     handleCancelDelete,
   } = useLabManagement(10);
 
-  const handleEdit = (lab: Lab) => {
-    // TODO: Implement edit modal or navigate to edit page
-    console.log("Edit lab:", lab);
-    toast.info("Chức năng chỉnh sửa đang được phát triển");
-  };
-
   const handleView = (lab: Lab) => {
     navigate(`/labs/${lab.id}`);
   };
@@ -84,7 +78,10 @@ export default function LabPage() {
 
       {/* Filter and Search */}
       <Card>
-        <CardContent className="pt-6">
+        <CardHeader>
+          <CardTitle>Tìm kiếm và Lọc</CardTitle>
+        </CardHeader>
+        <CardContent>
           <FilterBar
             searchTerm={filters.search}
             onSearchChange={updateSearch}
@@ -108,7 +105,6 @@ export default function LabPage() {
           <LabList
             labs={labs}
             loading={isLoading}
-            onEdit={handleEdit}
             onDelete={(lab: Lab) => handleDeleteClick(lab.id)}
             onToggleStatus={handleToggleStatus}
             onView={handleView}

@@ -7,7 +7,6 @@ import { LabCard } from "./lab-card";
 interface LabListProps {
   labs: Lab[];
   loading?: boolean;
-  onEdit?: (lab: Lab) => void;
   onDelete?: (lab: Lab) => void;
   onToggleStatus?: (lab: Lab) => void;
   onView?: (lab: Lab) => void;
@@ -16,7 +15,6 @@ interface LabListProps {
 export const LabList: FC<LabListProps> = ({
   labs,
   loading,
-  onEdit,
   onDelete,
   onToggleStatus,
   onView,
@@ -62,7 +60,6 @@ export const LabList: FC<LabListProps> = ({
         <LabCard
           key={lab.id}
           lab={lab}
-          onEdit={onEdit}
           onDelete={onDelete}
           onToggleStatus={onToggleStatus}
           onView={onView}
