@@ -49,37 +49,23 @@ export const labService = {
   },
 
   /**
-   * Get a paginated list of labs (legacy method - for backward compatibility)
+   * Get a paginated list of all labs
    * @param params - Pagination and filter parameters
    * @returns Promise with paginated lab list
    */
-  getLabsPaginated: async (
-    params: PaginationParams & {
-      isActivate?: Boolean;
-      search?: string;
-      courseId?: number;
-    }
-  ): Promise<PaginatedResponse<Lab>> => {
-    // If courseId is provided, use the new API
-    if (params.courseId) {
-      return labService.getLabsByCourseId(params.courseId, {
-        page: params.page,
-        size: params.size,
-        search: params.search,
-        isActive: params.isActivate as boolean | undefined,
-      });
-    }
-
-    // Fallback to old API structure if no courseId
+  getLabsPaginated: async (params: {
+    page?: number;
+    size?: number;
+    search?: string;
+    isActive?: boolean;
+  }): Promise<PaginatedResponse<Lab>> => {
     const queryParams: Record<string, any> = {
-      page: params.page.toString(),
-      size: params.size.toString(),
-      sortBy: params.sortBy,
-      sortDir: params.sortDir,
+      page: (params.page ?? 0).toString(),
+      size: (params.size ?? 10).toString(),
     };
 
-    if (params.isActivate !== undefined) {
-      queryParams.isActivate = params.isActivate.toString();
+    if (params.isActive !== undefined) {
+      queryParams.isActive = params.isActive.toString();
     }
 
     if (params.search && params.search.trim()) {

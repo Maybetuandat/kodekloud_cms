@@ -1,5 +1,12 @@
 import * as React from "react";
-import { HelpCircleIcon, Boxes, Home, Tags, BookOpen } from "lucide-react";
+import {
+  HelpCircleIcon,
+  Boxes,
+  Home,
+  Tags,
+  BookOpen,
+  FlaskConical,
+} from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -36,6 +43,12 @@ export function AppSidebar({
         url: "/courses",
         icon: BookOpen,
         isActive: location.pathname.startsWith("/courses"),
+      },
+      {
+        title: t("navigation.labs"),
+        url: "/labs",
+        icon: FlaskConical,
+        isActive: location.pathname.startsWith("/labs"),
       },
       {
         title: t("navigation.category"),

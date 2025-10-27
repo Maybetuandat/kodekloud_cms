@@ -10,12 +10,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { Question } from "@/types/question";
-import { LabDetailHeader } from "../../components/labs/detail/index/lab-detail-header";
-import { LabInfoSection } from "../../components/labs/detail/index/lab-info-section";
-import { LabQuestionsTab } from "../../components/labs/detail/index/lab-question-tab";
-import { LabSetupStepsTab } from "../../components/labs/detail/index/lab-setup-step-tab";
-import { QuestionFilters, useLabDetailPage } from "./use-lab-detail-page";
+
 import { LabDeleteDialog } from "@/components/labs/detail/index/lab-delete-dialog";
+import { LabDetailHeader } from "@/components/labs/detail/index/lab-detail-header";
+import { LabInfoSection } from "@/components/labs/detail/index/lab-info-section";
+import { LabQuestionsTab } from "@/components/labs/detail/index/lab-question-tab";
+import { LabSetupStepsTab } from "@/components/labs/detail/index/lab-setup-step-tab";
+import { useLabDetailPage } from "./use-lab-detail-page";
 
 export function LabDetail() {
   const { labId } = useParams<{ labId: string }>();

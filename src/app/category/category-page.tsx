@@ -15,7 +15,6 @@ import {
   CreateCategoryRequest,
   UpdateCategoryRequest,
 } from "@/types/category";
-import { date } from "zod";
 
 export default function CategoryPage() {
   const { t } = useTranslation("categories");
@@ -178,18 +177,6 @@ export default function CategoryPage() {
     });
   };
 
-  // Handle status filter change
-  const handleStatusChange = (value: string) => {
-    let status: undefined | true | false = undefined;
-    if (value === "active") status = true;
-    if (value === "inactive") status = false;
-
-    handleFiltersChange({
-      ...filters,
-      status,
-    });
-  };
-
   // Handle sort change
   const handleSortChange = (value: string) => {
     handleFiltersChange({
@@ -199,7 +186,7 @@ export default function CategoryPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="min-h-screen w-full px-6 py-6 space-y-6 mb-10">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

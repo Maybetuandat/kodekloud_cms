@@ -1,4 +1,4 @@
-import { useLabQuestions } from "@/app/labs/use-lab-question";
+import { useLabQuestions } from "@/app/labs/detail-page/use-lab-question";
 import { Card, CardContent } from "@/components/ui/card";
 import { DeleteQuestionDialog } from "./question/lab-delete-question-dialog";
 import { LoadingState } from "./question/lab-loading-state";
