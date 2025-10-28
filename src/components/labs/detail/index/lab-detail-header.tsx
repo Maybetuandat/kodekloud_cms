@@ -37,7 +37,10 @@ export function LabDetailHeader({
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-bold">{lab.title}</h1>
-                <Badge variant={lab.isActive ? "default" : "secondary"}>
+                <Badge
+                  variant={lab.isActive ? "default" : "secondary"}
+                  className="bg-green-500"
+                >
                   {lab.isActive ? t("active") : t("inactive")}
                 </Badge>
               </div>

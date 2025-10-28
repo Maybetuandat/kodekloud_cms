@@ -1,4 +1,3 @@
-// components/labs/detail/setup-steps/setup-step-header.tsx
 import { Button } from "@/components/ui/button";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, FlaskConical } from "lucide-react";
@@ -39,11 +38,11 @@ export function SetupStepHeader({
             disabled={disabled}
           >
             <FlaskConical className="h-4 w-4" />
-            Test Setup
+            Kiểm tra
           </Button>
           <Button onClick={onCreateClick} className="gap-2" disabled={disabled}>
             <Plus className="h-4 w-4" />
-            Add Step
+            Thêm bước thiết lập
           </Button>
         </div>
       </div>

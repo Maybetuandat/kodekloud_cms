@@ -10,7 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
-import { CourseCard } from "@/components/courses/index/course-card";
+import { CourseCard } from "@/components/courses/index-page/course-card";
 import { Course } from "@/types/course";
 import { Category } from "@/types/category";
 import { useCoursePage } from "@/app/courses/index-page/use-course-page";

@@ -43,7 +43,10 @@ export const LabCard: FC<LabCardProps> = ({
               {lab.title}
             </CardTitle>
             <div className="flex items-center gap-2 mt-2">
-              <Badge variant={lab.isActive ? "default" : "secondary"}>
+              <Badge
+                variant={lab.isActive ? "default" : "secondary"}
+                className="bg-green-500"
+              >
                 {lab.isActive ? "Active" : "Inactive"}
               </Badge>
               {lab.estimatedTime && (

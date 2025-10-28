@@ -5,7 +5,10 @@
   "activate": "Kích hoạt",
   "edit": "Chỉnh sửa",
   "delete": "Xóa",
+  "updateSuccess": " Đã cập nhật {{name}} thành công",
+  "updateError": "Cập nhật thất bại",
 
+  "toggleStatusSuccess": "Đã {{status}} {{name}}",
   "labInfo": "Thông Tin Bài Lab",
   "labInfoDescription": "Tổng quan chi tiết về các thuộc tính và thông số kỹ thuật cốt lõi của bài lab.",
   "labId": "ID Bài Lab",

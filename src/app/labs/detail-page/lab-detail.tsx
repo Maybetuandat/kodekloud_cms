@@ -9,8 +9,6 @@ import { useParams, useNavigate } from "react-router-dom";
 
 import { toast } from "sonner";
 
-import { Question } from "@/types/question";
-
 import { LabDeleteDialog } from "@/components/labs/detail/index/lab-delete-dialog";
 import { LabDetailHeader } from "@/components/labs/detail/index/lab-detail-header";
 import { LabInfoSection } from "@/components/labs/detail/index/lab-info-section";
@@ -21,12 +19,10 @@ import { useLabDetailPage } from "./use-lab-detail-page";
 export function LabDetail() {
   const { labId } = useParams<{ labId: string }>();
   const navigate = useNavigate();
-  const { t } = useTranslation(["labs", "common"]);
+  const { t } = useTranslation("labs");
 
   const [isEditLabOpen, setIsEditLabOpen] = useState(false);
   const [isDeleteLabOpen, setIsDeleteLabOpen] = useState(false);
-  const [isCreateQuestionOpen, setIsCreateQuestionOpen] = useState(false);
-  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
 
   const { lab, isLoadingLab, updateLab, toggleLabStatus, deleteLab } =
     useLabDetailPage(Number(labId));
@@ -36,24 +32,23 @@ export function LabDetail() {
     try {
       await updateLab(data);
       setIsEditLabOpen(false);
-      toast.success(t("labs.updateSuccess", { name: data.title }));
+      toast.success(t("updateSuccess", { name: data.title }));
     } catch (error) {
-      toast.error(t("labs.updateError"));
+      toast.error(t("updateError"));
     }
   };
 
   const handleToggleLabStatus = async () => {
     try {
-      await toggleLabStatus();
-      const newStatus = !lab?.isActive;
+      const updatedLab = await toggleLabStatus();
       toast.success(
-        t("labs.toggleStatusSuccess", {
-          name: lab?.title,
-          status: newStatus ? t("common.activated") : t("common.deactivated"),
+        t("toggleStatusSuccess", {
+          name: updatedLab?.title,
+          status: updatedLab?.isActive ? t("activate") : t("deactivate"),
         })
       );
     } catch (error) {
-      toast.error(t("labs.toggleStatusError"));
+      toast.error(t("toggleStatusError"));
     }
   };
 

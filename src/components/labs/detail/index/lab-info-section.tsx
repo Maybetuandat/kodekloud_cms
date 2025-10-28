@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Calendar, FileText, Hash } from "lucide-react";
 import { format } from "date-fns";
-
+import { vi } from "date-fns/locale";
 interface LabInfoSectionProps {
   lab: Lab;
 }
@@ -14,7 +14,7 @@ export function LabInfoSection({ lab }: LabInfoSectionProps) {
 
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), "PPP");
+      return format(new Date(dateString), "PPP", { locale: vi });
     } catch {
       return t("unknownDate");
     }
@@ -22,18 +22,15 @@ export function LabInfoSection({ lab }: LabInfoSectionProps) {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold">{t("labInfo")}</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          {t("labInfoDescription")}
-        </p>
-      </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 p-6">
         {/* Lab Name - Nổi bật nhất */}
         <div className="space-y-2">
           <h3 className="text-xl font-bold text-foreground">{lab.title}</h3>
           <div className="flex items-center gap-3">
-            <Badge variant={lab.isActive ? "default" : "secondary"}>
+            <Badge
+              variant={lab.isActive ? "default" : "secondary"}
+              className="bg-green-500"
+            >
               {lab.isActive ? t("active") : t("inactive")}
             </Badge>
           </div>

@@ -122,8 +122,9 @@ export const labService = {
    * @returns Promise with updated lab
    */
   toggleLabStatus: async (id: number): Promise<Lab> => {
-    const result = await api.put<{ lab: Lab }>(`/labs/${id}/toggle-status`);
-    return result.lab;
+    const result = await api.patch<Lab>(`/labs/${id}/toggle-activation`);
+    console.log("Toggle Lab Status Result:", result);
+    return result;
   },
 
   /**

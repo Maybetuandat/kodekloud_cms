@@ -107,12 +107,7 @@ export function LabUploadExcelDialog({
       setUploadProgress(100);
       setUploadResult(result);
 
-      // Nếu tất cả đều thành công, đóng dialog sau 1.5s
-      if (result.failed === 0) {
-        setTimeout(() => {
-          handleClose();
-        }, 1500);
-      }
+      handleClose();
     } catch (err) {
       setError("Failed to upload questions. Please try again.");
       console.error(err);

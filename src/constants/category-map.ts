@@ -1,4 +1,3 @@
-// src/constants/category-map.ts
 import { Container, Terminal, GitBranch } from "lucide-react";
 
 export const categoryMap = {

@@ -5,8 +5,7 @@
   "activate": "Activate",
   "edit": "Edit",
   "delete": "Delete",
-
-  "labInfo": "Lab Information",
+  "toggleStatusSuccess": "Successfully {{status}} {{name}}",
   "labInfoDescription": "Detailed overview of the lab's core properties and specifications.",
   "labId": "Lab ID",
   "status": "Status",

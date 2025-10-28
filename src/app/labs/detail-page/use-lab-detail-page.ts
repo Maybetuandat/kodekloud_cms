@@ -59,6 +59,7 @@ export const useLabDetailPage = (labId: number) => {
     try {
       setActionLoading(true);
       const updatedLab = await labService.toggleLabStatus(labId);
+      console.log("Toggled Lab:", updatedLab);
       setLab(updatedLab);
       return updatedLab;
     } catch (error) {
