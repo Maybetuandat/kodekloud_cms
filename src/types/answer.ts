@@ -1,7 +1,7 @@
 export interface Answer {
   id: number;
   content: string;
-  isCorrect: boolean;
+  isRightAns: boolean;
   questionId: number;
   createdAt: string;
   updatedAt: string;
@@ -9,5 +9,5 @@ export interface Answer {
 
 export interface CreateAnswerRequest {
   content: string;
-  isCorrect: boolean;
+  isRightAns: boolean;
 }

@@ -105,82 +105,13 @@ export const questionService = {
   bulkCreateQuestionsFromExcel: async (
     labId: number,
     questions: ExcelQuestionRow[]
-  ): Promise<{
-    success: number;
-    failed: number;
-    errors: Array<{ question: string; error: string }>;
-  }> => {
-    let successCount = 0;
-    let failedCount = 0;
-    const errors: Array<{ question: string; error: string }> = [];
-
-    for (const questionData of questions) {
-      try {
-        console.log("Creating question:", questionData.question);
-
-        // 1. Tạo question thông qua endpoint của lab
-        const createdQuestion = await api.post<Question>(
-          `${LABS_ENDPOINT}/${labId}/questions`,
-          {
-            question: questionData.question,
-            hint: questionData.hint,
-            solution: questionData.solution,
-          }
-        );
-
-        console.log("Question created with ID:", createdQuestion.id);
-
-        const questionId = createdQuestion.id;
-
-        // 2. Tạo từng answer một cho question (tuần tự để dễ debug)
-        for (const answer of questionData.answers) {
-          try {
-            console.log(
-              `Creating answer for question ${questionId}:`,
-              answer.content
-            );
-
-            await api.post(`${QUESTIONS_ENDPOINT}/${questionId}/answers`, {
-              content: answer.content,
-              isCorrect: answer.isCorrect,
-            });
-
-            console.log(
-              `Answer created successfully for question ${questionId}`
-            );
-          } catch (answerError) {
-            console.error(
-              `Failed to create answer for question ${questionId}:`,
-              answerError
-            );
-            throw answerError; // Throw để catch ở outer try-catch
-          }
-        }
-
-        successCount++;
-        console.log(
-          `Successfully created question ${questionId} with ${questionData.answers.length} answers`
-        );
-      } catch (error) {
-        failedCount++;
-        const errorMessage =
-          error instanceof Error ? error.message : "Unknown error";
-        errors.push({
-          question: questionData.question,
-          error: errorMessage,
-        });
-        console.error("Error creating question:", questionData.question, error);
-      }
-    }
-
-    console.log(
-      `Upload completed: ${successCount} success, ${failedCount} failed`
+  ): Promise<any> => {
+    console.log("Debug questions", questions);
+    const response = await api.post<Question[]>(
+      `${LABS_ENDPOINT}/${labId}/questions/bulk`,
+      questions
     );
-
-    return {
-      success: successCount,
-      failed: failedCount,
-      errors,
-    };
+    console.log("Debug response", response);
+    return response;
   },
 };

@@ -1,11 +1,11 @@
 import { useLabQuestions } from "@/app/labs/detail-page/use-lab-question";
 import { Card, CardContent } from "@/components/ui/card";
-import { DeleteQuestionDialog } from "./question/lab-delete-question-dialog";
-import { LoadingState } from "./question/lab-loading-state";
-import { LabQuestionsFilters } from "./question/lab-question-filter";
-import { LabQuestionsHeader } from "./question/lab-question-header";
-import { LabQuestionsList } from "./question/lab-question-list";
-import { LabUploadExcelDialog } from "./question/lab-upload-excel-dialog";
+import { DeleteQuestionDialog } from "./question/delete-question-dialog";
+import { LoadingState } from "./question/loading-state";
+import { LabQuestionsFilters } from "./question/question-filter";
+import { LabQuestionsHeader } from "./question/question-header";
+import { LabQuestionsList } from "./question/question-list";
+import { LabUploadExcelDialog } from "./question/upload-question-excel-dialog";
 
 interface LabQuestionsTabProps {
   labId: number;

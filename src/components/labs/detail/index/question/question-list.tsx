@@ -1,10 +1,6 @@
-import { LabQuestionsEmptyState } from "./lab-question-empty-state";
-import { LabQuestionItem } from "./lab-question-item";
-
-interface Question {
-  id: number;
-  // Add other question properties here
-}
+import { Question } from "@/types/question";
+import { LabQuestionsEmptyState } from "./question-empty-state";
+import { LabQuestionItem } from "./question-item";
 
 interface LabQuestionsListProps {
   questions: Question[];

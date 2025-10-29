@@ -1,4 +1,3 @@
-// src/components/question/lab-upload-excel-dialog.tsx
 import { useState, useRef } from "react";
 import {
   Dialog,
@@ -26,16 +25,10 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 
-interface UploadResult {
-  success: number;
-  failed: number;
-  errors: Array<{ question: string; error: string }>;
-}
-
 interface LabUploadExcelDialogProps {
   open: boolean;
   onClose: () => void;
-  onUpload: (questions: ExcelQuestionRow[]) => Promise<UploadResult>;
+  onUpload: (questions: ExcelQuestionRow[]) => Promise<any>;
 }
 
 export function LabUploadExcelDialog({
@@ -50,7 +43,7 @@ export function LabUploadExcelDialog({
     null
   );
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
+  const [uploadResult, setUploadResult] = useState<any | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -221,19 +214,24 @@ export function LabUploadExcelDialog({
                       <div className="font-medium mb-2">Failed questions:</div>
                       <ScrollArea className="max-h-[150px]">
                         <ul className="space-y-2">
-                          {uploadResult.errors.map((err, idx) => (
-                            <li
-                              key={idx}
-                              className="text-xs bg-white dark:bg-gray-900 p-2 rounded border"
-                            >
-                              <div className="font-medium text-red-600">
-                                {err.question}
-                              </div>
-                              <div className="text-muted-foreground mt-1">
-                                Error: {err.error}
-                              </div>
-                            </li>
-                          ))}
+                          {uploadResult.errors.map(
+                            (
+                              err: { question: string; error: string },
+                              idx: number
+                            ) => (
+                              <li
+                                key={idx}
+                                className="text-xs bg-white dark:bg-gray-900 p-2 rounded border"
+                              >
+                                <div className="font-medium text-red-600">
+                                  {err.question}
+                                </div>
+                                <div className="text-muted-foreground mt-1">
+                                  Error: {err.error}
+                                </div>
+                              </li>
+                            )
+                          )}
                         </ul>
                       </ScrollArea>
                     </div>
@@ -313,13 +311,13 @@ export function LabUploadExcelDialog({
                             <div
                               key={ansIdx}
                               className={`flex items-start gap-2 p-2 rounded-md border ${
-                                answer.isCorrect
+                                answer.isRightAns
                                   ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-900"
                                   : "bg-gray-50 border-gray-200 dark:bg-gray-950/20 dark:border-gray-800"
                               }`}
                             >
                               <div className="shrink-0 mt-0.5">
-                                {answer.isCorrect ? (
+                                {answer.isRightAns ? (
                                   <div className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white">
                                     <Check className="h-3 w-3" />
                                   </div>
@@ -332,7 +330,7 @@ export function LabUploadExcelDialog({
                               <div className="flex-1">
                                 <div
                                   className={`text-sm ${
-                                    answer.isCorrect
+                                    answer.isRightAns
                                       ? "font-medium text-green-900 dark:text-green-100"
                                       : "text-gray-700 dark:text-gray-300"
                                   }`}
@@ -340,7 +338,7 @@ export function LabUploadExcelDialog({
                                   {answer.content}
                                 </div>
                               </div>
-                              {answer.isCorrect && (
+                              {answer.isRightAns && (
                                 <Badge
                                   variant="default"
                                   className="bg-green-500 hover:bg-green-600 text-xs"

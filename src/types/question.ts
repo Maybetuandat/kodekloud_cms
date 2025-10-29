@@ -1,4 +1,4 @@
-// src/types/question.ts
+import { Answer } from "./answer";
 
 export interface Question {
   id: number;
@@ -7,13 +7,14 @@ export interface Question {
   solution: string;
   createdAt: string;
   updatedAt: string;
+  answers: Answer[];
 }
 
 export interface CreateQuestionRequest {
   hint: string;
   question: string;
   solution: string;
-  labId?: number; // Optional: nếu question thuộc về một lab cụ thể
+  labId?: number;
 }
 
 export interface UpdateQuestionRequest {

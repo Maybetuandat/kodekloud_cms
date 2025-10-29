@@ -1,13 +1,11 @@
+import { CreateAnswerRequest } from "@/types/answer";
 import * as XLSX from "xlsx";
 
 export interface ExcelQuestionRow {
   question: string;
   hint: string;
   solution: string;
-  answers: {
-    content: string;
-    isCorrect: boolean;
-  }[];
+  answers: CreateAnswerRequest[];
 }
 
 class ExcelService {
@@ -39,7 +37,7 @@ class ExcelService {
     const questions: ExcelQuestionRow[] = [];
 
     data.forEach((row: any) => {
-      const answers: { content: string; isCorrect: boolean }[] = [];
+      const answers: CreateAnswerRequest[] = [];
 
       // Giả sử file Excel có cấu trúc:
       // Question | Hint | Solution | Answer1 | IsCorrect1 | Answer2 | IsCorrect2 | Answer3 | IsCorrect3 | Answer4 | IsCorrect4
@@ -51,7 +49,7 @@ class ExcelService {
         if (row[answerKey]) {
           answers.push({
             content: String(row[answerKey]).trim(),
-            isCorrect: this.parseBoolean(row[isCorrectKey]),
+            isRightAns: this.parseBoolean(row[isCorrectKey]),
           });
         }
       }

@@ -7,15 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect } from "react";
 import { answerService } from "@/services/answerService";
 import { Answer } from "@/types/answer";
-
-interface Question {
-  id: number;
-  question: string;
-  hint: string;
-  solution: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Question } from "@/types/question";
 
 interface LabQuestionItemProps {
   question: Question;
@@ -145,13 +137,13 @@ export function LabQuestionItem({
                     <div
                       key={answer.id}
                       className={`flex items-start gap-2 p-2 rounded-md border ${
-                        answer.isCorrect
+                        answer.isRightAns
                           ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-900"
                           : "bg-gray-50 border-gray-200 dark:bg-gray-950/20 dark:border-gray-800"
                       }`}
                     >
                       <div className="shrink-0 mt-0.5">
-                        {answer.isCorrect ? (
+                        {answer.isRightAns ? (
                           <div className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white">
                             <Check className="h-3 w-3" />
                           </div>
@@ -164,7 +156,7 @@ export function LabQuestionItem({
                       <div className="flex-1">
                         <div
                           className={`text-sm ${
-                            answer.isCorrect
+                            answer.isRightAns
                               ? "font-medium text-green-900 dark:text-green-100"
                               : "text-gray-700 dark:text-gray-300"
                           }`}
@@ -172,7 +164,7 @@ export function LabQuestionItem({
                           {answer.content}
                         </div>
                       </div>
-                      {answer.isCorrect && (
+                      {answer.isRightAns && (
                         <Badge
                           variant="default"
                           className="bg-green-500 hover:bg-green-600 text-xs"
@@ -190,7 +182,7 @@ export function LabQuestionItem({
           {/* Quick Info (when collapsed) */}
           {!expanded && answers.length > 0 && (
             <div className="pl-12 text-xs text-muted-foreground">
-              {answers.filter((a) => a.isCorrect).length} correct answer(s) of{" "}
+              {answers.filter((a) => a.isRightAns).length} correct answer(s) of{" "}
               {answers.length}
             </div>
           )}
