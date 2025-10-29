@@ -24,6 +24,7 @@ import { excelService, ExcelQuestionRow } from "@/services/excelService";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 interface LabUploadExcelDialogProps {
   open: boolean;
@@ -50,9 +51,8 @@ export function LabUploadExcelDialog({
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
 
-    // Validate file type
     if (!selectedFile.name.match(/\.(xlsx|xls)$/)) {
-      setError("Please upload a valid Excel file (.xlsx or .xls)");
+      setError("Vui lòng tải lên một tệp Excel hợp lệ (.xlsx hoặc .xls)");
       return;
     }
 
@@ -60,16 +60,15 @@ export function LabUploadExcelDialog({
     setError(null);
     setUploadResult(null);
 
-    // Parse and preview
     try {
       const questions = await excelService.parseExcelFile(selectedFile);
       if (questions.length === 0) {
-        setError("No valid questions found in the file");
+        setError("Không tìm thấy câu hỏi hợp lệ nào trong tệp");
         return;
       }
       setPreviewData(questions);
     } catch (err) {
-      setError("Failed to parse Excel file. Please check the format.");
+      setError("Không thể phân tích tệp Excel. Vui lòng kiểm tra định dạng.");
       console.error(err);
     }
   };
@@ -83,7 +82,6 @@ export function LabUploadExcelDialog({
     setUploadResult(null);
 
     try {
-      // Simulate progress for better UX
       const progressInterval = setInterval(() => {
         setUploadProgress((prev) => {
           if (prev >= 90) {
@@ -97,12 +95,13 @@ export function LabUploadExcelDialog({
       const result = await onUpload(previewData);
 
       clearInterval(progressInterval);
-      setUploadProgress(100);
+
       setUploadResult(result);
 
+      toast.success("Tải lên câu hỏi thành công!");
       handleClose();
     } catch (err) {
-      setError("Failed to upload questions. Please try again.");
+      setError("Tải lên câu hỏi thất bại. Vui lòng thử lại.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -129,15 +128,14 @@ export function LabUploadExcelDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Upload Questions from Excel</DialogTitle>
+          <DialogTitle>Tải lên Câu hỏi từ Excel</DialogTitle>
           <DialogDescription>
-            Upload an Excel file containing questions and answers. Download the
-            template for the correct format.
+            Tải lên tệp Excel chứa các câu hỏi và câu trả lời. Vui lòng tải mẫu
+            (template) để biết định dạng chính xác.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          {/* Download Template Button */}
           <div className="flex justify-end">
             <Button
               variant="outline"
@@ -147,11 +145,10 @@ export function LabUploadExcelDialog({
               disabled={loading}
             >
               <Download className="h-4 w-4" />
-              Download Template
+              Tải Mẫu (Template)
             </Button>
           </div>
 
-          {/* File Upload */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Input
@@ -180,7 +177,6 @@ export function LabUploadExcelDialog({
             )}
           </div>
 
-          {/* Error Alert */}
           {error && !uploadResult && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
@@ -188,7 +184,6 @@ export function LabUploadExcelDialog({
             </Alert>
           )}
 
-          {/* Upload Result Alert */}
           {uploadResult && (
             <Alert
               variant={uploadResult.failed === 0 ? "default" : "destructive"}
@@ -206,12 +201,12 @@ export function LabUploadExcelDialog({
               <AlertDescription>
                 <div className="space-y-2">
                   <div className="font-medium">
-                    Upload completed: {uploadResult.success} success,{" "}
-                    {uploadResult.failed} failed
+                    Tải lên hoàn tất: {uploadResult.success} thành công,{" "}
+                    {uploadResult.failed} thất bại
                   </div>
                   {uploadResult.errors.length > 0 && (
                     <div className="text-sm">
-                      <div className="font-medium mb-2">Failed questions:</div>
+                      <div className="font-medium mb-2">Câu hỏi bị lỗi:</div>
                       <ScrollArea className="max-h-[150px]">
                         <ul className="space-y-2">
                           {uploadResult.errors.map(
@@ -227,7 +222,7 @@ export function LabUploadExcelDialog({
                                   {err.question}
                                 </div>
                                 <div className="text-muted-foreground mt-1">
-                                  Error: {err.error}
+                                  Lỗi: {err.error}
                                 </div>
                               </li>
                             )
@@ -241,28 +236,25 @@ export function LabUploadExcelDialog({
             </Alert>
           )}
 
-          {/* Success Alert (khi parse file thành công) */}
           {previewData && previewData.length > 0 && !error && !uploadResult && (
             <Alert className="border-green-200 bg-green-50 dark:bg-green-950/20">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-800 dark:text-green-200">
-                File parsed successfully! {previewData.length} question(s) ready
-                to upload.
+                Phân tích tệp thành công! {previewData.length} câu hỏi sẵn sàng
+                để tải lên.
               </AlertDescription>
             </Alert>
           )}
 
-          {/* Preview */}
           {previewData && previewData.length > 0 && !uploadResult && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="text-sm font-medium">
-                  Preview ({previewData.length} question
-                  {previewData.length > 1 ? "s" : ""})
+                  Xem trước ({previewData.length} câu hỏi)
                 </div>
                 <Badge variant="secondary">
                   {previewData.reduce((sum, q) => sum + q.answers.length, 0)}{" "}
-                  total answers
+                  tổng số câu trả lời
                 </Badge>
               </div>
 
@@ -273,7 +265,6 @@ export function LabUploadExcelDialog({
                       key={index}
                       className="border rounded-lg p-4 space-y-3 bg-card hover:bg-accent/5 transition-colors"
                     >
-                      {/* Question Header */}
                       <div className="flex items-start gap-3">
                         <Badge variant="outline" className="shrink-0 mt-1">
                           Q{index + 1}
@@ -283,28 +274,25 @@ export function LabUploadExcelDialog({
                             {q.question}
                           </div>
 
-                          {/* Hint */}
                           {q.hint && (
                             <div className="text-sm text-muted-foreground">
-                              <span className="font-medium">💡 Hint:</span>{" "}
+                              <span className="font-medium">💡 Gợi ý:</span>{" "}
                               {q.hint}
                             </div>
                           )}
 
-                          {/* Solution */}
                           {q.solution && (
                             <div className="text-sm text-muted-foreground">
-                              <span className="font-medium">📝 Solution:</span>{" "}
+                              <span className="font-medium">📝 Giải pháp:</span>{" "}
                               {q.solution}
                             </div>
                           )}
                         </div>
                       </div>
 
-                      {/* Answers */}
                       <div className="pl-12 space-y-2">
                         <div className="text-sm font-medium text-muted-foreground">
-                          Answers:
+                          Câu trả lời:
                         </div>
                         <div className="space-y-2">
                           {q.answers.map((answer, ansIdx) => (
@@ -343,7 +331,7 @@ export function LabUploadExcelDialog({
                                   variant="default"
                                   className="bg-green-500 hover:bg-green-600 text-xs"
                                 >
-                                  Correct
+                                  Đúng
                                 </Badge>
                               )}
                             </div>
@@ -357,12 +345,11 @@ export function LabUploadExcelDialog({
             </div>
           )}
 
-          {/* Upload Progress */}
           {loading && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">
-                  Uploading questions...
+                  Đang tải lên câu hỏi...
                 </span>
                 <span className="font-medium">{uploadProgress}%</span>
               </div>
@@ -373,7 +360,7 @@ export function LabUploadExcelDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={loading}>
-            {uploadResult && uploadResult.failed > 0 ? "Close" : "Cancel"}
+            {uploadResult && uploadResult.failed > 0 ? "Đóng" : "Hủy"}
           </Button>
           {(!uploadResult || uploadResult.failed > 0) && (
             <Button
@@ -381,8 +368,8 @@ export function LabUploadExcelDialog({
               disabled={!previewData || previewData.length === 0 || loading}
             >
               {loading
-                ? "Uploading..."
-                : `Upload ${previewData?.length || 0} Question(s)`}
+                ? "Đang tải lên..."
+                : `Tải lên ${previewData?.length || 0} Câu hỏi`}
             </Button>
           )}
         </DialogFooter>

@@ -1,10 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { questionService } from "@/services/questionService";
-import {
-  Question,
-  CreateQuestionRequest,
-  UpdateQuestionRequest,
-} from "@/types/question";
+import { Question, UpdateQuestionRequest } from "@/types/question";
 import { ExcelQuestionRow } from "@/services/excelService";
 
 export interface QuestionFilters {
@@ -33,11 +29,6 @@ export interface UseLabQuestions {
   filters: QuestionFilters;
   searchValue: string;
   deleteQuestionId: number | null;
-  createQuestion: (
-    data: CreateQuestionRequest,
-    onSuccess?: (question: Question) => void,
-    onError?: (error: Error) => void
-  ) => Promise<void>;
   updateQuestion: (
     id: number,
     data: UpdateQuestionRequest,
@@ -61,7 +52,6 @@ export interface UseLabQuestions {
   setDeleteQuestionId: (id: number | null) => void;
   handleSearchChange: (value: string) => void;
   handleFiltersChange: (newFilters: Partial<QuestionFilters>) => void;
-  handleCreateQuestion: () => void;
   handleEditQuestion: (questionId: number) => void;
   handleDeleteQuestion: (questionId: number) => void;
   handleConfirmDelete: () => Promise<void>;
@@ -201,18 +191,6 @@ export const useLabQuestions = ({
     }
   };
 
-  const createQuestion = async (
-    data: CreateQuestionRequest,
-    onSuccess?: (question: Question) => void,
-    onError?: (error: Error) => void
-  ) => {
-    await performActionAndRefresh(
-      () => questionService.createQuestion(labId, data),
-      (newQuestion) => onSuccess?.(newQuestion),
-      onError
-    );
-  };
-
   const updateQuestion = async (
     id: number,
     data: UpdateQuestionRequest,
@@ -270,11 +248,6 @@ export const useLabQuestions = ({
     setFilters(newFilters);
   };
 
-  const handleCreateQuestion = () => {
-    // TODO: Open create dialog
-    console.log("Create question for lab:", labId);
-  };
-
   const handleEditQuestion = (questionId: number) => {
     // TODO: Open edit dialog
     console.log("Edit question:", questionId);
@@ -318,13 +291,10 @@ export const useLabQuestions = ({
     uploadExcelDialogOpen,
     uploadResult,
 
-    // CRUD Operations
-    createQuestion,
     updateQuestion,
     deleteQuestion,
     bulkDeleteQuestions,
 
-    // Setters
     setFilters,
     setCurrentPage,
     setPageSize,
@@ -335,7 +305,7 @@ export const useLabQuestions = ({
     // UI Handlers
     handleSearchChange,
     handleFiltersChange,
-    handleCreateQuestion,
+
     handleEditQuestion,
     handleDeleteQuestion,
     handleConfirmDelete,

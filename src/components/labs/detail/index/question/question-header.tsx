@@ -1,4 +1,3 @@
-// src/components/question/lab-question-header.tsx
 import { Button } from "@/components/ui/button";
 import { Plus, Upload } from "lucide-react";
 import { CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,11 +10,11 @@ export function LabQuestionsHeader({ onUploadExcel }: LabQuestionsHeaderProps) {
   return (
     <CardHeader>
       <div className="flex items-center justify-between">
-        <CardTitle>Questions</CardTitle>
+        <CardTitle>Câu hỏi</CardTitle>
         <div className="flex gap-2">
           <Button onClick={onUploadExcel} className="gap-2">
             <Plus className="h-4 w-4" />
-            Create Question
+            Tạo câu hỏi
           </Button>
         </div>
       </div>

@@ -25,7 +25,7 @@ export function LabQuestionsTab({ labId }: LabQuestionsTabProps) {
     // Handlers
     handleSearchChange,
     handleFiltersChange,
-    handleCreateQuestion,
+
     handleEditQuestion,
     handleDeleteQuestion,
     handleConfirmDelete,
@@ -61,7 +61,7 @@ export function LabQuestionsTab({ labId }: LabQuestionsTabProps) {
             questions={questions}
             currentPage={currentPage}
             pageSize={pageSize}
-            onCreateQuestion={handleCreateQuestion}
+            onUploadExcel={() => setUploadExcelDialogOpen(true)}
             onEditQuestion={handleEditQuestion}
             onDeleteQuestion={handleDeleteQuestion}
           />

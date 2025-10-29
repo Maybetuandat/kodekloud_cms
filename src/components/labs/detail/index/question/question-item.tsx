@@ -1,4 +1,3 @@
-// src/components/question/lab-question-item.tsx
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -64,14 +63,14 @@ export function LabQuestionItem({
               {/* Hint */}
               {question.hint && (
                 <div className="text-sm text-muted-foreground">
-                  <span className="font-medium">💡 Hint:</span> {question.hint}
+                  <span className="font-medium">Gợi ý:</span> {question.hint}
                 </div>
               )}
 
               {/* Solution (collapsed by default) */}
               {expanded && question.solution && (
                 <div className="text-sm text-muted-foreground">
-                  <span className="font-medium">📝 Solution:</span>{" "}
+                  <span className="font-medium">Giải pháp:</span>{" "}
                   {question.solution}
                 </div>
               )}
@@ -114,20 +113,20 @@ export function LabQuestionItem({
           {expanded && (
             <div className="pl-12 space-y-2 pt-2 border-t">
               <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                Answers:
+                Câu trả lời:
                 {loadingAnswers && (
                   <span className="text-xs">(Loading...)</span>
                 )}
                 {!loadingAnswers && answers.length > 0 && (
                   <Badge variant="secondary" className="text-xs">
-                    {answers.length} answer{answers.length > 1 ? "s" : ""}
+                    {answers.length}
                   </Badge>
                 )}
               </div>
 
               {!loadingAnswers && answers.length === 0 && (
                 <div className="text-sm text-muted-foreground italic">
-                  No answers yet
+                  Chưa có câu trả lời
                 </div>
               )}
 
@@ -169,7 +168,7 @@ export function LabQuestionItem({
                           variant="default"
                           className="bg-green-500 hover:bg-green-600 text-xs"
                         >
-                          Correct
+                          Đúng
                         </Badge>
                       )}
                     </div>
@@ -182,8 +181,8 @@ export function LabQuestionItem({
           {/* Quick Info (when collapsed) */}
           {!expanded && answers.length > 0 && (
             <div className="pl-12 text-xs text-muted-foreground">
-              {answers.filter((a) => a.isRightAns).length} correct answer(s) of{" "}
-              {answers.length}
+              {answers.filter((a) => a.isRightAns).length} câu trả lời đúng
+              trong {answers.length}
             </div>
           )}
         </div>

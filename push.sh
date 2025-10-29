@@ -1,4 +1,4 @@
 git add .
-git commit -m "fix(question and answer): fix bug in question and answer types and excel upload"
+git commit -m "feay(question and answer): update logic for add and delete question and answer"
 git push origin  main
 clear

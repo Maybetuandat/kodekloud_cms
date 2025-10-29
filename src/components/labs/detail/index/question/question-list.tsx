@@ -6,7 +6,7 @@ interface LabQuestionsListProps {
   questions: Question[];
   currentPage: number;
   pageSize: number;
-  onCreateQuestion: () => void;
+  onUploadExcel: () => void;
   onEditQuestion: (questionId: number) => void;
   onDeleteQuestion: (questionId: number) => void;
 }
@@ -15,12 +15,12 @@ export function LabQuestionsList({
   questions,
   currentPage,
   pageSize,
-  onCreateQuestion,
+  onUploadExcel,
   onEditQuestion,
   onDeleteQuestion,
 }: LabQuestionsListProps) {
   if (questions.length === 0) {
-    return <LabQuestionsEmptyState onCreateQuestion={onCreateQuestion} />;
+    return <LabQuestionsEmptyState onCreateQuestion={onUploadExcel} />;
   }
 
   return (
