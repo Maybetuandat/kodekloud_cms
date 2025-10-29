@@ -40,3 +40,13 @@ export interface QuestionsPaginatedResponse {
   pageSize: number;
   totalPages: number;
 }
+export interface UpdateQuestionWithAnswersRequest {
+  hint?: string;
+  question?: string;
+  solution?: string;
+  answers?: Array<{
+    id?: number;
+    content: string;
+    isRightAns: boolean;
+  }>;
+}

@@ -29,6 +29,8 @@ export interface UseLabQuestions {
   filters: QuestionFilters;
   searchValue: string;
   deleteQuestionId: number | null;
+  editQuestionId: number | null;
+  editQuestionData: Question | null;
   updateQuestion: (
     id: number,
     data: UpdateQuestionRequest,
@@ -50,12 +52,23 @@ export interface UseLabQuestions {
   setPageSize: (size: number) => void;
   setSearchValue: (value: string) => void;
   setDeleteQuestionId: (id: number | null) => void;
+  setEditQuestionId: (id: number | null) => void;
   handleSearchChange: (value: string) => void;
   handleFiltersChange: (newFilters: Partial<QuestionFilters>) => void;
   handleEditQuestion: (questionId: number) => void;
   handleDeleteQuestion: (questionId: number) => void;
   handleConfirmDelete: () => Promise<void>;
   handleCancelDelete: () => void;
+  handleSaveEditQuestion: (data: {
+    question: string;
+    hint: string;
+    solution: string;
+    answers: Array<{
+      id?: number;
+      content: string;
+      isRightAns: boolean;
+    }>;
+  }) => Promise<void>;
   refresh: () => void;
 }
 
@@ -74,6 +87,10 @@ export const useLabQuestions = ({
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [deleteQuestionId, setDeleteQuestionId] = useState<number | null>(null);
+  const [editQuestionId, setEditQuestionId] = useState<number | null>(null);
+  const [editQuestionData, setEditQuestionData] = useState<Question | null>(
+    null
+  );
   const [searchValue, setSearchValue] = useState("");
   const [uploadExcelDialogOpen, setUploadExcelDialogOpen] = useState(false);
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
@@ -81,6 +98,18 @@ export const useLabQuestions = ({
     search: "",
     sortBy: "newest",
   });
+
+  // Load question data when editQuestionId changes
+  useEffect(() => {
+    if (editQuestionId !== null) {
+      const question = questions.find((q) => q.id === editQuestionId);
+      if (question) {
+        setEditQuestionData(question);
+      }
+    } else {
+      setEditQuestionData(null);
+    }
+  }, [editQuestionId, questions]);
 
   const handleUploadExcel = async (
     questions: ExcelQuestionRow[]
@@ -95,11 +124,8 @@ export const useLabQuestions = ({
       );
 
       setUploadResult(result);
-
-      // Refresh questions list
       await fetchQuestions();
 
-      // Chỉ đóng dialog nếu upload hoàn toàn thành công
       if (result.failed === 0) {
         setTimeout(() => {
           setUploadExcelDialogOpen(false);
@@ -134,10 +160,8 @@ export const useLabQuestions = ({
     try {
       const response = await questionService.getQuestionsByLabId(labId);
 
-      // Client-side filtering and sorting
       let filteredQuestions = response;
 
-      // Apply search filter
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
         filteredQuestions = filteredQuestions.filter(
@@ -148,7 +172,6 @@ export const useLabQuestions = ({
         );
       }
 
-      // Apply sorting
       filteredQuestions = filteredQuestions.sort((a, b) => {
         if (filters.sortBy === "newest") {
           return (
@@ -238,7 +261,6 @@ export const useLabQuestions = ({
     setCurrentPage(0);
   };
 
-  // UI Handler functions
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
     setFilters({ search: value });
@@ -249,8 +271,7 @@ export const useLabQuestions = ({
   };
 
   const handleEditQuestion = (questionId: number) => {
-    // TODO: Open edit dialog
-    console.log("Edit question:", questionId);
+    setEditQuestionId(questionId);
   };
 
   const handleDeleteQuestion = (questionId: number) => {
@@ -276,8 +297,38 @@ export const useLabQuestions = ({
     setDeleteQuestionId(null);
   };
 
+  // Save edited question with answers
+  const handleSaveEditQuestion = async (data: {
+    question: string;
+    hint: string;
+    solution: string;
+    answers: Array<{
+      id?: number;
+      content: string;
+      isRightAns: boolean;
+    }>;
+  }) => {
+    if (!editQuestionId) return;
+
+    setActionLoading(true);
+    try {
+      // Call API with complete data including answers
+      await questionService.updateQuestion(editQuestionId, data);
+
+      // Refresh questions list
+      await fetchQuestions();
+
+      // Close dialog
+      setEditQuestionId(null);
+    } catch (error) {
+      console.error("Failed to save question:", error);
+      throw error;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   return {
-    // State
     questions,
     loading,
     actionLoading,
@@ -288,6 +339,8 @@ export const useLabQuestions = ({
     filters,
     searchValue,
     deleteQuestionId,
+    editQuestionId,
+    editQuestionData,
     uploadExcelDialogOpen,
     uploadResult,
 
@@ -300,19 +353,18 @@ export const useLabQuestions = ({
     setPageSize,
     setSearchValue,
     setDeleteQuestionId,
+    setEditQuestionId,
     setUploadExcelDialogOpen,
 
-    // UI Handlers
     handleSearchChange,
     handleFiltersChange,
-
     handleEditQuestion,
     handleDeleteQuestion,
     handleConfirmDelete,
     handleCancelDelete,
     handleUploadExcel,
+    handleSaveEditQuestion,
 
-    // Utility
     refresh: fetchQuestions,
   };
 };

@@ -85,7 +85,7 @@ export const questionService = {
     id: number,
     data: UpdateQuestionRequest
   ): Promise<Question> => {
-    return api.put<Question>(`${QUESTIONS_ENDPOINT}/${id}`, data);
+    return api.patch<Question>(`${QUESTIONS_ENDPOINT}/${id}`, data);
   },
 
   // Delete question
