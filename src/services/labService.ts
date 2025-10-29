@@ -55,13 +55,13 @@ export const labService = {
    */
   getLabsPaginated: async (params: {
     page?: number;
-    size?: number;
+    pageSize?: number;
     search?: string;
     isActive?: boolean;
   }): Promise<PaginatedResponse<Lab>> => {
     const queryParams: Record<string, any> = {
       page: (params.page ?? 0).toString(),
-      size: (params.size ?? 10).toString(),
+      pageSize: (params.pageSize ?? 10).toString(),
     };
 
     if (params.isActive !== undefined) {

@@ -9,24 +9,24 @@ import { DeleteLabConfirmDialog } from "@/components/courses/detail/lab-tab/dele
 
 interface CourseLabsTabProps {
   labs: Lab[];
-  onCreateLab: () => void;
-  onDeleteLab: (labId: number) => Promise<void>;
+  onAddLabs: () => void;
+  onRemoveLab: (labId: number) => Promise<void>;
   isLoading?: boolean;
-  // Pagination props
+
   currentPage: number;
   totalPages: number;
   totalItems: number;
   pageSize: number;
   onPageChange: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
-  // Filter props
+
   onFiltersChange: (filters: { search: string; status?: boolean }) => void;
 }
 
 export function CourseLabsTab({
   labs,
-  onCreateLab,
-  onDeleteLab,
+  onAddLabs,
+  onRemoveLab,
   isLoading = false,
   currentPage,
   totalPages,
@@ -40,10 +40,10 @@ export function CourseLabsTab({
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  // Delete confirmation dialog state
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [labToDelete, setLabToDelete] = useState<Lab | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  // Remove confirmation dialog state
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+  const [labToRemove, setLabToRemove] = useState<Lab | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
@@ -87,24 +87,26 @@ export function CourseLabsTab({
     });
   };
 
-  const handleDeleteClick = (labId: number) => {
+  const handleRemoveClick = (labId: number) => {
     const lab = labs.find((l) => l.id === labId);
     if (lab) {
-      setLabToDelete(lab);
-      setIsDeleteDialogOpen(true);
+      setLabToRemove(lab);
+      setIsRemoveDialogOpen(true);
     }
   };
 
-  const handleConfirmDelete = async () => {
-    if (!labToDelete) return;
+  const handleConfirmRemove = async () => {
+    if (!labToRemove) return;
 
-    setIsDeleting(true);
+    setIsRemoving(true);
     try {
-      await onDeleteLab(labToDelete.id);
+      await onRemoveLab(labToRemove.id);
+      setIsRemoveDialogOpen(false);
+      setLabToRemove(null);
     } catch (error) {
-      console.error("Failed to delete lab:", error);
-
-      setIsDeleting(false);
+      console.error("Failed to remove lab:", error);
+    } finally {
+      setIsRemoving(false);
     }
   };
 
@@ -112,9 +114,9 @@ export function CourseLabsTab({
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">{t("courses.detail.labs.title")}</h2>
-        <Button onClick={onCreateLab} className="gap-2" disabled={isLoading}>
+        <Button onClick={onAddLabs} className="gap-2" disabled={isLoading}>
           <Plus className="w-4 h-4" />
-          {t("courses.detail.labs.createButton")}
+          Thêm bài thực hành
         </Button>
       </div>
 
@@ -126,7 +128,7 @@ export function CourseLabsTab({
       ) : (
         <LabList
           labs={labs}
-          onDeleteLab={handleDeleteClick}
+          onDeleteLab={handleRemoveClick}
           currentPage={currentPage}
           totalPages={totalPages}
           totalElements={totalItems}
@@ -143,19 +145,19 @@ export function CourseLabsTab({
         />
       )}
 
-      {/* Delete Confirmation Dialog */}
+      {/* Remove Confirmation Dialog */}
       <DeleteLabConfirmDialog
-        open={isDeleteDialogOpen}
+        open={isRemoveDialogOpen}
         onOpenChange={(open) => {
-          setIsDeleteDialogOpen(open);
+          setIsRemoveDialogOpen(open);
           if (!open) {
-            setLabToDelete(null);
-            setIsDeleting(false);
+            setLabToRemove(null);
+            setIsRemoving(false);
           }
         }}
-        lab={labToDelete}
-        onConfirm={handleConfirmDelete}
-        loading={isDeleting}
+        lab={labToRemove}
+        onConfirm={handleConfirmRemove}
+        loading={isRemoving}
       />
     </div>
   );

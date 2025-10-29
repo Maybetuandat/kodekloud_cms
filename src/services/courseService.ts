@@ -71,4 +71,24 @@ export const courseService = {
       isActive: !course.isActive,
     });
   },
+
+  /**
+   * Add labs to course
+   */
+  addLabsToCourse: async (
+    courseId: number,
+    labIds: number[]
+  ): Promise<void> => {
+    await api.post(`/courses/${courseId}/labs`, { labIds });
+  },
+
+  /**
+   * Remove lab from course
+   */
+  removeLabFromCourse: async (
+    courseId: number,
+    labId: number
+  ): Promise<void> => {
+    await api.delete(`/courses/${courseId}/labs/${labId}`);
+  },
 };

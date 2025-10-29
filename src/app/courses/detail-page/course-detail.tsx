@@ -5,10 +5,9 @@ import {
 } from "@/components/courses/detail/overview-tab/edit-basic-info-modal";
 import { CourseLabsTab } from "@/components/courses/detail/lab-tab/lab-tabs";
 import { CourseOverviewTab } from "@/components/courses/detail/overview-tab/overview-tab";
-import { LabFormDialog } from "@/components/courses/detail/lab-tab/lab-form-dialog";
+import { SelectLabsDialog } from "@/components/courses/detail/lab-tab/select-labs-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Course } from "@/types/course";
-import { CreateLabRequest, UpdateLabRequest } from "@/types/lab";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
@@ -18,23 +17,26 @@ export function CourseDetail() {
   const { courseId } = useParams<{ courseId: string }>();
   const { t } = useTranslation(["courses", "common"]);
 
-  const [isCreateLabOpen, setIsCreateLabOpen] = useState(false);
+  const [isSelectLabsOpen, setIsSelectLabsOpen] = useState(false);
   const [isEditBasicInfoOpen, setIsEditBasicInfoOpen] = useState(false);
-  const [isCreatingLab, setIsCreatingLab] = useState(false);
+  const [isAddingLabs, setIsAddingLabs] = useState(false);
 
   const {
     course,
     isLoadingCourse,
     labs,
     isLoadingLabs,
+    availableLabs,
+    isLoadingAvailableLabs,
+    fetchAvailableLabs,
     currentPage,
     totalPages,
     totalItems,
     pageSize,
     updateDescriptionCourse,
     updateBasicInfoCourse,
-    createLab,
-    deleteLab,
+    addLabsToCourse,
+    removeLabFromCourse,
     handlePageChange,
     handlePageSizeChange,
     handleFiltersChange,
@@ -61,36 +63,39 @@ export function CourseDetail() {
     listCourseUser: [],
   };
 
-  const handleDeleteLab = async (labId: number) => {
-    deleteLab(
+  const handleRemoveLabFromCourse = async (labId: number) => {
+    removeLabFromCourse(
       labId,
       () => {
-        console.log("Lab deleted successfully");
+        console.log("Lab removed from course successfully");
       },
       (error) => {
-        console.error("Failed to delete lab:", error);
+        console.error("Failed to remove lab from course:", error);
       }
     );
   };
 
-  const handleCreateLab = async (data: CreateLabRequest | UpdateLabRequest) => {
-    setIsCreatingLab(true);
+  const handleOpenSelectLabs = async () => {
+    await fetchAvailableLabs();
+    setIsSelectLabsOpen(true);
+  };
+
+  const handleAddLabsToCourse = async (labIds: number[]) => {
+    setIsAddingLabs(true);
     try {
-      await createLab(
-        data,
-        (newLab) => {
-          console.log("Lab created successfully:", newLab);
-          setIsCreateLabOpen(false);
+      await addLabsToCourse(
+        labIds,
+        () => {
+          setIsSelectLabsOpen(false);
         },
         (error) => {
-          console.error("Failed to create lab:", error);
+          console.error("Failed to add labs to course:", error);
           throw error;
         }
       );
     } catch (error) {
-      // Error already logged in callback
     } finally {
-      setIsCreatingLab(false);
+      setIsAddingLabs(false);
     }
   };
 
@@ -149,8 +154,8 @@ export function CourseDetail() {
           <TabsContent value="labs" className="mt-6">
             <CourseLabsTab
               labs={labs}
-              onCreateLab={() => setIsCreateLabOpen(true)}
-              onDeleteLab={handleDeleteLab}
+              onAddLabs={handleOpenSelectLabs}
+              onRemoveLab={handleRemoveLabFromCourse}
               isLoading={isLoadingLabs}
               currentPage={currentPage}
               totalPages={totalPages}
@@ -164,12 +169,14 @@ export function CourseDetail() {
         </Tabs>
       </div>
 
-      {/* Create Lab Modal */}
-      <LabFormDialog
-        open={isCreateLabOpen}
-        onOpenChange={setIsCreateLabOpen}
-        onSubmit={handleCreateLab}
-        loading={isCreatingLab}
+      {/* Select Labs Dialog */}
+      <SelectLabsDialog
+        open={isSelectLabsOpen}
+        onOpenChange={setIsSelectLabsOpen}
+        onConfirm={handleAddLabsToCourse}
+        availableLabs={availableLabs}
+        loading={isLoadingAvailableLabs}
+        isSubmitting={isAddingLabs}
       />
 
       {/* Edit Basic Info Modal */}

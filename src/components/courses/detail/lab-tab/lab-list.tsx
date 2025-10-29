@@ -76,9 +76,9 @@ export function LabList({
   };
 
   const statusOptions = [
-    { value: "all", label: "All status" },
-    { value: "true", label: "Active" },
-    { value: "false", label: "Inactive" },
+    { value: "all", label: "Tất cả trạng thái" },
+    { value: "true", label: "Hoạt động" },
+    { value: "false", label: "Không hoạt động" },
   ];
 
   const formatDate = (dateString: string) => {
@@ -104,7 +104,7 @@ export function LabList({
           onSearchChange={handleSearchChange}
           onSearchSubmit={onSearchSubmit}
           onSearchClear={handleSearchClear}
-          placeholder="Search labs..."
+          placeholder="Tìm kiếm bài thực hành ..."
           filters={
             onStatusFilterChange
               ? [
@@ -134,7 +134,7 @@ export function LabList({
                 {/* Title and Badge */}
                 <div className="flex items-center gap-3 mb-3">
                   <h3 className="text-xl font-bold text-foreground truncate">
-                    {lab.name}
+                    {lab.title}
                   </h3>
                   <Badge
                     className={`${

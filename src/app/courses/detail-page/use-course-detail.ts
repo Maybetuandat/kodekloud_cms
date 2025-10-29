@@ -1,14 +1,20 @@
 import { BasicInfoFormData } from "@/components/courses/detail/overview-tab/edit-basic-info-modal";
-import { useLabPage, LabFilters } from "@/hooks/labs/use-lab";
+import { useLabPage } from "@/hooks/labs/use-lab";
 import { courseService } from "@/services/courseService";
+import { labService } from "@/services/labService";
 import { Course } from "@/types/course";
+import { Lab } from "@/types/lab";
 import { useEffect, useState } from "react";
 
 export const useCourseDetailPage = (courseId: number) => {
   const [course, setCourse] = useState<Course | null>(null);
   const [isLoadingCourse, setIsLoadingCourse] = useState(true);
 
-  // Use lab page hook với courseId
+  // Available labs (not in this course)
+  const [availableLabs, setAvailableLabs] = useState<Lab[]>([]);
+  const [isLoadingAvailableLabs, setIsLoadingAvailableLabs] = useState(false);
+
+  // Use lab page hook với courseId (labs in course)
   const {
     labs,
     loading: isLoadingLabs,
@@ -17,9 +23,6 @@ export const useCourseDetailPage = (courseId: number) => {
     totalItems,
     pageSize,
     filters,
-    createLab,
-    updateLab,
-    deleteLab,
     toggleLabStatus,
     handlePageChange,
     handleFiltersChange,
@@ -47,6 +50,78 @@ export const useCourseDetailPage = (courseId: number) => {
       fetchCourse();
     }
   }, [courseId]);
+
+  /**
+   * Fetch available labs (not in this course)
+   */
+  const fetchAvailableLabs = async () => {
+    setIsLoadingAvailableLabs(true);
+    try {
+      // Fetch all labs without courseId filter
+      const allLabs = await labService.getLabsPaginated({
+        page: 0,
+        size: 1000, // Get all labs
+      });
+
+      // Filter out labs already in course
+      const currentLabIds = labs.map((lab) => lab.id);
+      const available = allLabs.data.filter(
+        (lab) => !currentLabIds.includes(lab.id)
+      );
+
+      setAvailableLabs(available);
+    } catch (error) {
+      console.error("Failed to fetch available labs:", error);
+    } finally {
+      setIsLoadingAvailableLabs(false);
+    }
+  };
+
+  /**
+   * Add labs to course
+   */
+  const addLabsToCourse = async (
+    labIds: number[],
+    onSuccess?: () => void,
+    onError?: (error: any) => void
+  ) => {
+    try {
+      // Call API to add labs to course
+      await courseService.addLabsToCourse(courseId, labIds);
+
+      // Refresh labs list
+      await refreshLabs();
+
+      onSuccess?.();
+    } catch (error) {
+      console.error("Failed to add labs to course:", error);
+      onError?.(error);
+      throw error;
+    }
+  };
+
+  /**
+   * Remove lab from course
+   */
+  const removeLabFromCourse = async (
+    labId: number,
+    onSuccess?: () => void,
+    onError?: (error: any) => void
+  ) => {
+    try {
+      // Call API to remove lab from course
+      await courseService.removeLabFromCourse(courseId, labId);
+
+      // Refresh labs list
+      await refreshLabs();
+
+      onSuccess?.();
+    } catch (error) {
+      console.error("Failed to remove lab from course:", error);
+      onError?.(error);
+      throw error;
+    }
+  };
 
   /**
    * Update course description
@@ -108,11 +183,9 @@ export const useCourseDetailPage = (courseId: number) => {
    * Handle page size change
    */
   const handlePageSizeChange = (newPageSize: number) => {
-    // When page size changes, reset to first page
     handleFiltersChange({
       ...filters,
     });
-    // Note: The actual page size change logic should be in useLabPage hook
   };
 
   /**
@@ -138,6 +211,11 @@ export const useCourseDetailPage = (courseId: number) => {
     labs,
     isLoadingLabs,
 
+    // Available labs
+    availableLabs,
+    isLoadingAvailableLabs,
+    fetchAvailableLabs,
+
     // Pagination data
     currentPage,
     totalPages,
@@ -148,10 +226,9 @@ export const useCourseDetailPage = (courseId: number) => {
     updateDescriptionCourse,
     updateBasicInfoCourse,
 
-    // Lab CRUD functions from useLabPage hook
-    createLab,
-    updateLab,
-    deleteLab,
+    // Lab management functions
+    addLabsToCourse,
+    removeLabFromCourse,
     toggleLabStatus,
     refreshLabs,
 

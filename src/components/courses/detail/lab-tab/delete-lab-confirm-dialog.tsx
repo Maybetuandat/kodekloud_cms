@@ -58,7 +58,7 @@ export function DeleteLabConfirmDialog({
         <AlertDialogDescription className="text-left space-y-3">
           <p>
             Are you sure you want to delete the lab{" "}
-            <strong>"{lab.name}"</strong>?
+            <strong>"{lab.title}"</strong>?
           </p>
 
           <div className="bg-destructive/10 border border-destructive/20 p-3 rounded-lg">
