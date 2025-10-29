@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import { TiptapEditor } from "@/components/ui/tiptap-editor";
 
 interface CourseOverviewTabProps {
   description: string;
@@ -78,14 +77,15 @@ export function CourseOverviewTab({
           }}
         />
       ) : (
-        <div className="min-h-[300px] overflow-y-auto" data-color-mode="light">
-          <ReactQuill
-            theme="snow"
+        <div className="min-h-[300px]">
+          <TiptapEditor
             value={editedDescription}
-            onChange={(html) => {
-              setEditedDescription(html);
-            }}
-            className="h-[400px]"
+            onChange={setEditedDescription}
+            placeholder={
+              t("courses.form.descriptionPlaceholder") ||
+              "Write course description..."
+            }
+            className="min-h-[400px]"
           />
         </div>
       )}

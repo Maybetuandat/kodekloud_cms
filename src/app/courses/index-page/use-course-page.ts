@@ -65,7 +65,7 @@ export const useCoursePage = (): UseCoursePage => {
     setLoading(true);
     try {
       const response = await courseService.getCoursesPaginated({
-        page: currentPage - 1,
+        page: currentPage,
         pageSize: pageSize,
         search: filters.search || undefined,
         isActive: filters.isActive,

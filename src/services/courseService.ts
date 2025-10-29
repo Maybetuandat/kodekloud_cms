@@ -8,8 +8,8 @@ import {
 
 export const courseService = {
   getCoursesPaginated: async (params: {
-    page?: number;
-    pageSize?: number;
+    page: number;
+    pageSize: number;
     search?: string;
     isActive?: boolean;
     slugCategory?: string;
@@ -21,8 +21,8 @@ export const courseService = {
       isActive?: boolean;
       slugCategory?: string;
     } = {
-      page: params.page || 0,
-      pageSize: params.pageSize || 12,
+      page: params.page,
+      pageSize: params.pageSize,
     };
 
     if (params.search) {
@@ -41,8 +41,6 @@ export const courseService = {
 
     return response;
   },
-
-  // ...
 
   getCourseById: async (id: number): Promise<Course> => {
     const response = await api.get<Course>(`/courses/${id}`);

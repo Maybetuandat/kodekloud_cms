@@ -8,6 +8,7 @@ import { CourseForm } from "@/components/courses/create-course/course-form";
 import { CreateCourseRequest } from "@/types/course";
 
 import { UseNewCoursePage } from "./use-new-course-page";
+import { toast } from "sonner";
 
 export default function NewCoursePage() {
   const { t } = useTranslation("courses");
@@ -15,7 +16,11 @@ export default function NewCoursePage() {
   const { createCourse, actionLoading } = UseNewCoursePage();
 
   const handleCreateCourse = async (data: CreateCourseRequest) => {
-    await createCourse(data);
+    const response = await createCourse(data);
+    toast.success("tạo khoá học thành công");
+    if (response) {
+      navigate(`/courses/${response.id}`);
+    }
   };
   const handleCancel = () => {
     navigate("/courses");

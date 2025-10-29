@@ -1,11 +1,9 @@
-// src/components/courses/course-form.tsx
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Loader2, GraduationCap, FolderTree } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import { TiptapEditor } from "@/components/ui/tiptap-editor";
 import {
   Form,
   FormControl,
@@ -225,7 +223,7 @@ export function CourseForm({
           )}
         />
 
-        {/* Description */}
+        {/* Description - ✅ TipTap Editor */}
         <FormField
           control={form.control}
           name="description"
@@ -236,20 +234,16 @@ export function CourseForm({
               </FormLabel>
 
               <FormControl>
-                <div
-                  className="min-h-[150px] overflow-y-auto"
-                  data-color-mode="light"
-                >
-                  <ReactQuill
-                    theme="snow"
-                    value={field.value || ""}
-                    onChange={(html) => {
-                      field.onChange(html);
-                      console.log("🌐 HTML content:", html);
-                    }}
-                    className="h-[100px]"
-                  />
-                </div>
+                <TiptapEditor
+                  value={field.value || ""}
+                  onChange={field.onChange}
+                  placeholder={
+                    t("courses.form.descriptionPlaceholder") ||
+                    "Write course description..."
+                  }
+                  disabled={loading}
+                  className="min-h-[200px]"
+                />
               </FormControl>
 
               <FormDescription>
