@@ -37,6 +37,7 @@ export function LabQuestionItem({
     setLoadingAnswers(true);
     try {
       const data = await answerService.getAnswersByQuestionId(question.id);
+      data.sort((a, b) => b.id - a.id); // Sort answers: correct ones first
       setAnswers(data);
     } catch (error) {
       console.error("Failed to load answers:", error);
@@ -112,18 +113,6 @@ export function LabQuestionItem({
           {/* Answers Section (shown when expanded) */}
           {expanded && (
             <div className="pl-12 space-y-2 pt-2 border-t">
-              <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                Câu trả lời:
-                {loadingAnswers && (
-                  <span className="text-xs">(Loading...)</span>
-                )}
-                {!loadingAnswers && answers.length > 0 && (
-                  <Badge variant="secondary" className="text-xs">
-                    {answers.length}
-                  </Badge>
-                )}
-              </div>
-
               {!loadingAnswers && answers.length === 0 && (
                 <div className="text-sm text-muted-foreground italic">
                   Chưa có câu trả lời

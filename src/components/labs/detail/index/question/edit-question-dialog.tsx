@@ -1,4 +1,4 @@
-// app/labs/detail-page/question/edit-question-dialog.tsx
+// edit-question-dialog.tsx
 import { useState, useEffect } from "react";
 import {
   Dialog,
@@ -13,10 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Question } from "@/types/question";
-import { Loader2, Plus, Trash2, CheckCircle2, Circle } from "lucide-react";
+import { Loader2, Plus, Trash2, CheckCircle2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface EditQuestionDialogProps {
   open: boolean;
@@ -53,54 +54,48 @@ export function EditQuestionDialog({
   const [hint, setHint] = useState("");
   const [solution, setSolution] = useState("");
   const [answersList, setAnswersList] = useState<AnswerForm[]>([]);
+  const [selectedCorrectIndex, setSelectedCorrectIndex] = useState<number>(-1);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<{
     question?: string;
     answers?: string;
   }>({});
 
-  // Initialize form data when dialog opens
   useEffect(() => {
     if (question && open) {
       setQuestionText(question.question || "");
       setHint(question.hint || "");
       setSolution(question.solution || "");
-
-      // Initialize answers list from question.answers
       if (question.answers && question.answers.length > 0) {
-        setAnswersList(
-          question.answers.map((ans) => ({
-            id: ans.id,
-            content: ans.content,
-            isRightAns: ans.isRightAns,
-            isNew: false,
-          }))
-        );
+        const sortedAnswers = [...question.answers].sort((a, b) => {
+          const idA = a.id ?? 0;
+          const idB = b.id ?? 0;
+          return idB - idA;
+        });
+
+        const answers = sortedAnswers.map((ans) => ({
+          id: ans.id,
+          content: ans.content,
+          isRightAns: ans.isRightAns,
+          isNew: false,
+        }));
+        setAnswersList(answers);
+
+        // Find correct answer index
+        const correctIndex = answers.findIndex((ans) => ans.isRightAns);
+        setSelectedCorrectIndex(correctIndex);
       } else {
         // Default empty answers if none exist
         setAnswersList([
           { content: "", isRightAns: false, isNew: true },
           { content: "", isRightAns: false, isNew: true },
         ]);
+        setSelectedCorrectIndex(-1);
       }
 
       setErrors({});
     }
   }, [question, open]);
-
-  const handleAddAnswer = () => {
-    setAnswersList([
-      ...answersList,
-      { content: "", isRightAns: false, isNew: true },
-    ]);
-  };
-
-  const handleRemoveAnswer = (index: number) => {
-    if (answersList.length <= 2) {
-      return; // Minimum 2 answers required
-    }
-    setAnswersList(answersList.filter((_, i) => i !== index));
-  };
 
   const handleAnswerChange = (index: number, content: string) => {
     const newAnswers = [...answersList];
@@ -108,10 +103,8 @@ export function EditQuestionDialog({
     setAnswersList(newAnswers);
   };
 
-  const handleToggleCorrectAnswer = (index: number) => {
-    const newAnswers = [...answersList];
-    newAnswers[index].isRightAns = !newAnswers[index].isRightAns;
-    setAnswersList(newAnswers);
+  const handleSelectCorrectAnswer = (index: number) => {
+    setSelectedCorrectIndex(index);
   };
 
   const validateForm = (): boolean => {
@@ -126,11 +119,10 @@ export function EditQuestionDialog({
     const validAnswers = answersList.filter((ans) => ans.content.trim());
     if (validAnswers.length < 2) {
       newErrors.answers = "Vui lòng nhập ít nhất 2 câu trả lời";
-    } else {
-      const hasCorrectAnswer = validAnswers.some((ans) => ans.isRightAns);
-      if (!hasCorrectAnswer) {
-        newErrors.answers = "Vui lòng chọn ít nhất 1 câu trả lời đúng";
-      }
+    } else if (selectedCorrectIndex === -1) {
+      newErrors.answers = "Vui lòng chọn 1 câu trả lời đúng";
+    } else if (!answersList[selectedCorrectIndex]?.content.trim()) {
+      newErrors.answers = "Câu trả lời đúng không được để trống";
     }
 
     setErrors(newErrors);
@@ -146,10 +138,10 @@ export function EditQuestionDialog({
     try {
       const validAnswers = answersList
         .filter((ans) => ans.content.trim())
-        .map((ans) => ({
+        .map((ans, index) => ({
           id: ans.isNew ? undefined : ans.id,
           content: ans.content.trim(),
-          isRightAns: ans.isRightAns,
+          isRightAns: index === selectedCorrectIndex,
         }));
 
       await onSave({
@@ -173,12 +165,11 @@ export function EditQuestionDialog({
       setHint("");
       setSolution("");
       setAnswersList([]);
+      setSelectedCorrectIndex(-1);
       setErrors({});
       onClose();
     }
   };
-
-  const correctAnswersCount = answersList.filter((a) => a.isRightAns).length;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -190,10 +181,10 @@ export function EditQuestionDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[calc(90vh-180px)] pr-4">
+        <ScrollArea className="max-h-[calc(90vh-160px)] pr-4">
           <div className="space-y-6 py-4">
             {/* Question */}
-            <div className="space-y-2">
+            <div className="space-y-2 p-2">
               <Label htmlFor="question">
                 Câu hỏi <span className="text-red-500">*</span>
               </Label>
@@ -204,7 +195,7 @@ export function EditQuestionDialog({
                 onChange={(e) => setQuestionText(e.target.value)}
                 rows={3}
                 disabled={saving || loading}
-                className={errors.question ? "border-red-500" : ""}
+                className={errors.question ? "border-red-500 " : ""}
               />
               {errors.question && (
                 <p className="text-sm text-red-500">{errors.question}</p>
@@ -212,7 +203,7 @@ export function EditQuestionDialog({
             </div>
 
             {/* Hint */}
-            <div className="space-y-2">
+            <div className="space-y-2 p-2">
               <Label htmlFor="hint">Gợi ý</Label>
               <Textarea
                 id="hint"
@@ -221,11 +212,12 @@ export function EditQuestionDialog({
                 onChange={(e) => setHint(e.target.value)}
                 rows={2}
                 disabled={saving || loading}
+                className="p-"
               />
             </div>
 
             {/* Solution */}
-            <div className="space-y-2">
+            <div className="space-y-2 p-2">
               <Label htmlFor="solution">Giải pháp</Label>
               <Textarea
                 id="solution"
@@ -238,128 +230,115 @@ export function EditQuestionDialog({
             </div>
 
             {/* Answers */}
-            <div className="space-y-4">
+            <div className="space-y-4 p-2">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <Label>
                     Câu trả lời <span className="text-red-500">*</span>
                   </Label>
-                  {correctAnswersCount > 0 && (
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-xs">
-                        {correctAnswersCount} câu trả lời đúng
+                  <div className="flex items-center gap-2">
+                    {selectedCorrectIndex !== -1 && (
+                      <Badge variant="default" className="text-xs bg-green-600">
+                        Đáp án đúng:{" "}
+                        {String.fromCharCode(65 + selectedCorrectIndex)}
                       </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        {answersList.filter((a) => a.content.trim()).length}{" "}
-                        tổng câu trả lời
-                      </Badge>
-                    </div>
-                  )}
+                    )}
+                    <Badge variant="outline" className="text-xs">
+                      {answersList.filter((a) => a.content.trim()).length} câu
+                      trả lời
+                    </Badge>
+                  </div>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddAnswer}
-                  disabled={saving || loading}
-                >
-                  <Plus className="h-4 w-4 mr-1" />
-                  Thêm câu trả lời
-                </Button>
               </div>
 
               {errors.answers && (
                 <p className="text-sm text-red-500">{errors.answers}</p>
               )}
 
-              <div className="space-y-3">
-                {answersList.map((answer, index) => (
-                  <Card
-                    key={`answer-${answer.id || index}`}
-                    className={
-                      answer.isRightAns
-                        ? "border-green-500 bg-green-50 dark:bg-green-950/20"
-                        : ""
-                    }
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        {/* Correct Answer Toggle */}
-                        <button
-                          type="button"
-                          onClick={() => handleToggleCorrectAnswer(index)}
-                          disabled={saving || loading}
-                          className="shrink-0 mt-2 focus:outline-none"
-                        >
-                          {answer.isRightAns ? (
-                            <CheckCircle2 className="h-6 w-6 text-green-600 hover:text-green-700 transition-colors" />
-                          ) : (
-                            <Circle className="h-6 w-6 text-gray-400 hover:text-gray-500 transition-colors" />
-                          )}
-                        </button>
-
-                        {/* Answer Content */}
-                        <div className="flex-1 space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-xs">
-                              {String.fromCharCode(65 + index)}
-                            </Badge>
-                            {answer.isNew && (
-                              <Badge variant="secondary" className="text-xs">
-                                Mới
-                              </Badge>
-                            )}
-                            {answer.isRightAns && (
-                              <Badge className="text-xs bg-green-600">
-                                Đáp án đúng
-                              </Badge>
-                            )}
+              <RadioGroup
+                value={selectedCorrectIndex.toString()}
+                onValueChange={(value) =>
+                  handleSelectCorrectAnswer(parseInt(value))
+                }
+              >
+                <div className="space-y-3">
+                  {answersList.map((answer, index) => (
+                    <Card
+                      key={`answer-${answer.id || index}`}
+                      className={`transition-all hover:shadow-md ${
+                        index === selectedCorrectIndex
+                          ? "border-2 border-green-500 bg-green-50 dark:bg-green-950/20 shadow-sm"
+                          : "border hover:border-gray-300"
+                      }`}
+                    >
+                      <CardContent className="p-5">
+                        <div className="flex items-center gap-4">
+                          {/* Radio Button for Correct Answer */}
+                          <div className="flex-shrink-0">
+                            <RadioGroupItem
+                              value={index.toString()}
+                              id={`answer-${index}`}
+                              disabled={saving || loading}
+                              className={`h-5 w-5 ${
+                                index === selectedCorrectIndex
+                                  ? "border-green-600"
+                                  : ""
+                              }`}
+                            />
                           </div>
-                          <Input
-                            placeholder={`Câu trả lời ${String.fromCharCode(
-                              65 + index
-                            )}...`}
-                            value={answer.content}
-                            onChange={(e) =>
-                              handleAnswerChange(index, e.target.value)
-                            }
-                            disabled={saving || loading}
-                            className={answer.isRightAns ? "font-medium" : ""}
-                          />
+
+                          {/* Answer Content */}
+                          <div className="flex-1 space-y-2.5">
+                            {/* Badges Row */}
+                            {(answer.isNew ||
+                              index === selectedCorrectIndex) && (
+                              <div className="flex items-center gap-2">
+                                {answer.isNew && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs font-medium"
+                                  >
+                                    Mới
+                                  </Badge>
+                                )}
+                                {index === selectedCorrectIndex && (
+                                  <Badge className="text-xs bg-green-600 hover:bg-green-700">
+                                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                                    Đáp án đúng
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Input Field */}
+                            <Label
+                              htmlFor={`answer-input-${index}`}
+                              className="cursor-pointer block"
+                            >
+                              <Input
+                                id={`answer-input-${index}`}
+                                placeholder={`Câu trả lời ${String.fromCharCode(
+                                  65 + index
+                                )}...`}
+                                value={answer.content}
+                                onChange={(e) =>
+                                  handleAnswerChange(index, e.target.value)
+                                }
+                                disabled={saving || loading}
+                                className={`h-11 text-base ${
+                                  index === selectedCorrectIndex
+                                    ? "font-medium border-green-400 bg-white dark:bg-green-950/10 focus-visible:ring-green-500"
+                                    : "bg-white dark:bg-gray-950"
+                                }`}
+                              />
+                            </Label>
+                          </div>
                         </div>
-
-                        {/* Delete Button */}
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleRemoveAnswer(index)}
-                          disabled={
-                            saving || loading || answersList.length <= 2
-                          }
-                          className="shrink-0"
-                          title={
-                            answersList.length <= 2
-                              ? "Cần ít nhất 2 câu trả lời"
-                              : "Xóa câu trả lời"
-                          }
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted/50 p-3 rounded-md">
-                <div className="shrink-0 mt-0.5">💡</div>
-                <div className="space-y-1">
-                  <p>• Nhấp vào biểu tượng tròn để đánh dấu câu trả lời đúng</p>
-                  <p>• Có thể chọn nhiều câu trả lời đúng</p>
-                  <p>• Cần ít nhất 2 câu trả lời và 1 câu trả lời đúng</p>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-              </div>
+              </RadioGroup>
             </div>
           </div>
         </ScrollArea>

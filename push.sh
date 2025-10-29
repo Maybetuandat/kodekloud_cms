@@ -1,4 +1,4 @@
 git add .
-git commit -m "feat(question and answer): update logic for update model answer and question"
+git commit -m "fix bug(question and answer):fix logic update question and answer"
 git push origin  main
 clear
