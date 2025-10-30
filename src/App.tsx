@@ -13,6 +13,7 @@ import CategoryPage from "./app/category/category-page";
 import { CourseDetail } from "./app/courses/detail-page/course-detail";
 import { LabDetail } from "./app/labs/detail-page/lab-detail";
 import LabPage from "./app/labs/index-page/lab-page";
+import UserPage from "./app/user/user-page";
 
 function App() {
   return (
@@ -37,6 +38,10 @@ function App() {
           </Route>
           {/* Category Section */}
           <Route path="category" element={<CategoryPage />} />
+
+          <Route path="users">
+            <Route index element={<UserPage />} />
+          </Route>
         </Route>
       </Routes>
     </Router>

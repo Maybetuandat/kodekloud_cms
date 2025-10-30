@@ -146,9 +146,6 @@ export const useCourseDetailPage = (courseId: number) => {
     if (courseId) {
       loadLabs();
     }
-    if (courseId) {
-      fetchAvailableLabs();
-    }
   }, [courseId]);
 
   /**

@@ -1,4 +1,4 @@
         git add .
-        git commit -m "fix (lab page): update logic for display labs with paginations"
+        git commit -m "feat(user): update ui for user page"
         git push origin  main
         clear

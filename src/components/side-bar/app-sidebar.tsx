@@ -6,6 +6,7 @@ import {
   Tags,
   BookOpen,
   FlaskConical,
+  User,
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -55,6 +56,12 @@ export function AppSidebar({
         url: "/category",
         icon: Tags,
         isActive: location.pathname.startsWith("/category"),
+      },
+      {
+        title: t("navigation.users"),
+        url: "/users",
+        icon: User,
+        isActive: location.pathname.startsWith("/users"),
       },
     ],
     navSecondary: [
