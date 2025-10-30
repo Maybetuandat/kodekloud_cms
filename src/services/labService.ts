@@ -51,8 +51,8 @@ export const labService = {
     }
   ): Promise<PaginatedResponse<Lab>> => {
     const queryParams: Record<string, any> = {
-      page: (params.page ?? 0).toString(),
-      pageSize: (params.pageSize ?? 10).toString(),
+      page: (params.page ?? 1).toString(),
+      pageSize: (params.pageSize ?? 100).toString(),
     };
 
     if (params.isActive !== undefined) {
@@ -63,10 +63,12 @@ export const labService = {
       queryParams.search = params.search.trim();
     }
 
-    return api.get<PaginatedResponse<Lab>>(
+    const response = await api.get<PaginatedResponse<Lab>>(
       `/courses/${courseId}/labs/not-in-course`,
       queryParams
     );
+    console.log("Labs not in course response:", response);
+    return response;
   },
 
   getLabsPaginated: async (params: {
@@ -76,8 +78,8 @@ export const labService = {
     isActive?: boolean;
   }): Promise<PaginatedResponse<Lab>> => {
     const queryParams: Record<string, any> = {
-      page: (params.page ?? 0).toString(),
-      pageSize: (params.pageSize ?? 10).toString(),
+      page: (params.page ?? 1).toString(),
+      pageSize: (params.pageSize ?? 100).toString(),
     };
 
     if (params.isActive !== undefined) {

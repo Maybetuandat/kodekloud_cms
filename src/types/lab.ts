@@ -21,8 +21,8 @@ export interface PaginationParams {
   sortDir: "asc" | "desc";
 }
 
-export interface PaginatedResponse<T> {
-  data: T[];
+export interface PaginatedResponse<Lab> {
+  data: Lab[];
   currentPage: number;
   totalItems: number;
   totalPages: number;

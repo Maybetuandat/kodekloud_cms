@@ -113,11 +113,11 @@ export default function LabPage() {
           {/* Pagination */}
           {paginationData.totalPages > 0 && (
             <Pagination
-              currentPage={filters.page + 1}
+              currentPage={filters.page}
               totalPages={paginationData.totalPages}
               totalElements={paginationData.totalItems}
               pageSize={filters.pageSize}
-              onPageChange={(page) => updatePage(page - 1)}
+              onPageChange={(page) => updatePage(page)}
               onPageSizeChange={updatePageSize}
               loading={isLoading}
               showInfo={true}

@@ -146,6 +146,9 @@ export const useCourseDetailPage = (courseId: number) => {
     if (courseId) {
       loadLabs();
     }
+    if (courseId) {
+      fetchAvailableLabs();
+    }
   }, [courseId]);
 
   /**
@@ -159,12 +162,9 @@ export const useCourseDetailPage = (courseId: number) => {
         pageSize: 1000,
       });
 
-      const currentLabIds = labsInCourse.map((lab) => lab.id);
-      const available = allLabs.data.filter(
-        (lab) => !currentLabIds.includes(lab.id)
-      );
+      console.log("Available labs fetched:", allLabs.data);
 
-      setAvailableLabs(available);
+      setAvailableLabs(allLabs.data);
     } catch (error) {
       console.error("Failed to fetch available labs:", error);
     } finally {

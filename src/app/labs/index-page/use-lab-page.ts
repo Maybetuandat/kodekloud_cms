@@ -14,7 +14,7 @@ export const useLabManagement = (initialPageSize: number = 10) => {
   const [filters, setFilters] = useState<LabFilters>({
     search: "",
     isActive: "all",
-    page: 0,
+    page: 1,
     pageSize: initialPageSize,
   });
 
@@ -22,7 +22,7 @@ export const useLabManagement = (initialPageSize: number = 10) => {
   const [paginationData, setPaginationData] = useState<
     Omit<PaginatedResponse<Lab>, "data">
   >({
-    currentPage: 0,
+    currentPage: 1,
     totalItems: 0,
     totalPages: 0,
     hasNext: false,
