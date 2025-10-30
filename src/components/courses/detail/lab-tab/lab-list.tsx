@@ -32,8 +32,8 @@ interface LabListProps {
 export function LabList({
   labs,
   onDeleteLab,
-  currentPage = 0,
-  totalPages = 1,
+  currentPage = 1,
+  totalPages = 2,
   totalElements = 0,
   pageSize = 10,
   onPageChange,
@@ -56,10 +56,8 @@ export function LabList({
   };
   const navigate = useNavigate();
   const { courseId } = useParams<{ courseId: string }>();
-  const handleNavigateToLabDetail = (labId: number, courseId: number) => {
-    // Navigate to lab detail page
-    console.log("Navigating to lab detail:", labId, courseId);
-    navigate(`/courses/${courseId}/labs/${labId}`);
+  const handleNavigateToLabDetail = (labId: number) => {
+    navigate(`/labs/${labId}`);
   };
 
   const handleSearchClear = () => {
@@ -126,7 +124,7 @@ export function LabList({
         {labs.map((lab) => (
           <Card
             key={lab.id}
-            onClick={() => handleNavigateToLabDetail(lab.id, Number(courseId))}
+            onClick={() => handleNavigateToLabDetail(lab.id)}
             className="p-6 hover:shadow-lg transition-all duration-200 border-2"
           >
             <div className="flex items-start justify-between gap-4">
@@ -169,7 +167,10 @@ export function LabList({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => onDeleteLab(lab.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteLab(lab.id);
+                }}
                 className="text-destructive hover:bg-destructive/10 hover:text-destructive shrink-0 h-10 w-10"
                 disabled={loading}
               >
@@ -188,7 +189,6 @@ export function LabList({
           </p>
         </Card>
       )}
-
       {/* Pagination */}
       {onPageChange && totalPages > 0 && (
         <Pagination
@@ -196,7 +196,7 @@ export function LabList({
           totalPages={totalPages}
           totalElements={totalElements}
           pageSize={pageSize}
-          onPageChange={(page) => onPageChange(page - 1)}
+          onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
           loading={loading}
           showInfo={true}

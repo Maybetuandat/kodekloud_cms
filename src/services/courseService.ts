@@ -79,7 +79,7 @@ export const courseService = {
     courseId: number,
     labIds: number[]
   ): Promise<void> => {
-    await api.post(`/courses/${courseId}/labs`, { labIds });
+    await api.post(`/courses/${courseId}/labs`, labIds);
   },
 
   /**

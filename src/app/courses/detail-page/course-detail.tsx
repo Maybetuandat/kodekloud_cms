@@ -24,7 +24,7 @@ export function CourseDetail() {
   const {
     course,
     isLoadingCourse,
-    labs,
+    labsInCourse,
     isLoadingLabs,
     availableLabs,
     isLoadingAvailableLabs,
@@ -153,7 +153,8 @@ export function CourseDetail() {
           {/* Labs Tab */}
           <TabsContent value="labs" className="mt-6">
             <CourseLabsTab
-              labs={labs}
+              labs={labsInCourse}
+              courseId={safeCourse.id}
               onAddLabs={handleOpenSelectLabs}
               onRemoveLab={handleRemoveLabFromCourse}
               isLoading={isLoadingLabs}

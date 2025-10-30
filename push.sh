@@ -1,4 +1,4 @@
         git add .
-        git commit -m "fix (course): updat logic for assign lab into course"
+        git commit -m "fix (course detail): update logic for assign and delete lab in a  course"
         git push origin  main
         clear

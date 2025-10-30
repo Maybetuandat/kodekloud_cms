@@ -9,6 +9,7 @@ import { DeleteLabConfirmDialog } from "@/components/courses/detail/lab-tab/dele
 
 interface CourseLabsTabProps {
   labs: Lab[];
+  courseId: number;
   onAddLabs: () => void;
   onRemoveLab: (labId: number) => Promise<void>;
   isLoading?: boolean;
@@ -27,6 +28,7 @@ export function CourseLabsTab({
   labs,
   onAddLabs,
   onRemoveLab,
+  courseId,
   isLoading = false,
   currentPage,
   totalPages,

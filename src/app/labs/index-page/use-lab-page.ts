@@ -38,7 +38,7 @@ export const useLabManagement = (initialPageSize: number = 10) => {
       setIsLoading(true);
       const response = await labService.getLabsPaginated({
         page: filters.page,
-        size: filters.pageSize,
+        pageSize: filters.pageSize,
         search: filters.search || undefined,
         isActive:
           filters.isActive === "all"
