@@ -1,24 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { toast } from "sonner";
+
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 import { Lab } from "@/types/lab";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { LabList } from "@/components/labs/index-page/lab-list";
 import FilterBar from "@/components/ui/filter-bar";
 import { Pagination } from "@/components/ui/pagination";
 import { useLabManagement } from "./use-lab-page";
+import DeleteLabDialog from "@/components/labs/index-page/delete-lab-dialog";
+import { LabFormDialog } from "@/components/labs/detail/index/lab-form-dialog";
 
 export default function LabPage() {
   const navigate = useNavigate();
@@ -30,6 +23,7 @@ export default function LabPage() {
     isLoading,
     actionLoading,
     deleteLabId,
+    formDialogOpen,
     updateSearch,
     updateStatus,
     updatePage,
@@ -38,15 +32,13 @@ export default function LabPage() {
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
+    handleOpenCreateDialog,
+    handleCreateLab,
+    handleCloseDialog,
   } = useLabManagement(10);
 
   const handleView = (lab: Lab) => {
     navigate(`/labs/${lab.id}`);
-  };
-
-  const handleCreateNew = () => {
-    // TODO: Open create lab modal or navigate to create page
-    toast.info("Chức năng tạo lab đang được phát triển");
   };
 
   const statusFilterOptions = [
@@ -54,6 +46,18 @@ export default function LabPage() {
     { value: "active", label: "Đang hoạt động" },
     { value: "inactive", label: "Không hoạt động" },
   ];
+
+  const [localSearchTerm, setLocalSearchTerm] = useState(filters.search);
+  useEffect(() => {
+    setLocalSearchTerm(filters.search);
+  }, [filters.search]);
+  const handleSearchSubmit = () => {
+    updateSearch(localSearchTerm);
+  };
+  const handleSearchClear = () => {
+    setLocalSearchTerm("");
+    updateSearch("");
+  };
 
   // Get lab being deleted for dialog
   const labToDelete = deleteLabId
@@ -70,7 +74,7 @@ export default function LabPage() {
             Quản lý và tổ chức các bài lab thực hành
           </p>
         </div>
-        <Button onClick={handleCreateNew} size="lg">
+        <Button onClick={handleOpenCreateDialog} size="lg">
           <Plus className="h-5 w-5 mr-2" />
           Tạo Lab mới
         </Button>
@@ -83,8 +87,10 @@ export default function LabPage() {
         </CardHeader>
         <CardContent>
           <FilterBar
-            searchTerm={filters.search}
-            onSearchChange={updateSearch}
+            searchTerm={localSearchTerm}
+            onSearchChange={setLocalSearchTerm}
+            onSearchSubmit={handleSearchSubmit}
+            onSearchClear={handleSearchClear}
             placeholder="Tìm kiếm lab theo tên..."
             filters={[
               {
@@ -127,38 +133,21 @@ export default function LabPage() {
         </CardContent>
       </Card>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog
+      {/* Delete Dialog */}
+      <DeleteLabDialog
         open={deleteLabId !== null}
-        onOpenChange={handleCancelDelete}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Xác nhận xóa lab</AlertDialogTitle>
-            <AlertDialogDescription>
-              Bạn có chắc chắn muốn xóa lab{" "}
-              <span className="font-semibold">"{labToDelete?.title}"</span>?
-              <br />
-              Hành động này không thể hoàn tác.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={handleCancelDelete}
-              disabled={actionLoading}
-            >
-              Hủy
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              disabled={actionLoading}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              {actionLoading ? "Đang xóa..." : "Xóa"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        lab={labToDelete || null}
+        loading={actionLoading}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
+
+      {/* Create Lab Form Dialog */}
+      <LabFormDialog
+        open={formDialogOpen}
+        onOpenChange={handleCloseDialog}
+        onSubmit={handleCreateLab}
+      />
     </div>
   );
 }

@@ -4,8 +4,6 @@ import { MainLayout } from "./layouts/MainLayout";
 
 import "./i18n";
 
-import HomePage from "./app/home";
-
 import CoursePage from "./app/courses/index-page/course-page";
 import NewCoursePage from "./app/courses/new-course-page/new-course-page";
 
@@ -22,8 +20,7 @@ function App() {
         {/* Root Layout */}
         <Route path="/" element={<MainLayout />}>
           {/* Home */}
-          <Route index element={<HomePage />} />
-          <Route path="home" element={<HomePage />} />
+          <Route index element={<CoursePage />} />
 
           {/* Courses Section */}
           <Route path="courses">

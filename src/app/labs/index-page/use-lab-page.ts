@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
-import { Lab, PaginatedResponse } from "@/types/lab";
+import { CreateLabRequest, Lab, PaginatedResponse } from "@/types/lab";
 import { labService } from "@/services/labService";
+import { set } from "date-fns";
 
 export interface LabFilters {
   search: string;
@@ -18,6 +19,7 @@ export const useLabManagement = (initialPageSize: number = 10) => {
     pageSize: initialPageSize,
   });
 
+  const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [labs, setLabs] = useState<Lab[]>([]);
   const [paginationData, setPaginationData] = useState<
     Omit<PaginatedResponse<Lab>, "data">
@@ -70,12 +72,12 @@ export const useLabManagement = (initialPageSize: number = 10) => {
 
   // Update search
   const updateSearch = useCallback((search: string) => {
-    setFilters((prev) => ({ ...prev, search, page: 0 }));
+    setFilters((prev) => ({ ...prev, search, page: 1 }));
   }, []);
 
   // Update status filter
   const updateStatus = useCallback((isActive: string) => {
-    setFilters((prev) => ({ ...prev, isActive, page: 0 }));
+    setFilters((prev) => ({ ...prev, isActive, page: 1 }));
   }, []);
 
   // Update page
@@ -85,7 +87,7 @@ export const useLabManagement = (initialPageSize: number = 10) => {
 
   // Update page size
   const updatePageSize = useCallback((pageSize: number) => {
-    setFilters((prev) => ({ ...prev, pageSize, page: 0 }));
+    setFilters((prev) => ({ ...prev, pageSize, page: 1 }));
   }, []);
 
   // Clear filters
@@ -93,7 +95,7 @@ export const useLabManagement = (initialPageSize: number = 10) => {
     setFilters({
       search: "",
       isActive: "all",
-      page: 0,
+      page: 1,
       pageSize: filters.pageSize,
     });
   }, [filters.pageSize]);
@@ -148,19 +150,38 @@ export const useLabManagement = (initialPageSize: number = 10) => {
   const handleCancelDelete = useCallback(() => {
     setDeleteLabId(null);
   }, []);
+  const handleCreateLab = useCallback(
+    async (data: CreateLabRequest) => {
+      const response = await labService.createLab(data);
+      console.log("Create Lab Response:", response);
+      toast.success(`Tạo lab "${data.title}" thành công`);
+      await fetchLabs();
 
+      setFormDialogOpen(false);
+    },
+    [fetchLabs]
+  );
+  const handleOpenCreateDialog = useCallback(() => {
+    setFormDialogOpen(true);
+  }, []);
+
+  const handleCloseDialog = useCallback(() => {
+    setFormDialogOpen(false);
+  }, []);
   return {
     // State
     labs,
     paginationData,
     filters,
     isLoading,
+    formDialogOpen,
     actionLoading,
     deleteLabId,
 
     // Fetch
     fetchLabs,
 
+    handleCreateLab,
     // Filters
     updateSearch,
     updateStatus,
@@ -170,6 +191,8 @@ export const useLabManagement = (initialPageSize: number = 10) => {
 
     // Actions
     handleToggleStatus,
+    handleCloseDialog,
+    handleOpenCreateDialog,
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,

@@ -13,7 +13,7 @@ import { LabInfoSection } from "@/components/labs/detail/index/lab-info-section"
 import { LabQuestionsTab } from "@/components/labs/detail/index/lab-question-tab";
 import { LabSetupStepsTab } from "@/components/labs/detail/index/lab-setup-step-tab";
 import { useLabDetailPage } from "./use-lab-detail-page";
-import { LabFormDialog } from "@/components/courses/detail/lab-tab/lab-form-dialog";
+import { LabFormDialog } from "@/components/labs/detail/index/lab-form-dialog";
 
 export function LabDetail() {
   const { labId } = useParams<{ labId: string }>();

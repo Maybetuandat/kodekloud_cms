@@ -1,4 +1,4 @@
         git add .
-        git commit -m "feat(user): update ui for user page"
+        git commit -m "fix(search logic): update ui for search logic"
         git push origin  main
         clear

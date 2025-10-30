@@ -1,7 +1,5 @@
-import { useState, useMemo } from "react";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import FilterBar from "@/components/ui/filter-bar";
@@ -10,180 +8,47 @@ import { CategoryTable } from "@/components/categories/category-table";
 import { CategoryFormDialog } from "@/components/categories/category-form-dialog";
 import { CategoryDeleteDialog } from "@/components/categories/category-delete-dialog";
 import { useCategoryPage } from "@/app/category/use-category";
-import {
-  Category,
-  CreateCategoryRequest,
-  UpdateCategoryRequest,
-} from "@/types/category";
 
 export default function CategoryPage() {
   const { t } = useTranslation("categories");
 
-  // Use the custom hook for category page logic
+  // All logic is now in the hook
   const {
+    // Data
     categories,
+    filteredCategories,
+
+    // Loading states
     loading,
     actionLoading,
+
+    // Filter states
     filters,
-    createCategory,
-    updateCategory,
-    deleteCategory,
-    handleFiltersChange,
+    localSearchTerm,
+
+    // Dialog states
+    formDialogOpen,
+    deleteDialogOpen,
+    editingCategory,
+    deletingCategory,
+
+    // CRUD handlers
+    handleCreateCategory,
+    handleUpdateCategory,
+    handleDeleteCategory,
+
+    // Dialog handlers
+    openCreateDialog,
+    openEditDialog,
+    openDeleteDialog,
+    setFormDialogOpen,
+    setDeleteDialogOpen,
+
+    // Filter handlers
+    handleSearchChange,
+    handleSearchClear,
+    handleSortChange,
   } = useCategoryPage();
-
-  // Local UI state for dialogs
-  const [formDialogOpen, setFormDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [deletingCategory, setDeletingCategory] = useState<Category | null>(
-    null
-  );
-
-  // Local state for search input
-  const [localSearchTerm, setLocalSearchTerm] = useState(filters.search);
-
-  // Apply filters to categories (Frontend filtering)
-  const filteredCategories = useMemo(() => {
-    let filtered = [...categories];
-
-    // Search filter (search in frontend)
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      filtered = filtered.filter(
-        (cat) =>
-          cat.title.toLowerCase().includes(searchLower) ||
-          cat.description?.toLowerCase().includes(searchLower) ||
-          cat.slug?.toLowerCase().includes(searchLower)
-      );
-    }
-
-    // Sort
-    filtered.sort((a, b) => {
-      switch (filters.sortBy) {
-        case "newest":
-          return (
-            new Date(b.createdAt || 0).getTime() -
-            new Date(a.createdAt || 0).getTime()
-          );
-        case "oldest":
-          return (
-            new Date(a.createdAt || 0).getTime() -
-            new Date(b.createdAt || 0).getTime()
-          );
-        case "name":
-          return a.title.localeCompare(b.title);
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [categories, filters]);
-
-  // Handle create category
-  const handleCreateCategory = async (data: CreateCategoryRequest) => {
-    await createCategory(
-      data,
-      (newCategory) => {
-        toast.success(
-          t("categories.createSuccess", { name: newCategory.title })
-        );
-        setFormDialogOpen(false);
-      },
-      (error) => {
-        toast.error(t("categories.createError"), {
-          description: error.message,
-        });
-      }
-    );
-  };
-
-  // Handle update category
-  const handleUpdateCategory = async (data: UpdateCategoryRequest) => {
-    if (!editingCategory) return;
-
-    await updateCategory(
-      editingCategory.id,
-      data,
-      (updatedCategory) => {
-        toast.success(
-          t("categories.updateSuccess", { name: updatedCategory.title })
-        );
-        setFormDialogOpen(false);
-        setEditingCategory(null);
-      },
-      (error) => {
-        toast.error(t("categories.updateError"), {
-          description: error.message,
-        });
-      }
-    );
-  };
-
-  // Handle delete category
-  const handleDeleteCategory = async () => {
-    if (!deletingCategory) return;
-
-    await deleteCategory(
-      deletingCategory.id,
-      () => {
-        toast.success(
-          t("categories.deleteSuccess", { name: deletingCategory.title })
-        );
-        setDeleteDialogOpen(false);
-        setDeletingCategory(null);
-      },
-      (error) => {
-        toast.error(t("categories.deleteError"), {
-          description: error.message,
-        });
-      }
-    );
-  };
-
-  // Open create dialog
-  const openCreateDialog = () => {
-    setEditingCategory(null);
-    setFormDialogOpen(true);
-  };
-
-  // Open edit dialog
-  const openEditDialog = (category: Category) => {
-    setEditingCategory(category);
-    setFormDialogOpen(true);
-  };
-
-  // Open delete dialog
-  const openDeleteDialog = (category: Category) => {
-    setDeletingCategory(category);
-    setDeleteDialogOpen(true);
-  };
-
-  // Handle search change (instant search in frontend)
-  const handleSearchChange = (value: string) => {
-    setLocalSearchTerm(value);
-    handleFiltersChange({
-      ...filters,
-      search: value,
-    });
-  };
-
-  // Handle search clear
-  const handleSearchClear = () => {
-    setLocalSearchTerm("");
-    handleFiltersChange({
-      ...filters,
-      search: "",
-    });
-  };
-
-  // Handle sort change
-  const handleSortChange = (value: string) => {
-    handleFiltersChange({
-      ...filters,
-      sortBy: value as "newest" | "oldest" | "name",
-    });
-  };
 
   return (
     <div className="min-h-screen w-full px-6 py-6 space-y-6 mb-10">

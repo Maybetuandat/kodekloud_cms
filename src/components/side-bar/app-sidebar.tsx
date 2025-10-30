@@ -34,16 +34,10 @@ export function AppSidebar({
   const data = {
     navMain: [
       {
-        title: t("navigation.home"),
-        url: "/",
-        icon: Home,
-        isActive: location.pathname === "/" || location.pathname === "/home",
-      },
-      {
         title: t("navigation.courses"),
         url: "/courses",
         icon: BookOpen,
-        isActive: location.pathname.startsWith("/courses"),
+        isActive: location.pathname === "/" || location.pathname === "/courses",
       },
       {
         title: t("navigation.labs"),

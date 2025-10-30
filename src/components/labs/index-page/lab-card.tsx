@@ -45,7 +45,9 @@ export const LabCard: FC<LabCardProps> = ({
             <div className="flex items-center gap-2 mt-2">
               <Badge
                 variant={lab.isActive ? "default" : "secondary"}
-                className="bg-green-500"
+                className={`text-white ${
+                  lab.isActive ? "bg-green-500" : "bg-gray-400"
+                }`}
               >
                 {lab.isActive ? "Active" : "Inactive"}
               </Badge>

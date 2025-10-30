@@ -1,4 +1,6 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { categoryService } from "@/services/categoryService";
 import {
   Category,
@@ -15,6 +17,7 @@ export interface CategoryFilters {
 interface UseCategoryPageState {
   // Category data
   categories: Category[];
+  filteredCategories: Category[];
 
   // Loading states
   loading: boolean;
@@ -22,6 +25,13 @@ interface UseCategoryPageState {
 
   // Filter state
   filters: CategoryFilters;
+  localSearchTerm: string;
+
+  // Dialog states
+  formDialogOpen: boolean;
+  deleteDialogOpen: boolean;
+  editingCategory: Category | null;
+  deletingCategory: Category | null;
 
   // Error handling
   error: string | null;
@@ -31,28 +41,22 @@ interface UseCategoryPageActions {
   // Data fetching
   loadCategories: () => Promise<void>;
 
-  // CRUD operations
-  createCategory: (
-    data: CreateCategoryRequest,
-    onSuccess?: (category: Category) => void,
-    onError?: (error: Error) => void
-  ) => Promise<void>;
+  // CRUD operations with callbacks
+  handleCreateCategory: (data: CreateCategoryRequest) => Promise<void>;
+  handleUpdateCategory: (data: UpdateCategoryRequest) => Promise<void>;
+  handleDeleteCategory: () => Promise<void>;
 
-  updateCategory: (
-    id: number,
-    data: UpdateCategoryRequest,
-    onSuccess?: (category: Category) => void,
-    onError?: (error: Error) => void
-  ) => Promise<void>;
-
-  deleteCategory: (
-    id: number,
-    onSuccess?: () => void,
-    onError?: (error: Error) => void
-  ) => Promise<void>;
+  // Dialog handlers
+  openCreateDialog: () => void;
+  openEditDialog: (category: Category) => void;
+  openDeleteDialog: (category: Category) => void;
+  setFormDialogOpen: (open: boolean) => void;
+  setDeleteDialogOpen: (open: boolean) => void;
 
   // Filter handlers
-  handleFiltersChange: (newFilters: CategoryFilters) => void;
+  handleSearchChange: (value: string) => void;
+  handleSearchClear: () => void;
+  handleSortChange: (value: string) => void;
 
   // Utility functions
   clearError: () => void;
@@ -68,20 +72,27 @@ const initialFilters: CategoryFilters = {
 
 const initialState: UseCategoryPageState = {
   categories: [],
+  filteredCategories: [],
   loading: true,
   actionLoading: false,
   filters: initialFilters,
+  localSearchTerm: "",
+  formDialogOpen: false,
+  deleteDialogOpen: false,
+  editingCategory: null,
+  deletingCategory: null,
   error: null,
 };
 
 /**
  * Custom hook for managing category page operations
- * Handles fetching category list, filtering, and CRUD operations
+ * Handles all business logic including fetching, filtering, CRUD operations, and UI state
  *
  * @returns Object containing category page state and action functions
  */
 export const useCategoryPage = (): UseCategoryPageState &
   UseCategoryPageActions => {
+  const { t } = useTranslation("categories");
   const [state, setState] = useState<UseCategoryPageState>(initialState);
 
   /**
@@ -118,24 +129,57 @@ export const useCategoryPage = (): UseCategoryPageState &
   }, [loadCategories]);
 
   /**
-   * Handle filter changes
+   * Apply filters to categories (Frontend filtering)
    */
-  const handleFiltersChange = useCallback((newFilters: CategoryFilters) => {
-    setState((prev) => ({
-      ...prev,
-      filters: newFilters,
-    }));
-  }, []);
+  const filteredCategories = useMemo(() => {
+    let filtered = [...state.categories];
+
+    // Search filter (search in frontend)
+    if (state.filters.search) {
+      const searchLower = state.filters.search.toLowerCase();
+      filtered = filtered.filter(
+        (cat) =>
+          cat.title.toLowerCase().includes(searchLower) ||
+          cat.description?.toLowerCase().includes(searchLower) ||
+          cat.slug?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+      switch (state.filters.sortBy) {
+        case "newest":
+          return (
+            new Date(b.createdAt || 0).getTime() -
+            new Date(a.createdAt || 0).getTime()
+          );
+        case "oldest":
+          return (
+            new Date(a.createdAt || 0).getTime() -
+            new Date(b.createdAt || 0).getTime()
+          );
+        case "name":
+          return a.title.localeCompare(b.title);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [state.categories, state.filters]);
 
   /**
-   * Create a new category
+   * Update filtered categories in state
    */
-  const createCategory = useCallback(
-    async (
-      data: CreateCategoryRequest,
-      onSuccess?: (category: Category) => void,
-      onError?: (error: Error) => void
-    ): Promise<void> => {
+  useEffect(() => {
+    setState((prev) => ({ ...prev, filteredCategories }));
+  }, [filteredCategories]);
+
+  /**
+   * Handle create category
+   */
+  const handleCreateCategory = useCallback(
+    async (data: CreateCategoryRequest): Promise<void> => {
       setState((prev) => ({ ...prev, actionLoading: true, error: null }));
 
       try {
@@ -144,9 +188,15 @@ export const useCategoryPage = (): UseCategoryPageState &
         // Reload categories after creation
         await loadCategories();
 
-        setState((prev) => ({ ...prev, actionLoading: false }));
+        setState((prev) => ({
+          ...prev,
+          actionLoading: false,
+          formDialogOpen: false,
+        }));
 
-        if (onSuccess) onSuccess(newCategory);
+        toast.success(
+          t("categories.createSuccess", { name: newCategory.title })
+        );
       } catch (err) {
         const error =
           err instanceof Error ? err : new Error("Failed to create category");
@@ -156,26 +206,28 @@ export const useCategoryPage = (): UseCategoryPageState &
           actionLoading: false,
         }));
 
-        if (onError) onError(error);
+        toast.error(t("categories.createError"), {
+          description: error.message,
+        });
       }
     },
-    [loadCategories]
+    [loadCategories, t]
   );
 
   /**
-   * Update an existing category
+   * Handle update category
    */
-  const updateCategory = useCallback(
-    async (
-      id: number,
-      data: UpdateCategoryRequest,
-      onSuccess?: (category: Category) => void,
-      onError?: (error: Error) => void
-    ): Promise<void> => {
+  const handleUpdateCategory = useCallback(
+    async (data: UpdateCategoryRequest): Promise<void> => {
+      if (!state.editingCategory) return;
+
       setState((prev) => ({ ...prev, actionLoading: true, error: null }));
 
       try {
-        const updatedCategory = await categoryService.updateCategory(id, data);
+        const updatedCategory = await categoryService.updateCategory(
+          state.editingCategory.id,
+          data
+        );
 
         // Update the category in the current list
         setState((prev) => ({
@@ -184,9 +236,13 @@ export const useCategoryPage = (): UseCategoryPageState &
             cat.id === updatedCategory.id ? updatedCategory : cat
           ),
           actionLoading: false,
+          formDialogOpen: false,
+          editingCategory: null,
         }));
 
-        if (onSuccess) onSuccess(updatedCategory);
+        toast.success(
+          t("categories.updateSuccess", { name: updatedCategory.title })
+        );
       } catch (err) {
         const error =
           err instanceof Error ? err : new Error("Failed to update category");
@@ -196,46 +252,142 @@ export const useCategoryPage = (): UseCategoryPageState &
           actionLoading: false,
         }));
 
-        if (onError) onError(error);
+        toast.error(t("categories.updateError"), {
+          description: error.message,
+        });
       }
     },
-    []
+    [state.editingCategory, t]
   );
 
   /**
-   * Delete a category
+   * Handle delete category
    */
-  const deleteCategory = useCallback(
-    async (
-      id: number,
-      onSuccess?: () => void,
-      onError?: (error: Error) => void
-    ): Promise<void> => {
-      setState((prev) => ({ ...prev, actionLoading: true, error: null }));
+  const handleDeleteCategory = useCallback(async (): Promise<void> => {
+    if (!state.deletingCategory) return;
 
-      try {
-        await categoryService.deleteCategory(id);
+    setState((prev) => ({ ...prev, actionLoading: true, error: null }));
 
-        // Reload categories after deletion
-        await loadCategories();
+    try {
+      await categoryService.deleteCategory(state.deletingCategory.id);
 
-        setState((prev) => ({ ...prev, actionLoading: false }));
+      // Reload categories after deletion
+      await loadCategories();
 
-        if (onSuccess) onSuccess();
-      } catch (err) {
-        const error =
-          err instanceof Error ? err : new Error("Failed to delete category");
-        setState((prev) => ({
-          ...prev,
-          error: error.message,
-          actionLoading: false,
-        }));
+      const deletedCategoryTitle = state.deletingCategory.title;
 
-        if (onError) onError(error);
-      }
-    },
-    [loadCategories]
-  );
+      setState((prev) => ({
+        ...prev,
+        actionLoading: false,
+        deleteDialogOpen: false,
+        deletingCategory: null,
+      }));
+
+      toast.success(
+        t("categories.deleteSuccess", { name: deletedCategoryTitle })
+      );
+    } catch (err) {
+      const error =
+        err instanceof Error ? err : new Error("Failed to delete category");
+      setState((prev) => ({
+        ...prev,
+        error: error.message,
+        actionLoading: false,
+      }));
+
+      toast.error(t("categories.deleteError"), {
+        description: error.message,
+      });
+    }
+  }, [state.deletingCategory, loadCategories, t]);
+
+  /**
+   * Open create dialog
+   */
+  const openCreateDialog = useCallback((): void => {
+    setState((prev) => ({
+      ...prev,
+      editingCategory: null,
+      formDialogOpen: true,
+    }));
+  }, []);
+
+  /**
+   * Open edit dialog
+   */
+  const openEditDialog = useCallback((category: Category): void => {
+    setState((prev) => ({
+      ...prev,
+      editingCategory: category,
+      formDialogOpen: true,
+    }));
+  }, []);
+
+  /**
+   * Open delete dialog
+   */
+  const openDeleteDialog = useCallback((category: Category): void => {
+    setState((prev) => ({
+      ...prev,
+      deletingCategory: category,
+      deleteDialogOpen: true,
+    }));
+  }, []);
+
+  /**
+   * Set form dialog open state
+   */
+  const setFormDialogOpen = useCallback((open: boolean): void => {
+    setState((prev) => ({ ...prev, formDialogOpen: open }));
+  }, []);
+
+  /**
+   * Set delete dialog open state
+   */
+  const setDeleteDialogOpen = useCallback((open: boolean): void => {
+    setState((prev) => ({ ...prev, deleteDialogOpen: open }));
+  }, []);
+
+  /**
+   * Handle search change (instant search in frontend)
+   */
+  const handleSearchChange = useCallback((value: string): void => {
+    setState((prev) => ({
+      ...prev,
+      localSearchTerm: value,
+      filters: {
+        ...prev.filters,
+        search: value,
+      },
+    }));
+  }, []);
+
+  /**
+   * Handle search clear
+   */
+  const handleSearchClear = useCallback((): void => {
+    setState((prev) => ({
+      ...prev,
+      localSearchTerm: "",
+      filters: {
+        ...prev.filters,
+        search: "",
+      },
+    }));
+  }, []);
+
+  /**
+   * Handle sort change
+   */
+  const handleSortChange = useCallback((value: string): void => {
+    setState((prev) => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        sortBy: value as "newest" | "oldest" | "name",
+      },
+    }));
+  }, []);
 
   /**
    * Clear error message
@@ -248,8 +400,12 @@ export const useCategoryPage = (): UseCategoryPageState &
    * Reset filters to initial state
    */
   const resetFilters = useCallback((): void => {
-    handleFiltersChange(initialFilters);
-  }, [handleFiltersChange]);
+    setState((prev) => ({
+      ...prev,
+      filters: initialFilters,
+      localSearchTerm: "",
+    }));
+  }, []);
 
   /**
    * Refresh current data
@@ -264,10 +420,17 @@ export const useCategoryPage = (): UseCategoryPageState &
 
     // Actions
     loadCategories,
-    createCategory,
-    updateCategory,
-    deleteCategory,
-    handleFiltersChange,
+    handleCreateCategory,
+    handleUpdateCategory,
+    handleDeleteCategory,
+    openCreateDialog,
+    openEditDialog,
+    openDeleteDialog,
+    setFormDialogOpen,
+    setDeleteDialogOpen,
+    handleSearchChange,
+    handleSearchClear,
+    handleSortChange,
     clearError,
     resetFilters,
     refresh,
