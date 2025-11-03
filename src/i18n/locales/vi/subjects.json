@@ -1,0 +1,71 @@
+{
+  "subjects": {
+    "title": "Môn học",
+    "description": "Quản lý môn học",
+    "createNew": "Tạo Môn Học",
+    "createSubject": "Tạo Môn Học Mới",
+    "editSubject": "Chỉnh Sửa Môn Học",
+    "createSubjectDescription": "Thêm môn học mới để tổ chức nội dung",
+    "editSubjectDescription": "Cập nhật thông tin môn học",
+    "nosubjects": "Không tìm thấy môn học",
+    "noResultsFound": "Không tìm thấy môn học",
+    "tryDifferentFilters": "Thử điều chỉnh bộ lọc",
+    "createFirstSubject": "Tạo môn học đầu tiên để bắt đầu",
+    "searchPlaceholder": "Tìm kiếm môn học...",
+    "statusFilter": "Trạng Thái",
+    "sortBy": "Sắp Xếp",
+    "showingResults": "Hiển thị {{count}} trong {{total}} môn học",
+    "slug": "Đường dẫn",
+
+    "table": {
+      "title": "Tiêu Đề",
+      "slug": "Đường Dẫn",
+      "description": "Mô Tả",
+      "status": "Trạng Thái",
+      "updatedAt": "Cập Nhật",
+      "createdAt": "Tạo Lúc"
+    },
+
+    "form": {
+      "title": "Tiêu Đề",
+      "titlePlaceholder": "Nhập tiêu đề môn học",
+      "slug": "Đường Dẫn",
+      "slugPlaceholder": "duong-dan-mon-hoc",
+      "slugDescription": "Phiên bản thân thiện URL của tiêu đề",
+      "description": "Mô Tả",
+      "descriptionPlaceholder": "Nhập mô tả môn học",
+      "isActive": "Trạng Thái Hoạt Động",
+      "isActiveDescription": "Bật hoặc tắt môn học này"
+    },
+
+    "validation": {
+      "titleRequired": "Tiêu đề là bắt buộc"
+    },
+
+    "createSuccess": "Tạo môn học '{{name}}' thành công",
+    "createError": "Tạo môn học thất bại",
+    "updateSuccess": "Cập nhật môn học '{{name}}' thành công",
+    "updateError": "Cập nhật môn học thất bại",
+    "deleteSuccess": "Xóa môn học '{{name}}' thành công",
+    "deleteError": "Xóa môn học thất bại",
+
+    "deleteConfirmTitle": "Xóa Môn Học",
+    "deleteConfirmDescription": "Bạn có chắc chắn muốn xóa '{{name}}'? Hành động này không thể hoàn tác."
+  },
+
+  "common": {
+    "active": "Hoạt Động",
+    "inactive": "Không Hoạt Động",
+    "allStatus": "Tất Cả Trạng Thái",
+    "sortNewest": "Mới Nhất",
+    "sortOldest": "Cũ Nhất",
+    "sortName": "Tên (A-Z)",
+    "loading": "Đang tải...",
+    "actions": "Hành Động",
+    "edit": "Chỉnh Sửa",
+    "delete": "Xóa",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "create": "Tạo"
+  }
+}

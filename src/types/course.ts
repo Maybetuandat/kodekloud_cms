@@ -1,5 +1,5 @@
 import { Lab } from "@/types/lab";
-import { Category } from "./category";
+import { Subject } from "./subject";
 
 export interface Course {
   id: number;
@@ -11,7 +11,7 @@ export interface Course {
   shortDescription?: string;
   isActive: boolean;
   labs?: Lab[];
-  category: Category;
+  Subject: Subject;
   listCourseUser?: any[];
 }
 
@@ -32,7 +32,7 @@ export interface CreateCourseRequest {
   durationMinutes?: number;
   shortDescription?: string;
   isActive?: boolean;
-  category: {
+  Subject: {
     id: number;
   };
 }
@@ -46,12 +46,12 @@ export interface CourseFormData {
   durationMinutes?: number;
   shortDescription?: string;
   isActive: boolean;
-  categoryId: number;
+  SubjectId: number;
 }
 
 export interface CourseFilters {
   search: string;
   isActive?: boolean;
   sortBy: "newest" | "oldest";
-  categorySlug?: string;
+  code?: string;
 }

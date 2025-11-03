@@ -1,5 +1,3 @@
-// src/components/categories/category-delete-dialog.tsx
-import React from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 
@@ -13,23 +11,23 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Category } from "@/types/category";
+import { Subject } from "@/types/subject";
 
-interface CategoryDeleteDialogProps {
+interface SubjectDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  category: Category | null;
+  Subject: Subject | null;
   onConfirm: () => Promise<void>;
   loading?: boolean;
 }
 
-export function CategoryDeleteDialog({
+export function SubjectDeleteDialog({
   open,
   onOpenChange,
-  category,
+  Subject,
   onConfirm,
   loading = false,
-}: CategoryDeleteDialogProps) {
+}: SubjectDeleteDialogProps) {
   const { t } = useTranslation("categories");
 
   const handleConfirm = async () => {
@@ -41,13 +39,13 @@ export function CategoryDeleteDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            {t("categories.deleteConfirmTitle") || "Delete Category"}
+            {t("categories.deleteConfirmTitle") || "Delete Subject"}
           </AlertDialogTitle>
           <AlertDialogDescription>
             {t("categories.deleteConfirmDescription", {
-              name: category?.title,
+              name: Subject?.title,
             }) ||
-              `Are you sure you want to delete "${category?.title}"? This action cannot be undone.`}
+              `Are you sure you want to delete "${Subject?.title}"? This action cannot be undone.`}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

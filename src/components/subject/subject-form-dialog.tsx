@@ -1,4 +1,3 @@
-// src/components/categories/category-form-dialog.tsx
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,67 +26,67 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
-  Category,
-  CreateCategoryRequest,
-  UpdateCategoryRequest,
-} from "@/types/category";
+  Subject,
+  CreateSubjectRequest,
+  UpdateSubjectRequest,
+} from "@/types/subject";
 
 // Schema validation
-const createCategoryFormSchema = (t: any) =>
+const createSubjectFormSchema = (t: any) =>
   z.object({
-    title: z.string().min(1, t("categories.validation.titleRequired")),
+    title: z.string().min(1, t("subjects.validation.titleRequired")),
     description: z.string().optional(),
     slug: z.string().optional(),
     isActive: z.boolean().default(true),
   });
 
-interface CategoryFormDialogProps {
+interface SubjectFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  category?: Category | null;
+  Subject?: Subject | null;
   onSubmit: (
-    data: CreateCategoryRequest | UpdateCategoryRequest
+    data: CreateSubjectRequest | UpdateSubjectRequest
   ) => Promise<void>;
   loading?: boolean;
 }
 
-export function CategoryFormDialog({
+export function SubjectFormDialog({
   open,
   onOpenChange,
-  category,
+  Subject,
   onSubmit,
   loading = false,
-}: CategoryFormDialogProps) {
-  const { t } = useTranslation("categories");
-  const isEditMode = !!category;
+}: SubjectFormDialogProps) {
+  const { t } = useTranslation("subjects");
+  const isEditMode = !!Subject;
 
-  const form = useForm<CreateCategoryRequest | UpdateCategoryRequest>({
-    resolver: zodResolver(createCategoryFormSchema(t)),
+  const form = useForm<CreateSubjectRequest | UpdateSubjectRequest>({
+    resolver: zodResolver(createSubjectFormSchema(t)),
     defaultValues: {
       title: "",
+      code: "",
       description: "",
-      slug: "",
     },
   });
 
   useEffect(() => {
-    if (category && open) {
+    if (Subject && open) {
       form.reset({
-        title: category.title,
-        description: category.description || "",
-        slug: category.slug || "",
+        title: Subject.title,
+        description: Subject.description || "",
+        code: Subject.code || "",
       });
     } else if (!open) {
       form.reset({
         title: "",
         description: "",
-        slug: "",
+        code: "",
       });
     }
-  }, [category, open, form]);
+  }, [Subject, open, form]);
 
   const handleSubmit = async (
-    data: CreateCategoryRequest | UpdateCategoryRequest
+    data: CreateSubjectRequest | UpdateSubjectRequest
   ) => {
     await onSubmit(data);
   };
@@ -98,13 +97,13 @@ export function CategoryFormDialog({
         <DialogHeader>
           <DialogTitle>
             {isEditMode
-              ? t("categories.editCategory")
-              : t("categories.createCategory")}
+              ? t("subjects.editSubject")
+              : t("subjects.createSubject")}
           </DialogTitle>
           <DialogDescription>
             {isEditMode
-              ? t("categories.editCategoryDescription")
-              : t("categories.createCategoryDescription")}
+              ? t("subjects.editSubjectDescription")
+              : t("subjects.createSubjectDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -118,10 +117,10 @@ export function CategoryFormDialog({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("categories.form.title")}</FormLabel>
+                  <FormLabel>{t("subjects.form.title")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("categories.form.titlePlaceholder")}
+                      placeholder={t("subjects.form.titlePlaceholder")}
                       {...field}
                     />
                   </FormControl>
@@ -132,18 +131,18 @@ export function CategoryFormDialog({
 
             <FormField
               control={form.control}
-              name="slug"
+              name="code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("categories.form.slug")}</FormLabel>
+                  <FormLabel>{t("subjects.form.code")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={t("categories.form.slugPlaceholder")}
+                      placeholder={t("subjects.form.codePlaceholder")}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    {t("categories.form.slugDescription")}
+                    {t("subjects.form.codeDescription")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -155,10 +154,10 @@ export function CategoryFormDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("categories.form.description")}</FormLabel>
+                  <FormLabel>{t("subjects.form.description")}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={t("categories.form.descriptionPlaceholder")}
+                      placeholder={t("subjects.form.descriptionPlaceholder")}
                       className="min-h-[100px]"
                       {...field}
                     />

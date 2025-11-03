@@ -28,7 +28,7 @@ import {
   CreateCourseRequest,
   UpdateCourseRequest,
 } from "@/types/course";
-import { useCategoryPage } from "@/app/category/use-category";
+import { useSubjectPage } from "@/app/subject/use-subject";
 
 // Schema validation for form data
 const createCourseFormSchema = (t: any) =>
@@ -42,7 +42,7 @@ const createCourseFormSchema = (t: any) =>
       .min(1, t("courses.validation.durationMin"))
       .max(10000, t("courses.validation.durationMax"))
       .optional(),
-    categoryId: z.number().min(1, t("courses.validation.categoryRequired")),
+    SubjectId: z.number().min(1, t("courses.validation.SubjectRequired")),
     isActive: z.boolean().default(true),
   });
 
@@ -50,11 +50,11 @@ const createCourseFormSchema = (t: any) =>
 const transformFormDataToRequest = (
   formData: z.infer<ReturnType<typeof createCourseFormSchema>>
 ): CreateCourseRequest | UpdateCourseRequest => {
-  const { categoryId, ...rest } = formData;
+  const { SubjectId, ...rest } = formData;
   return {
     ...rest,
-    category: {
-      id: categoryId,
+    Subject: {
+      id: SubjectId,
     },
   };
 };
@@ -83,8 +83,8 @@ export function CourseForm({
   const {
     categories,
     loading: categoriesLoading,
-    error: categoryError,
-  } = useCategoryPage();
+    error: SubjectError,
+  } = useSubjectPage();
 
   const courseFormSchema = createCourseFormSchema(t);
   type CourseFormData = z.infer<typeof courseFormSchema>;
@@ -97,7 +97,7 @@ export function CourseForm({
       shortDescription: course?.shortDescription || "",
       level: course?.level || "",
       durationMinutes: course?.durationMinutes || 60,
-      categoryId: course?.category?.id || 0,
+      SubjectId: course?.Subject?.id || 0,
       isActive: course?.isActive ?? true,
     },
   });
@@ -111,10 +111,10 @@ export function CourseForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        {/* Category Error Alert */}
-        {categoryError && (
+        {/* Subject Error Alert */}
+        {SubjectError && (
           <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
-            {categoryError}
+            {SubjectError}
           </div>
         )}
 
@@ -141,14 +141,14 @@ export function CourseForm({
           )}
         />
 
-        {/* Category Dropdown */}
+        {/* Subject Dropdown */}
         <FormField
           control={form.control}
-          name="categoryId"
+          name="SubjectId"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-base">
-                {t("courses.form.category")}{" "}
+                {t("courses.form.Subject")}{" "}
                 <span className="text-destructive">*</span>
               </FormLabel>
               <Select
@@ -159,7 +159,7 @@ export function CourseForm({
                 <FormControl>
                   <SelectTrigger className="text-base">
                     <SelectValue
-                      placeholder={t("courses.form.categoryPlaceholder")}
+                      placeholder={t("courses.form.SubjectPlaceholder")}
                     />
                   </SelectTrigger>
                 </FormControl>
@@ -168,31 +168,29 @@ export function CourseForm({
                     <SelectItem value="0" disabled>
                       <div className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        {t("courses.form.categoryLoading")}
+                        {t("courses.form.SubjectLoading")}
                       </div>
                     </SelectItem>
                   ) : categories.length === 0 ? (
                     <SelectItem value="0" disabled>
-                      {t("courses.form.categoryEmpty")}
+                      {t("courses.form.SubjectEmpty")}
                     </SelectItem>
                   ) : (
-                    categories.map((category) => (
+                    categories.map((Subject) => (
                       <SelectItem
-                        key={category.id}
-                        value={category.id.toString()}
+                        key={Subject.id}
+                        value={Subject.id.toString()}
                       >
                         <div className="flex items-center gap-2">
                           <FolderTree className="h-4 w-4" />
-                          {category.title}
+                          {Subject.title}
                         </div>
                       </SelectItem>
                     ))
                   )}
                 </SelectContent>
               </Select>
-              <FormDescription>
-                {t("courses.form.categoryHint")}
-              </FormDescription>
+              <FormDescription>{t("courses.form.SubjectHint")}</FormDescription>
               <FormMessage />
             </FormItem>
           )}

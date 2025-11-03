@@ -7,8 +7,8 @@ import viCommon from "./locales/vi/common.json";
 import enCommon from "./locales/en/common.json";
 import viCourses from "./locales/vi/courses.json";
 import enCourses from "./locales/en/courses.json";
-import viCategories from "./locales/vi/categories.json";
-import enCategories from "./locales/en/categories.json";
+import viSubjects from "./locales/vi/subjects.json";
+import enSubjects from "./locales/en/subjects.json";
 import viLabs from "./locales/vi/labs.json";
 import enLabs from "./locales/en/labs.json";
 
@@ -19,7 +19,7 @@ i18n.use(initReactI18next).init({
   fallbackLng: "en",
 
   // Namespaces
-  ns: ["common", "courses", "categories", "labs"],
+  ns: ["common", "courses", "subjects", "labs"],
   defaultNS: "common",
 
   // Resources
@@ -27,13 +27,13 @@ i18n.use(initReactI18next).init({
     vi: {
       common: viCommon,
       courses: viCourses,
-      categories: viCategories,
+      subjects: viSubjects,
       labs: viLabs,
     },
     en: {
       common: enCommon,
       courses: enCourses,
-      categories: enCategories,
+      subjects: enSubjects,
       labs: enLabs,
     },
   },

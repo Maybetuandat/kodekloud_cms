@@ -1,55 +1,55 @@
+import { SubjectService } from "@/services/subjectService";
+import {
+  CreateSubjectRequest,
+  Subject,
+  UpdateSubjectRequest,
+} from "@/types/subject";
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { categoryService } from "@/services/categoryService";
-import {
-  Category,
-  CreateCategoryRequest,
-  UpdateCategoryRequest,
-} from "@/types/category";
 
-export interface CategoryFilters {
+export interface SubjectFilters {
   search: string;
   status: undefined | true | false;
   sortBy: "newest" | "oldest" | "name";
 }
 
-interface UseCategoryPageState {
-  // Category data
-  categories: Category[];
-  filteredCategories: Category[];
+interface UseSubjectPageState {
+  // Subject data
+  subjects: Subject[];
+  filteredsubjects: Subject[];
 
   // Loading states
   loading: boolean;
   actionLoading: boolean;
 
   // Filter state
-  filters: CategoryFilters;
+  filters: SubjectFilters;
   localSearchTerm: string;
 
   // Dialog states
   formDialogOpen: boolean;
   deleteDialogOpen: boolean;
-  editingCategory: Category | null;
-  deletingCategory: Category | null;
+  editingSubject: Subject | null;
+  deletingSubject: Subject | null;
 
   // Error handling
   error: string | null;
 }
 
-interface UseCategoryPageActions {
+interface UseSubjectPageActions {
   // Data fetching
-  loadCategories: () => Promise<void>;
+  loadsubjects: () => Promise<void>;
 
   // CRUD operations with callbacks
-  handleCreateCategory: (data: CreateCategoryRequest) => Promise<void>;
-  handleUpdateCategory: (data: UpdateCategoryRequest) => Promise<void>;
-  handleDeleteCategory: () => Promise<void>;
+  handleCreateSubject: (data: CreateSubjectRequest) => Promise<void>;
+  handleUpdateSubject: (data: UpdateSubjectRequest) => Promise<void>;
+  handleDeleteSubject: () => Promise<void>;
 
   // Dialog handlers
   openCreateDialog: () => void;
-  openEditDialog: (category: Category) => void;
-  openDeleteDialog: (category: Category) => void;
+  openEditDialog: (Subject: Subject) => void;
+  openDeleteDialog: (Subject: Subject) => void;
   setFormDialogOpen: (open: boolean) => void;
   setDeleteDialogOpen: (open: boolean) => void;
 
@@ -64,58 +64,49 @@ interface UseCategoryPageActions {
   refresh: () => void;
 }
 
-const initialFilters: CategoryFilters = {
+const initialFilters: SubjectFilters = {
   search: "",
   status: undefined,
   sortBy: "newest",
 };
 
-const initialState: UseCategoryPageState = {
-  categories: [],
-  filteredCategories: [],
+const initialState: UseSubjectPageState = {
+  subjects: [],
+  filteredsubjects: [],
   loading: true,
   actionLoading: false,
   filters: initialFilters,
   localSearchTerm: "",
   formDialogOpen: false,
   deleteDialogOpen: false,
-  editingCategory: null,
-  deletingCategory: null,
+  editingSubject: null,
+  deletingSubject: null,
   error: null,
 };
 
-/**
- * Custom hook for managing category page operations
- * Handles all business logic including fetching, filtering, CRUD operations, and UI state
- *
- * @returns Object containing category page state and action functions
- */
-export const useCategoryPage = (): UseCategoryPageState &
-  UseCategoryPageActions => {
-  const { t } = useTranslation("categories");
-  const [state, setState] = useState<UseCategoryPageState>(initialState);
+export const useSubjectPage = (): UseSubjectPageState &
+  UseSubjectPageActions => {
+  const { t } = useTranslation("subjects");
+  const [state, setState] = useState<UseSubjectPageState>(initialState);
 
-  /**
-   * Load all categories
-   */
-  const loadCategories = useCallback(async (): Promise<void> => {
+  const loadsubjects = useCallback(async (): Promise<void> => {
     try {
       setState((prev) => ({ ...prev, loading: true, error: null }));
 
-      const response = await categoryService.getAllCategories();
+      const response = await SubjectService.getAllSubjects();
 
       setState((prev) => ({
         ...prev,
-        categories: response,
+        subjects: response,
         loading: false,
       }));
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to load categories";
+        err instanceof Error ? err.message : "Failed to load subjects";
       setState((prev) => ({
         ...prev,
         error: errorMessage,
-        categories: [],
+        subjects: [],
         loading: false,
       }));
     }
@@ -125,14 +116,14 @@ export const useCategoryPage = (): UseCategoryPageState &
    * Initial load on mount
    */
   useEffect(() => {
-    loadCategories();
-  }, [loadCategories]);
+    loadsubjects();
+  }, [loadsubjects]);
 
   /**
-   * Apply filters to categories (Frontend filtering)
+   * Apply filters to subjects (Frontend filtering)
    */
-  const filteredCategories = useMemo(() => {
-    let filtered = [...state.categories];
+  const filteredsubjects = useMemo(() => {
+    let filtered = [...state.subjects];
 
     // Search filter (search in frontend)
     if (state.filters.search) {
@@ -140,8 +131,8 @@ export const useCategoryPage = (): UseCategoryPageState &
       filtered = filtered.filter(
         (cat) =>
           cat.title.toLowerCase().includes(searchLower) ||
-          cat.description?.toLowerCase().includes(searchLower) ||
-          cat.slug?.toLowerCase().includes(searchLower)
+          cat.description.toLowerCase().includes(searchLower) ||
+          cat.code.toLowerCase().includes(searchLower)
       );
     }
 
@@ -166,27 +157,27 @@ export const useCategoryPage = (): UseCategoryPageState &
     });
 
     return filtered;
-  }, [state.categories, state.filters]);
+  }, [state.subjects, state.filters]);
 
   /**
-   * Update filtered categories in state
+   * Update filtered subjects in state
    */
   useEffect(() => {
-    setState((prev) => ({ ...prev, filteredCategories }));
-  }, [filteredCategories]);
+    setState((prev) => ({ ...prev, filteredsubjects }));
+  }, [filteredsubjects]);
 
   /**
-   * Handle create category
+   * Handle create Subject
    */
-  const handleCreateCategory = useCallback(
-    async (data: CreateCategoryRequest): Promise<void> => {
+  const handleCreateSubject = useCallback(
+    async (data: CreateSubjectRequest): Promise<void> => {
       setState((prev) => ({ ...prev, actionLoading: true, error: null }));
 
       try {
-        const newCategory = await categoryService.createCategory(data);
+        const newSubject = await SubjectService.createSubject(data);
 
-        // Reload categories after creation
-        await loadCategories();
+        // Reload subjects after creation
+        await loadsubjects();
 
         setState((prev) => ({
           ...prev,
@@ -194,112 +185,108 @@ export const useCategoryPage = (): UseCategoryPageState &
           formDialogOpen: false,
         }));
 
-        toast.success(
-          t("categories.createSuccess", { name: newCategory.title })
-        );
+        toast.success(t("subjects.createSuccess", { name: newSubject.title }));
       } catch (err) {
         const error =
-          err instanceof Error ? err : new Error("Failed to create category");
+          err instanceof Error ? err : new Error("Failed to create Subject");
         setState((prev) => ({
           ...prev,
           error: error.message,
           actionLoading: false,
         }));
 
-        toast.error(t("categories.createError"), {
+        toast.error(t("subjects.createError"), {
           description: error.message,
         });
       }
     },
-    [loadCategories, t]
+    [loadsubjects, t]
   );
 
   /**
-   * Handle update category
+   * Handle update Subject
    */
-  const handleUpdateCategory = useCallback(
-    async (data: UpdateCategoryRequest): Promise<void> => {
-      if (!state.editingCategory) return;
+  const handleUpdateSubject = useCallback(
+    async (data: UpdateSubjectRequest): Promise<void> => {
+      if (!state.editingSubject) return;
 
       setState((prev) => ({ ...prev, actionLoading: true, error: null }));
 
       try {
-        const updatedCategory = await categoryService.updateCategory(
-          state.editingCategory.id,
+        const updatedSubject = await SubjectService.updateSubject(
+          state.editingSubject.id,
           data
         );
 
-        // Update the category in the current list
+        // Update the Subject in the current list
         setState((prev) => ({
           ...prev,
-          categories: prev.categories.map((cat) =>
-            cat.id === updatedCategory.id ? updatedCategory : cat
+          subjects: prev.subjects.map((cat) =>
+            cat.id === updatedSubject.id ? updatedSubject : cat
           ),
           actionLoading: false,
           formDialogOpen: false,
-          editingCategory: null,
+          editingSubject: null,
         }));
 
         toast.success(
-          t("categories.updateSuccess", { name: updatedCategory.title })
+          t("subjects.updateSuccess", { name: updatedSubject.title })
         );
       } catch (err) {
         const error =
-          err instanceof Error ? err : new Error("Failed to update category");
+          err instanceof Error ? err : new Error("Failed to update Subject");
         setState((prev) => ({
           ...prev,
           error: error.message,
           actionLoading: false,
         }));
 
-        toast.error(t("categories.updateError"), {
+        toast.error(t("subjects.updateError"), {
           description: error.message,
         });
       }
     },
-    [state.editingCategory, t]
+    [state.editingSubject, t]
   );
 
   /**
-   * Handle delete category
+   * Handle delete Subject
    */
-  const handleDeleteCategory = useCallback(async (): Promise<void> => {
-    if (!state.deletingCategory) return;
+  const handleDeleteSubject = useCallback(async (): Promise<void> => {
+    if (!state.deletingSubject) return;
 
     setState((prev) => ({ ...prev, actionLoading: true, error: null }));
 
     try {
-      await categoryService.deleteCategory(state.deletingCategory.id);
+      await SubjectService.deleteSubject(state.deletingSubject.id);
 
-      // Reload categories after deletion
-      await loadCategories();
+      // Reload subjects after deletion
+      await loadsubjects();
 
-      const deletedCategoryTitle = state.deletingCategory.title;
+      const deletedSubjectTitle = state.deletingSubject.title;
 
       setState((prev) => ({
         ...prev,
         actionLoading: false,
         deleteDialogOpen: false,
-        deletingCategory: null,
+        deletingSubject: null,
       }));
 
-      toast.success(
-        t("categories.deleteSuccess", { name: deletedCategoryTitle })
-      );
+      toast.success(t("subjects.deleteSuccess", { name: deletedSubjectTitle }));
     } catch (err) {
       const error =
-        err instanceof Error ? err : new Error("Failed to delete category");
+        err instanceof Error ? err : new Error("Failed to delete Subject");
       setState((prev) => ({
         ...prev,
         error: error.message,
         actionLoading: false,
       }));
 
-      toast.error(t("categories.deleteError"), {
+      toast.error(t("subjects.deleteError"), {
         description: error.message,
       });
     }
-  }, [state.deletingCategory, loadCategories, t]);
+  }, [state.deletingSubject, loadsubjects, t]);
 
   /**
    * Open create dialog
@@ -307,7 +294,7 @@ export const useCategoryPage = (): UseCategoryPageState &
   const openCreateDialog = useCallback((): void => {
     setState((prev) => ({
       ...prev,
-      editingCategory: null,
+      editingSubject: null,
       formDialogOpen: true,
     }));
   }, []);
@@ -315,10 +302,10 @@ export const useCategoryPage = (): UseCategoryPageState &
   /**
    * Open edit dialog
    */
-  const openEditDialog = useCallback((category: Category): void => {
+  const openEditDialog = useCallback((Subject: Subject): void => {
     setState((prev) => ({
       ...prev,
-      editingCategory: category,
+      editingSubject: Subject,
       formDialogOpen: true,
     }));
   }, []);
@@ -326,10 +313,10 @@ export const useCategoryPage = (): UseCategoryPageState &
   /**
    * Open delete dialog
    */
-  const openDeleteDialog = useCallback((category: Category): void => {
+  const openDeleteDialog = useCallback((Subject: Subject): void => {
     setState((prev) => ({
       ...prev,
-      deletingCategory: category,
+      deletingSubject: Subject,
       deleteDialogOpen: true,
     }));
   }, []);
@@ -411,18 +398,18 @@ export const useCategoryPage = (): UseCategoryPageState &
    * Refresh current data
    */
   const refresh = useCallback((): void => {
-    loadCategories();
-  }, [loadCategories]);
+    loadsubjects();
+  }, [loadsubjects]);
 
   return {
     // State
     ...state,
 
     // Actions
-    loadCategories,
-    handleCreateCategory,
-    handleUpdateCategory,
-    handleDeleteCategory,
+    loadsubjects,
+    handleCreateSubject,
+    handleUpdateSubject,
+    handleDeleteSubject,
     openCreateDialog,
     openEditDialog,
     openDeleteDialog,

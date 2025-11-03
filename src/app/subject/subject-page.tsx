@@ -4,19 +4,19 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import FilterBar from "@/components/ui/filter-bar";
 
-import { CategoryTable } from "@/components/categories/category-table";
-import { CategoryFormDialog } from "@/components/categories/category-form-dialog";
-import { CategoryDeleteDialog } from "@/components/categories/category-delete-dialog";
-import { useCategoryPage } from "@/app/category/use-category";
+import { useSubjectPage } from "@/app/subject/use-subject";
+import { SubjectDeleteDialog } from "@/components/subject/subject-delete-dialog";
+import { SubjectFormDialog } from "@/components/subject/subject-form-dialog";
+import { SubjectTable } from "@/components/subject/subject-table";
 
-export default function CategoryPage() {
-  const { t } = useTranslation("categories");
+export default function SubjectPage() {
+  const { t } = useTranslation("subjects");
 
   // All logic is now in the hook
   const {
     // Data
-    categories,
-    filteredCategories,
+    subjects,
+    filteredsubjects,
 
     // Loading states
     loading,
@@ -29,13 +29,13 @@ export default function CategoryPage() {
     // Dialog states
     formDialogOpen,
     deleteDialogOpen,
-    editingCategory,
-    deletingCategory,
+    editingSubject,
+    deletingSubject,
 
     // CRUD handlers
-    handleCreateCategory,
-    handleUpdateCategory,
-    handleDeleteCategory,
+    handleCreateSubject,
+    handleUpdateSubject,
+    handleDeleteSubject,
 
     // Dialog handlers
     openCreateDialog,
@@ -48,7 +48,7 @@ export default function CategoryPage() {
     handleSearchChange,
     handleSearchClear,
     handleSortChange,
-  } = useCategoryPage();
+  } = useSubjectPage();
 
   return (
     <div className="min-h-screen w-full px-6 py-6 space-y-6 mb-10">
@@ -56,15 +56,15 @@ export default function CategoryPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            {t("categories.title") || "Categories"}
+            {t("subjects.title") || "subjects"}
           </h1>
           <p className="text-muted-foreground mt-1">
-            {t("categories.description") || "Manage your content categories"}
+            {t("subjects.description") || "Manage your content subjects"}
           </p>
         </div>
         <Button onClick={openCreateDialog}>
           <Plus className="mr-2 h-4 w-4" />
-          {t("categories.createNew") || "Create Category"}
+          {t("subjects.createNew") || "Create Subject"}
         </Button>
       </div>
 
@@ -73,14 +73,12 @@ export default function CategoryPage() {
         searchTerm={localSearchTerm}
         onSearchChange={handleSearchChange}
         onSearchClear={handleSearchClear}
-        placeholder={
-          t("categories.searchPlaceholder") || "Search categories..."
-        }
+        placeholder={t("subjects.searchPlaceholder") || "Search subjects..."}
         filters={[
           {
             value: filters.sortBy,
             onChange: handleSortChange,
-            placeholder: t("categories.sortBy") || "Sort By",
+            placeholder: t("subjects.sortBy") || "Sort By",
             widthClass: "w-36",
             options: [
               {
@@ -100,41 +98,41 @@ export default function CategoryPage() {
         ]}
       />
 
-      {/* Categories Table */}
-      <CategoryTable
+      {/* subjects Table */}
+      <SubjectTable
         key={Date.now()}
-        categories={filteredCategories}
+        subjects={filteredsubjects}
         onEdit={openEditDialog}
         onDelete={openDeleteDialog}
         loading={loading}
       />
 
       {/* Summary */}
-      {!loading && categories.length > 0 && (
+      {!loading && subjects.length > 0 && (
         <div className="text-sm text-muted-foreground text-center">
-          {t("categories.showingResults", {
-            count: filteredCategories.length,
-            total: categories.length,
+          {t("subjects.showingResults", {
+            count: filteredsubjects.length,
+            total: subjects.length,
           }) ||
-            `Showing ${filteredCategories.length} of ${categories.length} categories`}
+            `Showing ${filteredsubjects.length} of ${subjects.length} subjects`}
         </div>
       )}
 
       {/* Form Dialog */}
-      <CategoryFormDialog
+      <SubjectFormDialog
         open={formDialogOpen}
         onOpenChange={setFormDialogOpen}
-        category={editingCategory}
-        onSubmit={editingCategory ? handleUpdateCategory : handleCreateCategory}
+        Subject={editingSubject}
+        onSubmit={editingSubject ? handleUpdateSubject : handleCreateSubject}
         loading={actionLoading}
       />
 
       {/* Delete Dialog */}
-      <CategoryDeleteDialog
+      <SubjectDeleteDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        category={deletingCategory}
-        onConfirm={handleDeleteCategory}
+        Subject={deletingSubject}
+        onConfirm={handleDeleteSubject}
         loading={actionLoading}
       />
     </div>

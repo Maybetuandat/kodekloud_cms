@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 import { CourseCard } from "@/components/courses/index-page/course-card";
 import { Course } from "@/types/course";
-import { Category } from "@/types/category";
+import { Category } from "@/types/subject";
 import { useCoursePage } from "@/app/courses/index-page/use-course-page";
 import { Pagination } from "@/components/ui/pagination";
 import FilterBar from "@/components/ui/filter-bar";

@@ -1,20 +1,20 @@
 {
-  "categories": {
-    "title": "Categories",
-    "description": "Manage your content categories",
-    "createNew": "Create Category",
-    "createCategory": "Create New Category",
-    "editCategory": "Edit Category",
-    "createCategoryDescription": "Add a new category to organize your content",
-    "editCategoryDescription": "Update category information",
-    "noCategories": "No categories found",
-    "noResultsFound": "No categories found",
+  "subjects": {
+    "title": "subjects",
+    "description": "Manage your content subjects",
+    "createNew": "Create Subjects",
+    "createSubject": "Create New Subject",
+    "editSubject": "Edit Subject",
+    "createSubjectDescription": "Add a new subject to organize your content",
+    "editSubjectDescription": "Update subject information",
+    "nosubjects": "No subjects found",
+    "noResultsFound": "No subjects found",
     "tryDifferentFilters": "Try adjusting your filters",
-    "createFirstCategory": "Create your first category to get started",
-    "searchPlaceholder": "Search categories...",
+    "createFirstCategory": "Create your first subject to get started",
+    "searchPlaceholder": "Search subjects...",
     "statusFilter": "Status",
     "sortBy": "Sort By",
-    "showingResults": "Showing {{count}} of {{total}} categories",
+    "showingResults": "Showing {{count}} of {{total}} subjects",
     "slug": "Slug",
 
     "table": {
@@ -28,9 +28,9 @@
 
     "form": {
       "title": "Title",
-      "titlePlaceholder": "Enter category title",
+      "titlePlaceholder": "Enter subject title",
       "slug": "Slug",
-      "slugPlaceholder": "category-slug",
+      "slugPlaceholder": "subject-slug",
       "slugDescription": "URL-friendly version of the title",
       "description": "Description",
       "descriptionPlaceholder": "Enter category description",
@@ -42,14 +42,14 @@
       "titleRequired": "Title is required"
     },
 
-    "createSuccess": "Category '{{name}}' created successfully",
-    "createError": "Failed to create category",
-    "updateSuccess": "Category '{{name}}' updated successfully",
-    "updateError": "Failed to update category",
-    "deleteSuccess": "Category '{{name}}' deleted successfully",
-    "deleteError": "Failed to delete category",
+    "createSuccess": "Subject '{{name}}' created successfully",
+    "createError": "Failed to create subject",
+    "updateSuccess": "Subject '{{name}}' updated successfully",
+    "updateError": "Failed to update subject",
+    "deleteSuccess": "Subject '{{name}}' deleted successfully",
+    "deleteError": "Failed to delete subject",
 
-    "deleteConfirmTitle": "Delete Category",
+    "deleteConfirmTitle": "Delete Subject",
     "deleteConfirmDescription": "Are you sure you want to delete '{{name}}'? This action cannot be undone."
   },
 

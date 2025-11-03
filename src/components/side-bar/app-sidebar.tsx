@@ -46,10 +46,10 @@ export function AppSidebar({
         isActive: location.pathname.startsWith("/labs"),
       },
       {
-        title: t("navigation.category"),
-        url: "/category",
+        title: t("navigation.subject"),
+        url: "/subjects",
         icon: Tags,
-        isActive: location.pathname.startsWith("/category"),
+        isActive: location.pathname.startsWith("/subjects"),
       },
       {
         title: t("navigation.users"),

@@ -12,14 +12,14 @@ export const courseService = {
     pageSize: number;
     search?: string;
     isActive?: boolean;
-    slugCategory?: string;
+    code?: string;
   }): Promise<CourseResponse> => {
     const queryParams: {
       page: number;
       pageSize: number;
       search?: string;
       isActive?: boolean;
-      slugCategory?: string;
+      code?: string;
     } = {
       page: params.page,
       pageSize: params.pageSize,
@@ -29,8 +29,8 @@ export const courseService = {
       queryParams.search = params.search;
     }
 
-    if (params.slugCategory) {
-      queryParams.slugCategory = params.slugCategory;
+    if (params.code) {
+      queryParams.code = params.code;
     }
 
     if (params.isActive != null) {

@@ -7,11 +7,11 @@ import "./i18n";
 import CoursePage from "./app/courses/index-page/course-page";
 import NewCoursePage from "./app/courses/new-course-page/new-course-page";
 
-import CategoryPage from "./app/category/category-page";
 import { CourseDetail } from "./app/courses/detail-page/course-detail";
 import { LabDetail } from "./app/labs/detail-page/lab-detail";
 import LabPage from "./app/labs/index-page/lab-page";
 import UserPage from "./app/user/user-page";
+import SubjectPage from "./app/subject/subject-page";
 
 function App() {
   return (
@@ -33,8 +33,8 @@ function App() {
             <Route index element={<LabPage />} />
             <Route path=":labId" element={<LabDetail />} />
           </Route>
-          {/* Category Section */}
-          <Route path="category" element={<CategoryPage />} />
+          {/* Subject Section */}
+          <Route path="subjects" element={<SubjectPage />} />
 
           <Route path="users">
             <Route index element={<UserPage />} />

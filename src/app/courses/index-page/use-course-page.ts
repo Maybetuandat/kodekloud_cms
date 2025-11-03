@@ -6,8 +6,8 @@ import {
   CreateCourseRequest,
   UpdateCourseRequest,
 } from "@/types/course";
-import { categoryService } from "@/services/categoryService";
-import { Category } from "@/types/category";
+import { SubjectService } from "@/services/subjectService";
+import { Subject } from "@/types/subject";
 
 export interface UseCoursePage {
   courses: Course[];
@@ -23,7 +23,7 @@ export interface UseCoursePage {
     onSuccess?: (course: Course) => void,
     onError?: (error: Error) => void
   ) => Promise<void>;
-  fetchCategories: () => Promise<Category[]>;
+  fetchSubjects: () => Promise<Subject[]>;
   updateCourse: (
     id: number,
     data: UpdateCourseRequest,
@@ -57,7 +57,7 @@ export const useCoursePage = (): UseCoursePage => {
   const [filters, setFiltersState] = useState<CourseFilters>({
     search: "",
     isActive: undefined,
-    categorySlug: undefined, // Filter cho category
+    code: undefined, // Filter cho Subject
     sortBy: "newest",
   });
 
@@ -69,7 +69,7 @@ export const useCoursePage = (): UseCoursePage => {
         pageSize: pageSize,
         search: filters.search || undefined,
         isActive: filters.isActive,
-        slugCategory: filters.categorySlug || undefined,
+        code: filters.code || undefined,
       });
 
       setCourses(response.data);
@@ -117,12 +117,12 @@ export const useCoursePage = (): UseCoursePage => {
     );
   };
 
-  const fetchCategories = useCallback(async () => {
+  const fetchSubjects = useCallback(async () => {
     try {
-      const categories = await categoryService.getAllCategories();
-      return categories;
+      const subjects = await SubjectService.getAllSubjects();
+      return subjects;
     } catch (error) {
-      console.error("Failed to load categories:", error);
+      console.error("Failed to load subjects:", error);
       return [];
     }
   }, []);
@@ -185,7 +185,7 @@ export const useCoursePage = (): UseCoursePage => {
     totalPages,
     totalItems,
     filters,
-    fetchCategories,
+    fetchSubjects,
     createCourse,
     updateCourse,
     deleteCourse,
