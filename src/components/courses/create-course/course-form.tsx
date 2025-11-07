@@ -42,7 +42,7 @@ const createCourseFormSchema = (t: any) =>
       .min(1, t("courses.validation.durationMin"))
       .max(10000, t("courses.validation.durationMax"))
       .optional(),
-    SubjectId: z.number().min(1, t("courses.validation.SubjectRequired")),
+    subjectId: z.number().min(1, "Môn học là bắt buộc"),
     isActive: z.boolean().default(true),
   });
 
@@ -50,18 +50,15 @@ const createCourseFormSchema = (t: any) =>
 const transformFormDataToRequest = (
   formData: z.infer<ReturnType<typeof createCourseFormSchema>>
 ): CreateCourseRequest | UpdateCourseRequest => {
-  const { SubjectId, ...rest } = formData;
+  const { subjectId, ...rest } = formData;
   return {
     ...rest,
-    Subject: {
-      id: SubjectId,
-    },
   };
 };
 
 interface CourseFormProps {
   course?: Course | null;
-  onSubmit: (data: CreateCourseRequest | UpdateCourseRequest) => Promise<void>;
+  onSubmit: (data: CreateCourseRequest, subjectId: number) => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
 }
@@ -81,8 +78,8 @@ export function CourseForm({
 }: CourseFormProps) {
   const { t } = useTranslation("courses");
   const {
-    categories,
-    loading: categoriesLoading,
+    subjects,
+    loading: subjectLoading,
     error: SubjectError,
   } = useSubjectPage();
 
@@ -97,7 +94,7 @@ export function CourseForm({
       shortDescription: course?.shortDescription || "",
       level: course?.level || "",
       durationMinutes: course?.durationMinutes || 60,
-      SubjectId: course?.Subject?.id || 0,
+      subjectId: course?.subject?.id || 0,
       isActive: course?.isActive ?? true,
     },
   });
@@ -105,7 +102,7 @@ export function CourseForm({
   const handleSubmit = async (data: CourseFormData) => {
     // Transform form data to API request format
     const requestData = transformFormDataToRequest(data);
-    await onSubmit(requestData);
+    await onSubmit(requestData, data.subjectId);
   };
 
   return (
@@ -144,53 +141,53 @@ export function CourseForm({
         {/* Subject Dropdown */}
         <FormField
           control={form.control}
-          name="SubjectId"
+          name="subjectId"
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-base">
-                {t("courses.form.Subject")}{" "}
+                {t("courses.form.subject")}{" "}
                 <span className="text-destructive">*</span>
               </FormLabel>
               <Select
                 onValueChange={(value) => field.onChange(Number(value))}
                 value={field.value?.toString()}
-                disabled={loading || categoriesLoading}
+                disabled={loading || subjectLoading}
               >
                 <FormControl>
                   <SelectTrigger className="text-base">
                     <SelectValue
-                      placeholder={t("courses.form.SubjectPlaceholder")}
+                      placeholder={t("courses.form.subjectPlaceholder")}
                     />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {categoriesLoading ? (
+                  {subjectLoading ? (
                     <SelectItem value="0" disabled>
                       <div className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
                         {t("courses.form.SubjectLoading")}
                       </div>
                     </SelectItem>
-                  ) : categories.length === 0 ? (
+                  ) : subjects.length === 0 ? (
                     <SelectItem value="0" disabled>
                       {t("courses.form.SubjectEmpty")}
                     </SelectItem>
                   ) : (
-                    categories.map((Subject) => (
+                    subjects.map((subject) => (
                       <SelectItem
-                        key={Subject.id}
-                        value={Subject.id.toString()}
+                        key={subject.id}
+                        value={subject.id.toString()}
                       >
                         <div className="flex items-center gap-2">
                           <FolderTree className="h-4 w-4" />
-                          {Subject.title}
+                          {subject.title}
                         </div>
                       </SelectItem>
                     ))
                   )}
                 </SelectContent>
               </Select>
-              <FormDescription>{t("courses.form.SubjectHint")}</FormDescription>
+              <FormDescription>{t("courses.form.subjectHint")}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -221,7 +218,6 @@ export function CourseForm({
           )}
         />
 
-        {/* Description - ✅ TipTap Editor */}
         <FormField
           control={form.control}
           name="description"
@@ -357,7 +353,7 @@ export function CourseForm({
           >
             {t("common.cancel")}
           </Button>
-          <Button type="submit" disabled={loading || categoriesLoading}>
+          <Button type="submit" disabled={loading || subjectLoading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {course ? t("common.update") : t("common.create")}
           </Button>

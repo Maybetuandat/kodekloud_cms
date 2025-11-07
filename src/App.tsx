@@ -20,7 +20,7 @@ function App() {
         {/* Root Layout */}
         <Route path="/" element={<MainLayout />}>
           {/* Home */}
-          <Route index element={<CoursePage />} />
+          <Route index element={<SubjectPage />} />
 
           {/* Courses Section */}
           <Route path="courses">

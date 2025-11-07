@@ -20,6 +20,7 @@ export const SubjectService = {
 
   // Create new Subject
   createSubject: async (data: CreateSubjectRequest): Promise<Subject> => {
+    console.log("create subject", data);
     return api.post<Subject>(`${ENDPOINT}`, data);
   },
 

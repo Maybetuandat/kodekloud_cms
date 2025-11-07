@@ -33,15 +33,16 @@ export const UserDeleteDialog: FC<UserDeleteDialogProps> = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+          <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the user
-            account for <span className="font-semibold">{user.username}</span> (
-            {user.email}).
+            Hành động này không thể hoàn tác. Điều này sẽ xóa vĩnh viễn tài
+            khoản người dùng
+            <span className="font-semibold">{user.username}</span> ({user.email}
+            ).
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>Hủy</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();

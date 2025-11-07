@@ -23,8 +23,8 @@ import { Subject } from "@/types/subject";
 
 interface SubjectTableProps {
   subjects: Subject[];
-  onEdit: (Subject: Subject) => void;
-  onDelete: (Subject: Subject) => void;
+  onEdit: (subject: Subject) => void;
+  onDelete: (subject: Subject) => void;
   loading?: boolean;
 }
 
@@ -57,19 +57,19 @@ export function SubjectTable({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]">#</TableHead>
-              <TableHead>{t("subjects.table.title") || "Title"}</TableHead>
-              <TableHead>{t("subjects.table.slug") || "Slug"}</TableHead>
+              <TableHead>{t("subjects.table.title")}</TableHead>
+              <TableHead>{t("subjects.table.code")}</TableHead>
               <TableHead className="hidden md:table-cell">
-                {t("subjects.table.description") || "Description"}
+                {t("subjects.table.description")}
               </TableHead>
               <TableHead className="w-[100px]">
-                {t("subjects.table.status") || "Status"}
+                {t("subjects.table.status")}
               </TableHead>
               <TableHead className="hidden lg:table-cell w-[150px]">
-                {t("subjects.table.updatedAt") || "Updated"}
+                {t("subjects.table.updatedAt")}
               </TableHead>
               <TableHead className="w-[80px] text-right">
-                {t("common.actions") || "Actions"}
+                {t("common.actions")}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -94,26 +94,26 @@ export function SubjectTable({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]">#</TableHead>
-              <TableHead>{t("subjects.table.title") || "Title"}</TableHead>
-              <TableHead>{t("subjects.table.slug") || "Slug"}</TableHead>
+              <TableHead>{t("subjects.table.title")}</TableHead>
+              <TableHead>{t("subjects.table.code")}</TableHead>
               <TableHead className="hidden md:table-cell">
-                {t("subjects.table.description") || "Description"}
+                {t("subjects.table.description")}
               </TableHead>
               <TableHead className="w-[100px]">
-                {t("subjects.table.status") || "Status"}
+                {t("subjects.table.status")}
               </TableHead>
               <TableHead className="hidden lg:table-cell w-[150px]">
-                {t("subjects.table.updatedAt") || "Updated"}
+                {t("subjects.table.updatedAt")}
               </TableHead>
               <TableHead className="w-[80px] text-right">
-                {t("common.actions") || "Actions"}
+                {t("common.actions")}
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             <TableRow>
               <TableCell colSpan={7} className="h-24 text-center">
-                {t("subjects.nosubjects") || "No subjects found"}
+                {t("subjects.nosubjects")}
               </TableCell>
             </TableRow>
           </TableBody>
@@ -128,38 +128,48 @@ export function SubjectTable({
         <TableHeader>
           <TableRow>
             <TableHead className="w-[50px]">#</TableHead>
-            <TableHead>{t("subjects.table.title") || "Title"}</TableHead>
-            <TableHead>{t("subjects.table.slug") || "Slug"}</TableHead>
+            <TableHead>{t("subjects.table.title")}</TableHead>
+            <TableHead>{t("subjects.table.code")}</TableHead>
+            <TableHead>{t("subjects.table.credits")}</TableHead>
             <TableHead className="hidden md:table-cell">
-              {t("subjects.table.description") || "Description"}
+              {t("subjects.table.description")}
             </TableHead>
 
             <TableHead className="hidden lg:table-cell w-[150px]">
-              {t("subjects.table.updatedAt") || "Updated"}
+              {t("subjects.table.updatedAt")}
             </TableHead>
             <TableHead className="w-[80px] text-right">
-              {t("common.actions") || "Actions"}
+              {t("common.actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {subjects.map((Subject, index) => (
-            <TableRow key={Subject.id}>
+          {subjects.map((subject, index) => (
+            <TableRow key={subject.id}>
               <TableCell className="font-medium">{index + 1}</TableCell>
-              <TableCell className="font-medium">{Subject.title}</TableCell>
+              <TableCell className="font-medium">{subject.title}</TableCell>
               <TableCell>
-                {Subject.code ? (
+                {subject.code ? (
                   <code className="text-xs bg-muted px-2 py-1 rounded">
-                    {Subject.code}
+                    {subject.code}
+                  </code>
+                ) : (
+                  <span className="text-muted-foreground">-</span>
+                )}
+              </TableCell>
+              <TableCell>
+                {subject.credits ? (
+                  <code className="text-xs bg-muted px-2 py-1 rounded">
+                    {subject.credits}
                   </code>
                 ) : (
                   <span className="text-muted-foreground">-</span>
                 )}
               </TableCell>
               <TableCell className="hidden md:table-cell">
-                {Subject.description ? (
+                {subject.description ? (
                   <span className="text-sm line-clamp-2">
-                    {Subject.description}
+                    {subject.description}
                   </span>
                 ) : (
                   <span className="text-muted-foreground">-</span>
@@ -167,7 +177,7 @@ export function SubjectTable({
               </TableCell>
 
               <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
-                {formatDate(Subject.updatedAt)}
+                {formatDate(subject.updatedAt)}
               </TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
@@ -177,13 +187,13 @@ export function SubjectTable({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onEdit(Subject)}>
+                    <DropdownMenuItem onClick={() => onEdit(subject)}>
                       <Edit className="mr-2 h-4 w-4" />
                       {t("common.edit") || "Edit"}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      onClick={() => onDelete(Subject)}
+                      onClick={() => onDelete(subject)}
                       className="text-destructive focus:text-destructive"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />

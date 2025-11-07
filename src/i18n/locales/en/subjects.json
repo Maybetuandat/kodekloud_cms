@@ -19,7 +19,8 @@
 
     "table": {
       "title": "Title",
-      "slug": "Slug",
+      "code": "Code",
+      "credits": "Credits",
       "description": "Description",
       "status": "Status",
       "updatedAt": "Updated",

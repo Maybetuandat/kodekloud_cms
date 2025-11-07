@@ -34,22 +34,23 @@ export function AppSidebar({
   const data = {
     navMain: [
       {
+        title: t("navigation.subject"),
+        url: "/subjects",
+        icon: Tags,
+        isActive:
+          location.pathname == "/" || location.pathname.startsWith("/subjects"),
+      },
+      {
         title: t("navigation.courses"),
         url: "/courses",
         icon: BookOpen,
-        isActive: location.pathname === "/" || location.pathname === "/courses",
+        isActive: location.pathname.startsWith("/courses"),
       },
       {
         title: t("navigation.labs"),
         url: "/labs",
         icon: FlaskConical,
         isActive: location.pathname.startsWith("/labs"),
-      },
-      {
-        title: t("navigation.subject"),
-        url: "/subjects",
-        icon: Tags,
-        isActive: location.pathname.startsWith("/subjects"),
       },
       {
         title: t("navigation.users"),

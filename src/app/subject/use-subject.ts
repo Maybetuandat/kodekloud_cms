@@ -39,7 +39,7 @@ interface UseSubjectPageState {
 
 interface UseSubjectPageActions {
   // Data fetching
-  loadsubjects: () => Promise<void>;
+  loadSubjects: () => Promise<void>;
 
   // CRUD operations with callbacks
   handleCreateSubject: (data: CreateSubjectRequest) => Promise<void>;
@@ -89,7 +89,7 @@ export const useSubjectPage = (): UseSubjectPageState &
   const { t } = useTranslation("subjects");
   const [state, setState] = useState<UseSubjectPageState>(initialState);
 
-  const loadsubjects = useCallback(async (): Promise<void> => {
+  const loadSubjects = useCallback(async (): Promise<void> => {
     try {
       setState((prev) => ({ ...prev, loading: true, error: null }));
 
@@ -116,8 +116,8 @@ export const useSubjectPage = (): UseSubjectPageState &
    * Initial load on mount
    */
   useEffect(() => {
-    loadsubjects();
-  }, [loadsubjects]);
+    loadSubjects();
+  }, [loadSubjects]);
 
   /**
    * Apply filters to subjects (Frontend filtering)
@@ -174,10 +174,11 @@ export const useSubjectPage = (): UseSubjectPageState &
       setState((prev) => ({ ...prev, actionLoading: true, error: null }));
 
       try {
+        console.log("Create Subject in Hook", data);
         const newSubject = await SubjectService.createSubject(data);
 
         // Reload subjects after creation
-        await loadsubjects();
+        await loadSubjects();
 
         setState((prev) => ({
           ...prev,
@@ -200,7 +201,7 @@ export const useSubjectPage = (): UseSubjectPageState &
         });
       }
     },
-    [loadsubjects, t]
+    [loadSubjects, t]
   );
 
   /**
@@ -261,7 +262,7 @@ export const useSubjectPage = (): UseSubjectPageState &
       await SubjectService.deleteSubject(state.deletingSubject.id);
 
       // Reload subjects after deletion
-      await loadsubjects();
+      await loadSubjects();
 
       const deletedSubjectTitle = state.deletingSubject.title;
 
@@ -286,7 +287,7 @@ export const useSubjectPage = (): UseSubjectPageState &
         description: error.message,
       });
     }
-  }, [state.deletingSubject, loadsubjects, t]);
+  }, [state.deletingSubject, loadSubjects, t]);
 
   /**
    * Open create dialog
@@ -398,15 +399,15 @@ export const useSubjectPage = (): UseSubjectPageState &
    * Refresh current data
    */
   const refresh = useCallback((): void => {
-    loadsubjects();
-  }, [loadsubjects]);
+    loadSubjects();
+  }, [loadSubjects]);
 
   return {
     // State
     ...state,
 
     // Actions
-    loadsubjects,
+    loadSubjects,
     handleCreateSubject,
     handleUpdateSubject,
     handleDeleteSubject,

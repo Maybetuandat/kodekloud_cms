@@ -24,10 +24,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+
 import {
-  Subject,
   CreateSubjectRequest,
+  Subject,
   UpdateSubjectRequest,
 } from "@/types/subject";
 
@@ -36,14 +36,15 @@ const createSubjectFormSchema = (t: any) =>
   z.object({
     title: z.string().min(1, t("subjects.validation.titleRequired")),
     description: z.string().optional(),
-    slug: z.string().optional(),
+    code: z.string().optional(),
     isActive: z.boolean().default(true),
+    credits: z.number().default(0),
   });
 
 interface SubjectFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  Subject?: Subject | null;
+  subject?: Subject | null;
   onSubmit: (
     data: CreateSubjectRequest | UpdateSubjectRequest
   ) => Promise<void>;
@@ -53,12 +54,12 @@ interface SubjectFormDialogProps {
 export function SubjectFormDialog({
   open,
   onOpenChange,
-  Subject,
+  subject,
   onSubmit,
   loading = false,
 }: SubjectFormDialogProps) {
   const { t } = useTranslation("subjects");
-  const isEditMode = !!Subject;
+  const isEditMode = !!subject;
 
   const form = useForm<CreateSubjectRequest | UpdateSubjectRequest>({
     resolver: zodResolver(createSubjectFormSchema(t)),
@@ -66,24 +67,27 @@ export function SubjectFormDialog({
       title: "",
       code: "",
       description: "",
+      credits: 0,
     },
   });
 
   useEffect(() => {
-    if (Subject && open) {
+    if (subject && open) {
       form.reset({
-        title: Subject.title,
-        description: Subject.description || "",
-        code: Subject.code || "",
+        title: subject.title,
+        description: subject.description || "",
+        code: subject.code || "",
+        credits: subject.credits,
       });
     } else if (!open) {
       form.reset({
         title: "",
         description: "",
         code: "",
+        credits: 0,
       });
     }
-  }, [Subject, open, form]);
+  }, [subject, open, form]);
 
   const handleSubmit = async (
     data: CreateSubjectRequest | UpdateSubjectRequest
@@ -131,6 +135,25 @@ export function SubjectFormDialog({
 
             <FormField
               control={form.control}
+              name="credits"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Số tín chỉ</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      placeholder="Nhập số tín chỉ môn học"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="code"
               render={({ field }) => (
                 <FormItem>
@@ -141,9 +164,6 @@ export function SubjectFormDialog({
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>
-                    {t("subjects.form.codeDescription")}
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

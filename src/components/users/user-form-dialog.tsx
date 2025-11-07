@@ -116,12 +116,12 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {isEditMode ? "Edit User" : "Create New User"}
+            {isEditMode ? "Sửa người dùng" : "Tạo người dùng mới"}
           </DialogTitle>
           <DialogDescription>
             {isEditMode
-              ? "Update user information. Leave password empty to keep current password."
-              : "Fill in the information to create a new user."}
+              ? "Cập nhật thông tin người dùng. Để trống mật khẩu để giữ nguyên mật khẩu hiện tại."
+              : "Điền thông tin để tạo người dùng mới."}
           </DialogDescription>
         </DialogHeader>
 
@@ -130,16 +130,16 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
             {/* Username */}
             <div className="space-y-2">
               <Label htmlFor="username">
-                Username <span className="text-red-500">*</span>
+                Tài khoản <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="username"
-                placeholder="Enter username"
+                placeholder="Nhập tài khoản"
                 {...register("username", {
-                  required: "Username is required",
+                  required: "Tài khoản là bắt buộc",
                   minLength: {
                     value: 3,
-                    message: "Username must be at least 3 characters",
+                    message: "Tài khoản phải có ít nhất 3 ký tự",
                   },
                 })}
                 disabled={loading}
@@ -155,13 +155,13 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName">
-                  First Name <span className="text-red-500">*</span>
+                  Tên <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="firstName"
-                  placeholder="Enter first name"
+                  placeholder="Nhập tên"
                   {...register("firstName", {
-                    required: "First name is required",
+                    required: "Tên là bắt buộc",
                   })}
                   disabled={loading}
                 />
@@ -174,13 +174,13 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
 
               <div className="space-y-2">
                 <Label htmlFor="lastName">
-                  Last Name <span className="text-red-500">*</span>
+                  Họ <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="lastName"
-                  placeholder="Enter last name"
+                  placeholder="Nhập họ"
                   {...register("lastName", {
-                    required: "Last name is required",
+                    required: "Họ là bắt buộc",
                   })}
                   disabled={loading}
                 />
@@ -200,12 +200,12 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter email"
+                placeholder="Nhập địa chỉ email"
                 {...register("email", {
-                  required: "Email is required",
+                  required: "Email là bắt buộc",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
+                    message: "Địa chỉ email không hợp lệ",
                   },
                 })}
                 disabled={loading}
@@ -217,11 +217,11 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
 
             {/* Phone Number */}
             <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Phone Number</Label>
+              <Label htmlFor="phoneNumber">Số điện thoại</Label>
               <Input
                 id="phoneNumber"
                 type="tel"
-                placeholder="Enter phone number"
+                placeholder="Nhập số điện thoại"
                 {...register("phoneNumber")}
                 disabled={loading}
               />
@@ -235,11 +235,11 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
             {/* Password */}
             <div className="space-y-2">
               <Label htmlFor="password">
-                Password{" "}
+                Mật khẩu{" "}
                 {!isEditMode && <span className="text-red-500">*</span>}
                 {isEditMode && (
                   <span className="text-sm text-muted-foreground ml-1">
-                    (Leave empty to keep current)
+                    (Để trống để giữ nguyên mật khẩu hiện tại)
                   </span>
                 )}
               </Label>
@@ -247,15 +247,13 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
                 id="password"
                 type="password"
                 placeholder={
-                  isEditMode
-                    ? "Enter new password (optional)"
-                    : "Enter password"
+                  isEditMode ? "Nhập mật khẩu (tuỳ chọn)" : "Nhập mật khẩu"
                 }
                 {...register("password", {
                   required: !isEditMode ? "Password is required" : false,
                   minLength: {
                     value: 6,
-                    message: "Password must be at least 6 characters",
+                    message: "Mật khẩu phải có ít nhất 6 ký tự",
                   },
                 })}
                 disabled={loading}
@@ -269,7 +267,7 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
 
             {/* Role */}
             <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
+              <Label htmlFor="role">Vai trò</Label>
               <Select
                 value={role}
                 onValueChange={(value) => setValue("role", value)}
@@ -279,27 +277,11 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="USER">User</SelectItem>
-                  <SelectItem value="ADMIN">Admin</SelectItem>
-                  <SelectItem value="MODERATOR">Moderator</SelectItem>
+                  <SelectItem value="USER">Sinh viên</SelectItem>
+                  <SelectItem value="ADMIN">Quản trị viên</SelectItem>
+                  <SelectItem value="MODERATOR">Giáo viên</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-
-            {/* Is Active */}
-            <div className="flex items-center justify-between space-x-2 rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <Label htmlFor="isActive">Active Status</Label>
-                <p className="text-sm text-muted-foreground">
-                  Set user account as active or inactive
-                </p>
-              </div>
-              <Switch
-                id="isActive"
-                checked={isActive}
-                onCheckedChange={(checked) => setValue("isActive", checked)}
-                disabled={loading}
-              />
             </div>
           </div>
 

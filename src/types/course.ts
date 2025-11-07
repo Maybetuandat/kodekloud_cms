@@ -11,7 +11,7 @@ export interface Course {
   shortDescription?: string;
   isActive: boolean;
   labs?: Lab[];
-  Subject: Subject;
+  subject?: Subject;
   listCourseUser?: any[];
 }
 
@@ -32,9 +32,6 @@ export interface CreateCourseRequest {
   durationMinutes?: number;
   shortDescription?: string;
   isActive?: boolean;
-  Subject: {
-    id: number;
-  };
 }
 
 export interface UpdateCourseRequest extends CreateCourseRequest {}
@@ -46,7 +43,7 @@ export interface CourseFormData {
   durationMinutes?: number;
   shortDescription?: string;
   isActive: boolean;
-  SubjectId: number;
+  subjectId: number;
 }
 
 export interface CourseFilters {

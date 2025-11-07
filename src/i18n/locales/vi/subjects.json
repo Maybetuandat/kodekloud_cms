@@ -19,7 +19,8 @@
 
     "table": {
       "title": "Tiêu Đề",
-      "slug": "Đường Dẫn",
+      "code": "Mã môn học",
+      "credits": "Số tín chỉ",
       "description": "Mô Tả",
       "status": "Trạng Thái",
       "updatedAt": "Cập Nhật",
@@ -29,9 +30,8 @@
     "form": {
       "title": "Tiêu Đề",
       "titlePlaceholder": "Nhập tiêu đề môn học",
-      "slug": "Đường Dẫn",
-      "slugPlaceholder": "duong-dan-mon-hoc",
-      "slugDescription": "Phiên bản thân thiện URL của tiêu đề",
+      "code": "Mã môn học",
+      "codePlaceholder": "Mã Môn Học",
       "description": "Mô Tả",
       "descriptionPlaceholder": "Nhập mô tả môn học",
       "isActive": "Trạng Thái Hoạt Động",

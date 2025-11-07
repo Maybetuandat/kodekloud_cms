@@ -23,7 +23,7 @@
         "inactive": "Inactive"
       },
       "categoryOptions": {
-        "all": "All Categories"
+        "all": "Tất cả môn học"
       },
       "noCoursesTitle": "No courses found",
       "noCoursesDescription": "Create your first course to get started",
@@ -64,9 +64,10 @@
       "advanced": "Advanced"
     },
     "form": {
-      "category": "Category",
-      "categoryHint": " Select the category that best fits this course",
-      "categoryEmpty": "-- Select Category --",
+      "subject": "Subject",
+      "subjectPlaceholder": "-- Chọn môn học --",
+      "subjectHint": " Select the subject that best fits this course",
+      "subjectEmpty": "-- Select Subject --",
       "basicInfo": "Basic Information",
       "basicInfoDescription": "Enter the essential details about your course",
       "title": "Title",

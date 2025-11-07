@@ -15,8 +15,11 @@ export default function NewCoursePage() {
   const navigate = useNavigate();
   const { createCourse, actionLoading } = UseNewCoursePage();
 
-  const handleCreateCourse = async (data: CreateCourseRequest) => {
-    const response = await createCourse(data);
+  const handleCreateCourse = async (
+    data: CreateCourseRequest,
+    subjectId: number
+  ) => {
+    const response = await createCourse(data, subjectId);
     toast.success("tạo khoá học thành công");
     if (response) {
       navigate(`/courses/${response.id}`);

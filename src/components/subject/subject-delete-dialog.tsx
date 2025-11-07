@@ -28,7 +28,7 @@ export function SubjectDeleteDialog({
   onConfirm,
   loading = false,
 }: SubjectDeleteDialogProps) {
-  const { t } = useTranslation("categories");
+  const { t } = useTranslation("subjects");
 
   const handleConfirm = async () => {
     await onConfirm();
@@ -39,13 +39,13 @@ export function SubjectDeleteDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            {t("categories.deleteConfirmTitle") || "Delete Subject"}
+            {t("subjects.deleteConfirmTitle") || "Delete Subject"}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            {t("categories.deleteConfirmDescription", {
+            {t("subjects.deleteConfirmDescription", {
               name: Subject?.title,
             }) ||
-              `Are you sure you want to delete "${Subject?.title}"? This action cannot be undone.`}
+              `Are you sure you want to delete "${Subject?.title}" ? This action cannot be undone.`}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

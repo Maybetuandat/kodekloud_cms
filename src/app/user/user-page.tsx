@@ -11,6 +11,7 @@ import { UserDeleteDialog } from "@/components/users/user-delete-dialog";
 
 import { User, CreateUserRequest, UpdateUserRequest } from "@/types/user";
 import { useUserPage } from "./use-user-page";
+import { date } from "zod";
 
 export default function UserPage() {
   const {
@@ -171,7 +172,7 @@ export default function UserPage() {
             onSearchChange={setLocalSearchTerm}
             onSearchSubmit={handleSearchSubmit}
             onSearchClear={handleSearchClear}
-            placeholder="Search by username, email, or full name..."
+            placeholder="Tìm kiếm bằng username, tên"
             filters={[
               {
                 value: statusFilterValue,
@@ -193,6 +194,7 @@ export default function UserPage() {
       <Card>
         <CardContent className="pt-6">
           <UserTable
+            key={Date.now()}
             users={users}
             loading={loading}
             onEdit={handleEditUser}

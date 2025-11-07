@@ -90,9 +90,9 @@ export const UserTable: FC<UserTableProps> = ({
   if (users.length === 0) {
     return (
       <div className="border rounded-lg p-12 text-center">
-        <p className="text-muted-foreground text-lg">No users found</p>
+        <p className="text-muted-foreground text-lg">Chưa có người dùng</p>
         <p className="text-sm text-muted-foreground mt-2">
-          Try adjusting your search or filter criteria
+          Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc bộ lọc
         </p>
       </div>
     );

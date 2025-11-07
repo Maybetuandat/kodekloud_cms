@@ -122,7 +122,7 @@ export default function SubjectPage() {
       <SubjectFormDialog
         open={formDialogOpen}
         onOpenChange={setFormDialogOpen}
-        Subject={editingSubject}
+        subject={editingSubject}
         onSubmit={editingSubject ? handleUpdateSubject : handleCreateSubject}
         loading={actionLoading}
       />

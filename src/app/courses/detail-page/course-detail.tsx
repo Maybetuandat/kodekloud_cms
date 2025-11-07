@@ -52,14 +52,7 @@ export function CourseDetail() {
     shortDescription: "",
     isActive: false,
     labs: [],
-    category: {
-      id: 0,
-      title: "",
-      description: "",
-      slug: "",
-      createdAt: "",
-      updatedAt: "",
-    },
+    subject: undefined,
     listCourseUser: [],
   };
 

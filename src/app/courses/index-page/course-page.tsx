@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 import { CourseCard } from "@/components/courses/index-page/course-card";
 import { Course } from "@/types/course";
-import { Category } from "@/types/subject";
+import { Subject } from "@/types/subject";
 import { useCoursePage } from "@/app/courses/index-page/use-course-page";
 import { Pagination } from "@/components/ui/pagination";
 import FilterBar from "@/components/ui/filter-bar";
@@ -36,21 +36,21 @@ export default function CoursePage() {
     setCurrentPage,
     setPageSize,
     refresh,
-    fetchCategories,
+    fetchSubjects,
   } = useCoursePage();
 
   const [localSearchTerm, setLocalSearchTerm] = useState(filters.search);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
 
-  // Load categories một lần khi component mount
+  // Load subjects một lần khi component mount
   useEffect(() => {
-    const loadCategories = async () => {
-      const categoriesData = await fetchCategories();
-      setCategories(categoriesData.filter((cat) => cat.slug));
+    const loadSubjects = async () => {
+      const subjectsData = await fetchSubjects();
+      setSubjects(subjectsData.filter((cat) => cat.code));
     };
 
-    loadCategories();
-  }, [fetchCategories]);
+    loadSubjects();
+  }, [fetchSubjects]);
 
   // Sync local search term với filters
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function CoursePage() {
 
   const handleCategoryChange = (value: string) => {
     setFilters({
-      categorySlug: value === "all" ? undefined : value,
+      code: value === "all" ? undefined : value,
     });
   };
 
@@ -185,9 +185,9 @@ export default function CoursePage() {
                 },
               ],
             },
-            // Category Filter
+
             {
-              value: filters.categorySlug || "all",
+              value: filters.code || "all",
               onChange: handleCategoryChange,
               placeholder: t("courses.page.categoryFilter"),
               widthClass: "w-[180px]",
@@ -196,8 +196,8 @@ export default function CoursePage() {
                   value: "all",
                   label: t("courses.page.categoryOptions.all"),
                 },
-                ...categories.map((category) => ({
-                  value: category.slug!,
+                ...subjects.map((category) => ({
+                  value: category.code!,
                   label: category.title,
                 })),
               ],
