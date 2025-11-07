@@ -3,27 +3,38 @@ import {
   BasicInfoFormData,
   EditBasicInfoModal,
 } from "@/components/courses/detail/overview-tab/edit-basic-info-modal";
-import { CourseLabsTab } from "@/components/courses/detail/lab-tab/lab-tabs";
-import { CourseOverviewTab } from "@/components/courses/detail/overview-tab/overview-tab";
+import { CourseLabsTab } from "@/app/courses/detail-page/lab-tab/lab-tabs";
+import { CourseOverviewTab } from "@/app/courses/detail-page/overview-tab/overview-tab";
 import { SelectLabsDialog } from "@/components/courses/detail/lab-tab/select-labs-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Course } from "@/types/course";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { useCourseDetailPage } from "./use-course-detail";
+import { useCourseLabs } from "./lab-tab/use-lab-tab";
+import { useCourseOverview } from "./overview-tab/user-overview";
+import { useCourseUsers } from "./user-tab/use-user-tab";
+import CourseUserTab from "./user-tab/user-course-tab";
 
 export function CourseDetail() {
   const { courseId } = useParams<{ courseId: string }>();
   const { t } = useTranslation(["courses", "common"]);
+  const courseIdNumber = Number(courseId);
 
   const [isSelectLabsOpen, setIsSelectLabsOpen] = useState(false);
   const [isEditBasicInfoOpen, setIsEditBasicInfoOpen] = useState(false);
   const [isAddingLabs, setIsAddingLabs] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
 
   const {
     course,
-    isLoadingCourse,
+    isLoading: isLoadingCourse,
+    updateDescription,
+    updateBasicInfo,
+  } = useCourseOverview(courseIdNumber);
+
+  // Labs hook
+  const {
     labsInCourse,
     isLoadingLabs,
     availableLabs,
@@ -33,14 +44,20 @@ export function CourseDetail() {
     totalPages,
     totalItems,
     pageSize,
-    updateDescriptionCourse,
-    updateBasicInfoCourse,
     addLabsToCourse,
     removeLabFromCourse,
     handlePageChange,
     handlePageSizeChange,
     handleFiltersChange,
-  } = useCourseDetailPage(Number(courseId));
+    initializeLabs,
+  } = useCourseLabs(courseIdNumber);
+
+  // Users hook
+  const {
+    usersInCourse,
+    isLoading: isLoadingUsers,
+    initializeUsers,
+  } = useCourseUsers(courseIdNumber);
 
   const safeCourse: Course = course || {
     id: 0,
@@ -54,6 +71,18 @@ export function CourseDetail() {
     labs: [],
     subject: undefined,
     listCourseUser: [],
+  };
+
+  // Handle tab change with lazy loading
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+
+    // Initialize data when tab is activated
+    if (value === "labs") {
+      initializeLabs();
+    } else if (value === "users") {
+      initializeUsers();
+    }
   };
 
   const handleRemoveLabFromCourse = async (labId: number) => {
@@ -87,22 +116,23 @@ export function CourseDetail() {
         }
       );
     } catch (error) {
+      // Error already logged
     } finally {
       setIsAddingLabs(false);
     }
   };
 
   const handleSaveDescription = (description: string) => {
-    updateDescriptionCourse(description);
+    updateDescription(description);
   };
 
   const handleSaveBasicInfo = (data: BasicInfoFormData) => {
-    updateBasicInfoCourse(data);
+    updateBasicInfo(data);
   };
 
   const onBack = () => window.history.back();
 
-  // Show loading state
+  // Show loading state for initial course load
   if (isLoadingCourse) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -125,13 +155,20 @@ export function CourseDetail() {
 
       {/* Content */}
       <div className="flex-1 overflow-auto p-6">
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+        <Tabs
+          value={activeTab}
+          onValueChange={handleTabChange}
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">
               {t("courses.detail.tabs.overview")}
             </TabsTrigger>
             <TabsTrigger value="labs">
               {t("courses.detail.tabs.labs")}
+            </TabsTrigger>
+            <TabsTrigger value="users">
+              {t("courses.detail.tabs.users")}
             </TabsTrigger>
           </TabsList>
 
@@ -143,7 +180,7 @@ export function CourseDetail() {
             />
           </TabsContent>
 
-          {/* Labs Tab */}
+          {/* Labs Tab - Only loads when activated */}
           <TabsContent value="labs" className="mt-6">
             <CourseLabsTab
               labs={labsInCourse}
@@ -159,6 +196,14 @@ export function CourseDetail() {
               onPageSizeChange={handlePageSizeChange}
               onFiltersChange={handleFiltersChange}
             />
+          </TabsContent>
+
+          {/* Users Tab - Only loads when activated */}
+          <TabsContent value="users" className="space-y-6 mt-6">
+            <CourseUserTab
+              isLoading={isLoadingUsers}
+              usersInCourse={usersInCourse}
+            ></CourseUserTab>
           </TabsContent>
         </Tabs>
       </div>

@@ -36,7 +36,8 @@
       "backButton": "Quay lại",
       "tabs": {
         "overview": "Tổng quan",
-        "labs": "Bài thực hành"
+        "labs": "Bài thực hành",
+        "users": "Học viên"
       },
       "overview": {
         "detailTitle": "Mô tả chi tiết"
@@ -93,7 +94,8 @@
     "backButton": "Quay lại",
     "tabs": {
       "overview": "Tổng quan",
-      "labs": "Bài thực hành"
+      "labs": "Bài thực hành",
+      "users": "Học viên"
     },
     "overview": {
       "detailTitle": "Mô tả chi tiết",

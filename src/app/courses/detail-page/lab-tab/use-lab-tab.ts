@@ -1,9 +1,7 @@
-import { BasicInfoFormData } from "@/components/courses/detail/overview-tab/edit-basic-info-modal";
 import { courseService } from "@/services/courseService";
 import { labService } from "@/services/labService";
-import { Course } from "@/types/course";
 import { Lab, PaginatedResponse } from "@/types/lab";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 interface LabFilters {
   search: string;
@@ -17,15 +15,8 @@ const initialFilters: LabFilters = {
   sortBy: "newest",
 };
 
-export const useCourseDetailPage = (courseId: number) => {
-  const [course, setCourse] = useState<Course | null>(null);
-  const [isLoadingCourse, setIsLoadingCourse] = useState(true);
-
-  // Available labs (not in this course)
-  const [availableLabs, setAvailableLabs] = useState<Lab[]>([]);
-  const [isLoadingAvailableLabs, setIsLoadingAvailableLabs] = useState(false);
-
-  // Labs in course - state from useLabPage
+export const useCourseLabs = (courseId: number) => {
+  // Labs in course
   const [labsInCourse, setLabsInCourse] = useState<Lab[]>([]);
   const [isLoadingLabs, setIsLoadingLabs] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,8 +28,15 @@ export const useCourseDetailPage = (courseId: number) => {
   const [filters, setFilters] = useState<LabFilters>(initialFilters);
   const [error, setError] = useState<string | null>(null);
 
+  // Available labs (not in this course)
+  const [availableLabs, setAvailableLabs] = useState<Lab[]>([]);
+  const [isLoadingAvailableLabs, setIsLoadingAvailableLabs] = useState(false);
+
+  // Track if labs have been loaded at least once
+  const [isInitialized, setIsInitialized] = useState(false);
+
   /**
-   * Load labs with pagination and filters (from useLabPage)
+   * Load labs with pagination and filters
    */
   const loadLabs = useCallback(
     async (page = 1, customFilters?: Partial<LabFilters>): Promise<void> => {
@@ -60,20 +58,20 @@ export const useCourseDetailPage = (courseId: number) => {
 
         const response: PaginatedResponse<Lab> =
           await labService.getLabsByCourseId(courseId, {
-            page, // Gửi 1-based page (backend sẽ trừ 1)
+            page,
             pageSize,
             isActive,
             search,
           });
 
         setLabsInCourse(response.data);
-        setCurrentPage(response.currentPage); // Backend trả về 0-based
+        setCurrentPage(response.currentPage);
         setTotalPages(response.totalPages);
         setTotalItems(response.totalItems);
         setHasNext(response.hasNext);
         setHasPrevious(response.hasPrevious);
         setFilters(activeFilters);
-        setIsLoadingLabs(false);
+        setIsInitialized(true);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to load labs";
@@ -83,6 +81,7 @@ export const useCourseDetailPage = (courseId: number) => {
         setTotalItems(0);
         setHasNext(false);
         setHasPrevious(false);
+      } finally {
         setIsLoadingLabs(false);
       }
     },
@@ -90,19 +89,27 @@ export const useCourseDetailPage = (courseId: number) => {
   );
 
   /**
-   * Handle page change (from useLabPage)
+   * Initialize labs - call this when tab becomes active
+   */
+  const initializeLabs = useCallback(() => {
+    if (!isInitialized) {
+      loadLabs(1);
+    }
+  }, [isInitialized, loadLabs]);
+
+  /**
+   * Handle page change
    */
   const handlePageChange = useCallback(
     (page: number) => {
-      // page từ Pagination component là 1-based
-      setCurrentPage(page - 1); // Chuyển về 0-based để lưu state
-      loadLabs(page); // Gửi 1-based đến API
+      setCurrentPage(page - 1);
+      loadLabs(page);
     },
     [loadLabs]
   );
 
   /**
-   * Handle filter changes (from useLabPage)
+   * Handle filter changes
    */
   const handleFiltersChange = useCallback(
     (newFilters: { search: string; status?: boolean }) => {
@@ -112,46 +119,29 @@ export const useCourseDetailPage = (courseId: number) => {
         sortBy: filters.sortBy,
       };
       setFilters(updatedFilters);
-      setCurrentPage(0); // Reset về page 0 (0-based)
-      loadLabs(1, updatedFilters); // Gọi API với page 1 (1-based)
+      setCurrentPage(0);
+      loadLabs(1, updatedFilters);
     },
     [loadLabs, filters.sortBy]
   );
 
-  const refreshLabs = useCallback((): void => {
-    loadLabs(currentPage);
-  }, [loadLabs, currentPage]);
-
-  // Fetch course details
-  useEffect(() => {
-    const fetchCourse = async () => {
-      setIsLoadingCourse(true);
-      try {
-        const data = await courseService.getCourseById(courseId);
-        setCourse(data);
-      } catch (error) {
-        console.error("Failed to fetch course details:", error);
-      } finally {
-        setIsLoadingCourse(false);
-      }
-    };
-
-    if (courseId) {
-      fetchCourse();
-    }
-  }, [courseId]);
-
-  // Initial load labs on mount
-  useEffect(() => {
-    if (courseId) {
-      loadLabs();
-    }
-  }, [courseId]);
+  /**
+   * Handle page size change
+   */
+  const handlePageSizeChange = useCallback(
+    (newPageSize: number) => {
+      handleFiltersChange({
+        search: filters.search,
+        status: filters.status,
+      });
+    },
+    [filters.search, filters.status, handleFiltersChange]
+  );
 
   /**
    * Fetch available labs (not in this course)
    */
-  const fetchAvailableLabs = async () => {
+  const fetchAvailableLabs = useCallback(async () => {
     setIsLoadingAvailableLabs(true);
     try {
       const allLabs = await labService.getLabsNotInCourse(courseId, {
@@ -160,14 +150,13 @@ export const useCourseDetailPage = (courseId: number) => {
       });
 
       console.log("Available labs fetched:", allLabs.data);
-
       setAvailableLabs(allLabs.data);
     } catch (error) {
       console.error("Failed to fetch available labs:", error);
     } finally {
       setIsLoadingAvailableLabs(false);
     }
-  };
+  }, [courseId]);
 
   /**
    * Add labs to course
@@ -179,7 +168,7 @@ export const useCourseDetailPage = (courseId: number) => {
   ) => {
     try {
       await courseService.addLabsToCourse(courseId, labIds);
-      await refreshLabs();
+      await loadLabs(currentPage);
       onSuccess?.();
     } catch (error) {
       console.error("Failed to add labs to course:", error);
@@ -198,7 +187,7 @@ export const useCourseDetailPage = (courseId: number) => {
   ) => {
     try {
       await courseService.removeLabFromCourse(courseId, labId);
-      await refreshLabs();
+      await loadLabs(currentPage);
       onSuccess?.();
     } catch (error) {
       console.error("Failed to remove lab from course:", error);
@@ -207,90 +196,19 @@ export const useCourseDetailPage = (courseId: number) => {
     }
   };
 
-  /**
-   * Update course description
-   */
-  const updateDescriptionCourse = async (newDescription: string) => {
-    if (!course) return;
-
-    try {
-      const updatedCourse = {
-        ...course,
-        description: newDescription,
-      };
-
-      const response = await courseService.updateCourse(
-        courseId,
-        updatedCourse
-      );
-      setCourse(response);
-    } catch (error) {
-      console.error("Failed to update course description:", error);
-      throw error;
-    }
-  };
-
-  /**
-   * Update course basic info
-   */
-  const updateBasicInfoCourse = async (updatedCourse: BasicInfoFormData) => {
-    if (!course) return;
-
-    try {
-      const courseToUpdate = { ...course };
-
-      if (updatedCourse.title !== undefined) {
-        courseToUpdate.title = updatedCourse.title;
-      }
-      if (updatedCourse.shortDescription !== undefined) {
-        courseToUpdate.shortDescription = updatedCourse.shortDescription;
-      }
-      if (updatedCourse.level !== undefined) {
-        courseToUpdate.level = updatedCourse.level;
-      }
-      if (updatedCourse.durationMinutes !== undefined) {
-        courseToUpdate.durationMinutes = updatedCourse.durationMinutes;
-      }
-
-      const response = await courseService.updateCourse(
-        courseId,
-        courseToUpdate
-      );
-      setCourse(response);
-    } catch (error) {
-      console.error("Failed to update course basic info:", error);
-      throw error;
-    }
-  };
-
-  /**
-   * Handle page size change
-   */
-  const handlePageSizeChange = (newPageSize: number) => {
-    // Currently not implemented - pageSize is fixed
-    // Can be extended if needed
-    handleFiltersChange({
-      search: filters.search,
-      status: filters.status,
-    });
-  };
-
   return {
-    // Course data
-    course,
-    isLoadingCourse,
-
-    // Labs data
+    // Data
     labsInCourse,
     isLoadingLabs,
     error,
+    isInitialized,
 
     // Available labs
     availableLabs,
     isLoadingAvailableLabs,
     fetchAvailableLabs,
 
-    // Pagination data
+    // Pagination
     currentPage,
     totalPages,
     totalItems,
@@ -299,19 +217,13 @@ export const useCourseDetailPage = (courseId: number) => {
     hasPrevious,
     filters,
 
-    // Course update functions
-    updateDescriptionCourse,
-    updateBasicInfoCourse,
-
-    // Lab management functions
+    // Actions
+    initializeLabs,
     addLabsToCourse,
     removeLabFromCourse,
-
-    refreshLabs,
-
-    // Pagination & Filter handlers
     handlePageChange,
     handlePageSizeChange,
     handleFiltersChange,
+    refreshLabs: () => loadLabs(currentPage),
   };
 };

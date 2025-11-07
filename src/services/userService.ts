@@ -38,6 +38,40 @@ export const userService = {
 
     return response;
   },
+  getUsersInCoursePaginated: async (
+    params: {
+      page: number;
+      pageSize: number;
+      keyword?: string;
+      isActive?: boolean;
+    },
+    courseId: number
+  ): Promise<PaginatedResponse<User>> => {
+    const queryParams: {
+      page: number;
+      pageSize: number;
+      keyword?: string;
+      isActive?: boolean;
+    } = {
+      page: params.page,
+      pageSize: params.pageSize,
+    };
+
+    if (params.keyword) {
+      queryParams.keyword = params.keyword;
+    }
+
+    if (params.isActive != null) {
+      queryParams.isActive = params.isActive;
+    }
+
+    const response = await api.get<PaginatedResponse<User>>(
+      `/courses/${courseId}/users`,
+      queryParams
+    );
+
+    return response;
+  },
 
   getUserById: async (id: number): Promise<User> => {
     const response = await api.get<User>(`/users/${id}`);
