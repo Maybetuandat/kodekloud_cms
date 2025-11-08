@@ -107,7 +107,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         {/* Selector số lượng item mỗi trang */}
         {showPageSizeSelector && onPageSizeChange && (
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-muted-foreground">Show</span>
+            <span className="text-sm text-muted-foreground">Hiển thị</span>
             <Select
               value={pageSize.toString()}
               onValueChange={handlePageSizeChange}
@@ -124,7 +124,6 @@ export const Pagination: React.FC<PaginationProps> = ({
                 ))}
               </SelectContent>
             </Select>
-            <span className="text-sm text-muted-foreground">items</span>
           </div>
         )}
 

@@ -39,11 +39,10 @@ export const UserTable: FC<UserTableProps> = ({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[60px]">ID</TableHead>
-              <TableHead>Username</TableHead>
-              <TableHead>First Name</TableHead>
-              <TableHead>Last Name</TableHead>
+              <TableHead>Tài khoản</TableHead>
+              <TableHead>Tên</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
+              <TableHead>Số điện thoại</TableHead>
               <TableHead className="w-[100px]">Role</TableHead>
               <TableHead className="w-[100px]">Status</TableHead>
               <TableHead className="w-[100px] text-right">Actions</TableHead>

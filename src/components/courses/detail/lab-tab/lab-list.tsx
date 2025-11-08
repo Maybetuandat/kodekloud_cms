@@ -192,7 +192,7 @@ export function LabList({
       {/* Pagination */}
       {onPageChange && totalPages > 0 && (
         <Pagination
-          currentPage={currentPage + 1}
+          currentPage={currentPage}
           totalPages={totalPages}
           totalElements={totalElements}
           pageSize={pageSize}

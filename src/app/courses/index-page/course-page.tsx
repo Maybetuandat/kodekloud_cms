@@ -35,7 +35,7 @@ export default function CoursePage() {
     setFilters,
     setCurrentPage,
     setPageSize,
-    refresh,
+    fetchCourses,
     fetchSubjects,
   } = useCoursePage();
 
@@ -135,7 +135,7 @@ export default function CoursePage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={refresh}
+            onClick={fetchCourses}
             disabled={loading}
           >
             <RefreshCw

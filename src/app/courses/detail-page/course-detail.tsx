@@ -48,7 +48,19 @@ export function CourseDetail() {
   const {
     usersInCourse,
     isLoading: isLoadingUsers,
+    currentPage: usersCurrentPage,
+    totalPages: usersTotalPages,
+    totalItems: usersTotalItems,
+    pageSize: usersPageSize,
+    hasNext: usersHasNext,
+    hasPrevious: usersHasPrevious,
     initializeUsers,
+    refreshUsers,
+    handlePageChange: handleUsersPageChange,
+    handlePageSizeChange: handleUsersPageSizeChange,
+    handleSearchChange: handleUsersSearchChange,
+    handleStatusFilterChange: handleUsersStatusFilterChange,
+    removeUserFromCourse,
   } = useCourseUsers(courseIdNumber);
 
   const safeCourse: Course = course || {
@@ -75,10 +87,6 @@ export function CourseDetail() {
     } else if (value === "users") {
       initializeUsers();
     }
-  };
-
-  const handleSaveDescription = (description: string) => {
-    updateDescription(description);
   };
 
   // Show loading state for initial course load
@@ -121,7 +129,7 @@ export function CourseDetail() {
           <TabsContent value="overview" className="space-y-6 mt-6">
             <CourseOverviewTab
               description={safeCourse.description ?? ""}
-              onSaveDescription={handleSaveDescription}
+              onSaveDescription={updateDescription}
             />
           </TabsContent>
 
@@ -145,13 +153,24 @@ export function CourseDetail() {
               onFiltersChange={handleFiltersChange}
             />
           </TabsContent>
-
-          {/* Users Tab - Only loads when activated */}
           <TabsContent value="users" className="space-y-6 mt-6">
             <CourseUserTab
               isLoading={isLoadingUsers}
               usersInCourse={usersInCourse}
-            ></CourseUserTab>
+              currentPage={usersCurrentPage}
+              totalPages={usersTotalPages}
+              totalItems={usersTotalItems}
+              pageSize={usersPageSize}
+              hasNext={usersHasNext}
+              hasPrevious={usersHasPrevious}
+              courseId={courseIdNumber}
+              onPageChange={handleUsersPageChange}
+              onPageSizeChange={handleUsersPageSizeChange}
+              onSearchChange={handleUsersSearchChange}
+              onStatusFilterChange={handleUsersStatusFilterChange}
+              onRemoveUser={removeUserFromCourse}
+              onRefresh={refreshUsers}
+            />
           </TabsContent>
         </Tabs>
       </div>

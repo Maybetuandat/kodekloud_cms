@@ -82,10 +82,7 @@ export default function LabPage() {
 
       {/* Filter and Search */}
       <Card>
-        <CardHeader>
-          <CardTitle>Tìm kiếm và Lọc</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <FilterBar
             searchTerm={localSearchTerm}
             onSearchChange={setLocalSearchTerm}

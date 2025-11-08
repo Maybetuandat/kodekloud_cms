@@ -11,7 +11,6 @@ import { UserDeleteDialog } from "@/components/users/user-delete-dialog";
 
 import { User, CreateUserRequest, UpdateUserRequest } from "@/types/user";
 import { useUserPage } from "./use-user-page";
-import { date } from "zod";
 
 export default function UserPage() {
   const {

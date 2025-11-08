@@ -38,6 +38,7 @@ export const userService = {
 
     return response;
   },
+
   getUsersInCoursePaginated: async (
     params: {
       page: number;
@@ -99,5 +100,20 @@ export const userService = {
       ...user,
       isActive: !user.isActive,
     });
+  },
+
+  /**
+   * Remove user from course
+   */
+  removeUserFromCourse: async (
+    courseId: number,
+    userId: number
+  ): Promise<{ message: string; courseId: number; userId: number }> => {
+    const response = await api.delete<{
+      message: string;
+      courseId: number;
+      userId: number;
+    }>(`/courses/${courseId}/users/${userId}`);
+    return response;
   },
 };

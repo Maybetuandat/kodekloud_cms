@@ -1,11 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { courseService } from "@/services/courseService";
-import {
-  Course,
-  CourseFilters,
-  CreateCourseRequest,
-  UpdateCourseRequest,
-} from "@/types/course";
+import { Course, CourseFilters, UpdateCourseRequest } from "@/types/course";
 import { SubjectService } from "@/services/subjectService";
 import { Subject } from "@/types/subject";
 
@@ -18,11 +13,6 @@ export interface UseCoursePage {
   totalPages: number;
   totalItems: number;
   filters: CourseFilters;
-  createCourse: (
-    data: CreateCourseRequest,
-    onSuccess?: (course: Course) => void,
-    onError?: (error: Error) => void
-  ) => Promise<void>;
   fetchSubjects: () => Promise<Subject[]>;
   updateCourse: (
     id: number,
@@ -43,7 +33,7 @@ export interface UseCoursePage {
   setFilters: (newFilters: Partial<CourseFilters>) => void;
   setCurrentPage: (page: number) => void;
   setPageSize: (size: number) => void;
-  refresh: () => void;
+  fetchCourses: () => void;
 }
 
 export const useCoursePage = (): UseCoursePage => {
@@ -51,7 +41,7 @@ export const useCoursePage = (): UseCoursePage => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSizeState] = useState(12);
+  const [pageSize, setPageSizeState] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFiltersState] = useState<CourseFilters>({
@@ -102,19 +92,6 @@ export const useCoursePage = (): UseCoursePage => {
     } finally {
       setActionLoading(false);
     }
-  };
-
-  const createCourse = async (
-    data: CreateCourseRequest,
-    onSuccess?: (course: Course) => void,
-    onError?: (error: Error) => void
-  ) => {
-    console.log("Creating course with data:", data);
-    await performActionAndRefresh(
-      () => courseService.createCourse(data),
-      (newCourse) => onSuccess?.(newCourse),
-      onError
-    );
   };
 
   const fetchSubjects = useCallback(async () => {
@@ -186,13 +163,13 @@ export const useCoursePage = (): UseCoursePage => {
     totalItems,
     filters,
     fetchSubjects,
-    createCourse,
+
     updateCourse,
     deleteCourse,
     toggleCourseStatus,
     setFilters,
     setCurrentPage,
     setPageSize,
-    refresh: fetchCourses,
+    fetchCourses,
   };
 };
