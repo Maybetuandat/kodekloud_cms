@@ -93,7 +93,7 @@ export function CourseCard({
   };
 
   const { Icon: CourseIcon, gradient } = getCategoryIconAndGradient(
-    course.category?.slug
+    course.subject?.code
   );
 
   return (
@@ -183,12 +183,12 @@ export function CourseCard({
 
         {/* Meta Information - All in one row */}
         <div className="flex items-center justify-between gap-2 text-xs">
-          {/* Left side: Category */}
-          {course.category && (
+          {/* Left side: Subject */}
+          {course.subject && (
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <FolderOpen className="h-3.5 w-3.5 flex-shrink-0" />
               <span className="font-medium truncate">
-                {course.category.title}
+                {course.subject.title}
               </span>
             </div>
           )}

@@ -43,7 +43,7 @@ export type BasicInfoFormData = z.infer<typeof basicInfoSchema>;
 
 interface EditBasicInfoModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (open: boolean) => void;
   onSubmit: (data: BasicInfoFormData) => void;
   course: Course;
 }
@@ -80,7 +80,7 @@ export function EditBasicInfoModal({
 
   const handleSubmit = (data: BasicInfoFormData) => {
     onSubmit(data);
-    onClose();
+    onClose(false);
   };
 
   return (
@@ -190,7 +190,11 @@ export function EditBasicInfoModal({
             />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onClose(false)}
+              >
                 {t("common.cancel")}
               </Button>
               <Button type="submit">{t("common.save")}</Button>

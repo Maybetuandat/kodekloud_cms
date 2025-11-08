@@ -6,14 +6,17 @@ import { Lab } from "@/types/lab";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { DeleteLabConfirmDialog } from "@/components/courses/detail/lab-tab/delete-lab-confirm-dialog";
+import { SelectLabsDialog } from "@/components/courses/detail/lab-tab/select-labs-dialog";
 
 interface CourseLabsTabProps {
   labs: Lab[];
   courseId: number;
-  onAddLabs: () => void;
-  onRemoveLab: (labId: number) => Promise<void>;
+  addLabsToCourse: (labIds: number[]) => Promise<void>;
+  fetchAvailableLabs: () => void;
+  removeLabFromCourse: (labId: number) => Promise<void>;
   isLoading?: boolean;
-
+  isLoadingAvailableLabs?: boolean;
+  availableLabs: Lab[];
   currentPage: number;
   totalPages: number;
   totalItems: number;
@@ -26,9 +29,12 @@ interface CourseLabsTabProps {
 
 export function CourseLabsTab({
   labs,
-  onAddLabs,
-  onRemoveLab,
+  fetchAvailableLabs,
+  removeLabFromCourse,
   courseId,
+  isLoadingAvailableLabs,
+  availableLabs,
+  addLabsToCourse,
   isLoading = false,
   currentPage,
   totalPages,
@@ -44,6 +50,7 @@ export function CourseLabsTab({
 
   // Remove confirmation dialog state
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+  const [isSelectLabsOpen, setIsSelectLabsOpen] = useState(false);
   const [labToRemove, setLabToRemove] = useState<Lab | null>(null);
   const [isRemoving, setIsRemoving] = useState(false);
 
@@ -89,6 +96,10 @@ export function CourseLabsTab({
     });
   };
 
+  const handleOpenSelectLabs = () => {
+    fetchAvailableLabs();
+    setIsSelectLabsOpen(true);
+  };
   const handleRemoveClick = (labId: number) => {
     const lab = labs.find((l) => l.id === labId);
     if (lab) {
@@ -102,7 +113,7 @@ export function CourseLabsTab({
 
     setIsRemoving(true);
     try {
-      await onRemoveLab(labToRemove.id);
+      await removeLabFromCourse(labToRemove.id);
       setIsRemoveDialogOpen(false);
       setLabToRemove(null);
     } catch (error) {
@@ -116,7 +127,11 @@ export function CourseLabsTab({
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">{t("courses.detail.labs.title")}</h2>
-        <Button onClick={onAddLabs} className="gap-2" disabled={isLoading}>
+        <Button
+          onClick={handleOpenSelectLabs}
+          className="gap-2"
+          disabled={isLoading}
+        >
           <Plus className="w-4 h-4" />
           Thêm bài thực hành
         </Button>
@@ -147,6 +162,14 @@ export function CourseLabsTab({
         />
       )}
 
+      {/* Select Labs Dialog */}
+      <SelectLabsDialog
+        open={isSelectLabsOpen}
+        onOpenChange={setIsSelectLabsOpen}
+        addLabsToCourse={addLabsToCourse}
+        availableLabs={availableLabs}
+        loading={isLoadingAvailableLabs}
+      />
       {/* Remove Confirmation Dialog */}
       <DeleteLabConfirmDialog
         open={isRemoveDialogOpen}

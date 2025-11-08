@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Lab } from "@/types/lab";
+import { toast } from "sonner";
 
 interface DeleteLabConfirmDialogProps {
   open: boolean;
@@ -34,6 +35,7 @@ export function DeleteLabConfirmDialog({
     try {
       await onConfirm();
       onOpenChange(false);
+      toast.success(`Xoá bài thực hành "${lab.title}" thành công.`);
     } catch (error) {
       console.error("Delete confirmation error:", error);
     }
@@ -49,7 +51,7 @@ export function DeleteLabConfirmDialog({
             </div>
             <div>
               <AlertDialogTitle className="text-left">
-                Confirm Delete Lab
+                Xoá bài thực hành
               </AlertDialogTitle>
             </div>
           </div>
@@ -57,27 +59,26 @@ export function DeleteLabConfirmDialog({
 
         <AlertDialogDescription className="text-left space-y-3">
           <p>
-            Are you sure you want to delete the lab{" "}
+            Bạn có chắc chắn là xoá bài thực hành này{" "}
             <strong>"{lab.title}"</strong>?
           </p>
 
           <div className="bg-destructive/10 border border-destructive/20 p-3 rounded-lg">
             <p className="text-sm text-destructive font-medium">
-              ⚠️ Warning: This action cannot be undone. All data related to this
-              lab will be permanently deleted.
+              ⚠️ Hành động này không thể hoàn tác!
             </p>
           </div>
         </AlertDialogDescription>
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>Huỷ</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={loading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Delete Lab
+            Xoá bài thực hành
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

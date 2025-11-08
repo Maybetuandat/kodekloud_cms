@@ -1,4 +1,4 @@
         git add .
-        git commit -m "feat(User Tab): update ui for User Tab"
+        git commit -m "fix(Course Detail ): update ui before add user tab ui "
         git push origin  main
         clear

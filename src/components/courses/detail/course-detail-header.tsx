@@ -4,31 +4,36 @@ import { Button } from "@/components/ui/button";
 import { categoryMap } from "@/constants/category-map";
 import { Course } from "@/types/course";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import {
+  BasicInfoFormData,
+  EditBasicInfoModal,
+} from "./overview-tab/edit-basic-info-modal";
 
 interface CourseDetailHeaderProps {
   course: Course;
-  onEdit: () => void;
-  onBack: () => void;
+  onEdit: (updateCourse: BasicInfoFormData) => void;
 }
 
 export function CourseDetailHeader({
   course,
   onEdit,
-  onBack,
 }: CourseDetailHeaderProps) {
   const { t } = useTranslation(["courses", "common"]);
+  const [isEditBasicInfoOpen, setIsEditBasicInfoOpen] = useState(false);
 
+  const handleBack = () => {
+    window.history.back();
+  };
   return (
     <div
-      className={`bg-gradient-to-r ${
-        categoryMap["docker"]?.gradient || "from-gray-400 to-gray-500"
-      } text-white p-6 relative`}
+      className={`bg-gradient-to-r from-gray-400 to-gray-600 text-white p-6 relative`}
     >
       {/* Edit Button - Top Right */}
       <Button
         variant="secondary"
         size="sm"
-        onClick={onEdit}
+        onClick={() => setIsEditBasicInfoOpen(true)}
         className="absolute top-4 right-4 gap-2 bg-white/20 hover:bg-white/30 text-white border-white/30"
       >
         <Edit className="h-4 w-4" />
@@ -36,7 +41,7 @@ export function CourseDetailHeader({
       </Button>
 
       <button
-        onClick={onBack}
+        onClick={handleBack}
         className="flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity"
       >
         <ArrowLeft className="w-5 h-5" />
@@ -59,6 +64,13 @@ export function CourseDetailHeader({
           </Badge>
         )}
       </div>
+      {/* Edit Basic Info Modal */}
+      <EditBasicInfoModal
+        isOpen={isEditBasicInfoOpen}
+        onClose={setIsEditBasicInfoOpen}
+        onSubmit={onEdit}
+        course={course}
+      />
     </div>
   );
 }

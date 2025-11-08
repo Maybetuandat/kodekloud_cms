@@ -14,11 +14,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Lab } from "@/types/lab";
 import { Search, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "sonner";
 
 interface SelectLabsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (labIds: number[]) => Promise<void>;
+  addLabsToCourse: (labIds: number[]) => Promise<void>;
   availableLabs: Lab[];
   loading?: boolean;
   isSubmitting?: boolean;
@@ -27,7 +28,7 @@ interface SelectLabsDialogProps {
 export function SelectLabsDialog({
   open,
   onOpenChange,
-  onConfirm,
+  addLabsToCourse,
   availableLabs,
   loading = false,
   isSubmitting = false,
@@ -65,7 +66,10 @@ export function SelectLabsDialog({
 
   const handleConfirm = async () => {
     if (selectedLabIds.length === 0) return;
-    await onConfirm(selectedLabIds);
+    await addLabsToCourse(selectedLabIds);
+    setSelectedLabIds([]);
+    onOpenChange(false);
+    toast.success("Thêm bài thực hành vào khóa học thành công.");
   };
 
   return (

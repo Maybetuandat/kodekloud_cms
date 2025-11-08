@@ -1,8 +1,4 @@
 import { CourseDetailHeader } from "@/components/courses/detail/course-detail-header";
-import {
-  BasicInfoFormData,
-  EditBasicInfoModal,
-} from "@/components/courses/detail/overview-tab/edit-basic-info-modal";
 import { CourseLabsTab } from "@/app/courses/detail-page/lab-tab/lab-tabs";
 import { CourseOverviewTab } from "@/app/courses/detail-page/overview-tab/overview-tab";
 import { SelectLabsDialog } from "@/components/courses/detail/lab-tab/select-labs-dialog";
@@ -20,10 +16,6 @@ export function CourseDetail() {
   const { courseId } = useParams<{ courseId: string }>();
   const { t } = useTranslation(["courses", "common"]);
   const courseIdNumber = Number(courseId);
-
-  const [isSelectLabsOpen, setIsSelectLabsOpen] = useState(false);
-  const [isEditBasicInfoOpen, setIsEditBasicInfoOpen] = useState(false);
-  const [isAddingLabs, setIsAddingLabs] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
 
   const {
@@ -85,52 +77,9 @@ export function CourseDetail() {
     }
   };
 
-  const handleRemoveLabFromCourse = async (labId: number) => {
-    removeLabFromCourse(
-      labId,
-      () => {
-        console.log("Lab removed from course successfully");
-      },
-      (error) => {
-        console.error("Failed to remove lab from course:", error);
-      }
-    );
-  };
-
-  const handleOpenSelectLabs = async () => {
-    await fetchAvailableLabs();
-    setIsSelectLabsOpen(true);
-  };
-
-  const handleAddLabsToCourse = async (labIds: number[]) => {
-    setIsAddingLabs(true);
-    try {
-      await addLabsToCourse(
-        labIds,
-        () => {
-          setIsSelectLabsOpen(false);
-        },
-        (error) => {
-          console.error("Failed to add labs to course:", error);
-          throw error;
-        }
-      );
-    } catch (error) {
-      // Error already logged
-    } finally {
-      setIsAddingLabs(false);
-    }
-  };
-
   const handleSaveDescription = (description: string) => {
     updateDescription(description);
   };
-
-  const handleSaveBasicInfo = (data: BasicInfoFormData) => {
-    updateBasicInfo(data);
-  };
-
-  const onBack = () => window.history.back();
 
   // Show loading state for initial course load
   if (isLoadingCourse) {
@@ -147,11 +96,7 @@ export function CourseDetail() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <CourseDetailHeader
-        course={safeCourse}
-        onEdit={() => setIsEditBasicInfoOpen(true)}
-        onBack={onBack}
-      />
+      <CourseDetailHeader course={safeCourse} onEdit={updateBasicInfo} />
 
       {/* Content */}
       <div className="flex-1 overflow-auto p-6">
@@ -185,8 +130,11 @@ export function CourseDetail() {
             <CourseLabsTab
               labs={labsInCourse}
               courseId={safeCourse.id}
-              onAddLabs={handleOpenSelectLabs}
-              onRemoveLab={handleRemoveLabFromCourse}
+              addLabsToCourse={addLabsToCourse}
+              fetchAvailableLabs={fetchAvailableLabs}
+              availableLabs={availableLabs}
+              isLoadingAvailableLabs={isLoadingAvailableLabs}
+              removeLabFromCourse={removeLabFromCourse}
               isLoading={isLoadingLabs}
               currentPage={currentPage}
               totalPages={totalPages}
@@ -207,24 +155,6 @@ export function CourseDetail() {
           </TabsContent>
         </Tabs>
       </div>
-
-      {/* Select Labs Dialog */}
-      <SelectLabsDialog
-        open={isSelectLabsOpen}
-        onOpenChange={setIsSelectLabsOpen}
-        onConfirm={handleAddLabsToCourse}
-        availableLabs={availableLabs}
-        loading={isLoadingAvailableLabs}
-        isSubmitting={isAddingLabs}
-      />
-
-      {/* Edit Basic Info Modal */}
-      <EditBasicInfoModal
-        isOpen={isEditBasicInfoOpen}
-        onClose={() => setIsEditBasicInfoOpen(false)}
-        onSubmit={handleSaveBasicInfo}
-        course={safeCourse}
-      />
     </div>
   );
 }
