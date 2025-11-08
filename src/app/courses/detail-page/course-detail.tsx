@@ -59,7 +59,6 @@ export function CourseDetail() {
     handlePageChange: handleUsersPageChange,
     handlePageSizeChange: handleUsersPageSizeChange,
     handleSearchChange: handleUsersSearchChange,
-    handleStatusFilterChange: handleUsersStatusFilterChange,
     removeUserFromCourse,
   } = useCourseUsers(courseIdNumber);
 
@@ -167,7 +166,6 @@ export function CourseDetail() {
               onPageChange={handleUsersPageChange}
               onPageSizeChange={handleUsersPageSizeChange}
               onSearchChange={handleUsersSearchChange}
-              onStatusFilterChange={handleUsersStatusFilterChange}
               onRemoveUser={removeUserFromCourse}
               onRefresh={refreshUsers}
             />

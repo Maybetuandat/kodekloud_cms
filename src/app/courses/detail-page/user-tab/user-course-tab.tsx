@@ -23,7 +23,6 @@ interface CourseUserTabProps {
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
   onSearchChange: (search: string) => void;
-  onStatusFilterChange: (status: boolean | undefined) => void;
   onRemoveUser: (userId: number) => Promise<void>;
   onRefresh: () => void;
 }
@@ -41,13 +40,11 @@ export default function CourseUserTab({
   onPageChange,
   onPageSizeChange,
   onSearchChange,
-  onStatusFilterChange,
   onRemoveUser,
   onRefresh,
 }: CourseUserTabProps) {
   const { t } = useTranslation(["courses", "common"]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [userToRemove, setUserToRemove] = useState<User | null>(null);
   const [isRemoving, setIsRemoving] = useState(false);
 

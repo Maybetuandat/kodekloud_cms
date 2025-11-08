@@ -14,9 +14,6 @@ export const useCourseUsers = (courseId: number) => {
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<boolean | undefined>(
-    undefined
-  );
 
   /**
    * Load users in course
@@ -63,7 +60,7 @@ export const useCourseUsers = (courseId: number) => {
         setIsLoading(false);
       }
     },
-    [courseId, pageSize]
+    [courseId, pageSize, searchTerm]
   );
 
   /**
@@ -71,19 +68,19 @@ export const useCourseUsers = (courseId: number) => {
    */
   const initializeUsers = useCallback(() => {
     if (!isInitialized) {
-      console.log("Initializing users for course:", courseId);
-      loadUsers(1, searchTerm, statusFilter);
+      setIsInitialized(true);
+      loadUsers(1, searchTerm);
     }
-  }, [isInitialized, loadUsers, searchTerm, statusFilter, courseId]);
+  }, [isInitialized, loadUsers, searchTerm, courseId]);
 
   /**
    * Handle page change
    */
   const handlePageChange = useCallback(
     (page: number) => {
-      loadUsers(page, searchTerm, statusFilter);
+      loadUsers(page, searchTerm);
     },
-    [loadUsers, searchTerm, statusFilter]
+    [loadUsers, searchTerm]
   );
 
   /**
@@ -92,9 +89,9 @@ export const useCourseUsers = (courseId: number) => {
   const handlePageSizeChange = useCallback(
     (size: number) => {
       setPageSize(size);
-      loadUsers(1, searchTerm, statusFilter);
+      loadUsers(1, searchTerm);
     },
-    [loadUsers, searchTerm, statusFilter]
+    [loadUsers, searchTerm]
   );
 
   /**
@@ -102,21 +99,11 @@ export const useCourseUsers = (courseId: number) => {
    */
   const handleSearchChange = useCallback(
     (keyword: string) => {
+      console.log("search keyword:", keyword);
       setSearchTerm(keyword);
-      loadUsers(1, keyword, statusFilter);
+      loadUsers(1, keyword);
     },
-    [loadUsers, statusFilter]
-  );
-
-  /**
-   * Handle status filter change
-   */
-  const handleStatusFilterChange = useCallback(
-    (isActive: boolean | undefined) => {
-      setStatusFilter(isActive);
-      loadUsers(1, searchTerm, isActive);
-    },
-    [loadUsers, searchTerm]
+    [loadUsers]
   );
 
   /**
@@ -131,7 +118,7 @@ export const useCourseUsers = (courseId: number) => {
       try {
         await userService.removeUserFromCourse(courseId, userId);
         // Reload current page after removing
-        await loadUsers(currentPage, searchTerm, statusFilter);
+        await loadUsers(currentPage, searchTerm);
       } catch (err) {
         const errorMessage =
           err instanceof Error
@@ -140,15 +127,15 @@ export const useCourseUsers = (courseId: number) => {
         throw new Error(errorMessage);
       }
     },
-    [courseId, currentPage, searchTerm, statusFilter, loadUsers]
+    [courseId, currentPage, searchTerm, loadUsers]
   );
 
   /**
    * Refresh users (reload current page)
    */
   const refreshUsers = useCallback(() => {
-    loadUsers(currentPage, searchTerm, statusFilter);
-  }, [loadUsers, currentPage, searchTerm, statusFilter]);
+    loadUsers(currentPage, searchTerm);
+  }, [loadUsers, currentPage, searchTerm]);
 
   return {
     usersInCourse,
@@ -166,7 +153,7 @@ export const useCourseUsers = (courseId: number) => {
     handlePageChange,
     handlePageSizeChange,
     handleSearchChange,
-    handleStatusFilterChange,
+
     removeUserFromCourse,
   };
 };
