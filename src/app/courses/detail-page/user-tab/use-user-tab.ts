@@ -1,6 +1,6 @@
 import { userService } from "@/services/userService";
 import { User } from "@/types/user";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 export const useCourseUsers = (courseId: number) => {
   const [usersInCourse, setUsersInCourse] = useState<User[]>([]);
@@ -15,100 +15,64 @@ export const useCourseUsers = (courseId: number) => {
   const [hasPrevious, setHasPrevious] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  /**
-   * Load users in course
-   */
-  const loadUsers = useCallback(
-    async (page: number, keyword?: string, isActive?: boolean) => {
-      if (!courseId) {
-        console.warn("courseId is required to load users");
-        return;
-      }
+  const loadUsers = useCallback(async () => {
+    if (!courseId) {
+      console.warn("courseId is required to load users");
+      return;
+    }
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await userService.getUsersInCoursePaginated(
+        {
+          page: currentPage,
+          pageSize: pageSize,
+          search: searchTerm,
+        },
+        courseId
+      );
 
-      try {
-        setIsLoading(true);
-        setError(null);
+      setUsersInCourse(response.data);
+      setTotalItems(response.totalItems);
+      setTotalPages(response.totalPages);
+      setCurrentPage(response.currentPage);
+      setIsInitialized(true);
+      setHasNext(response.hasNext);
+      setHasPrevious(response.hasPrevious);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to load users";
+      setError(errorMessage);
+      setUsersInCourse([]);
+      setTotalItems(0);
+      setTotalPages(0);
+      setHasNext(false);
+      setHasPrevious(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [courseId, pageSize, searchTerm, currentPage]);
 
-        const response = await userService.getUsersInCoursePaginated(
-          {
-            page: page,
-            pageSize: pageSize,
-            keyword: keyword,
-            isActive: isActive,
-          },
-          courseId
-        );
-
-        setUsersInCourse(response.data);
-        setTotalItems(response.totalItems);
-
-        setTotalPages(response.totalPages);
-        setCurrentPage(response.currentPage);
-        setIsInitialized(true);
-        setHasNext(response.hasNext);
-        setHasPrevious(response.hasPrevious);
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to load users";
-        setError(errorMessage);
-        setUsersInCourse([]);
-        setTotalItems(0);
-        setTotalPages(0);
-        setHasNext(false);
-        setHasPrevious(false);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [courseId, pageSize, searchTerm]
-  );
-
-  /**
-   * Initialize users - call this when tab becomes active
-   */
   const initializeUsers = useCallback(() => {
     if (!isInitialized) {
       setIsInitialized(true);
-      loadUsers(1, searchTerm);
+      loadUsers();
     }
-  }, [isInitialized, loadUsers, searchTerm, courseId]);
+  }, [isInitialized, loadUsers]);
 
-  /**
-   * Handle page change
-   */
-  const handlePageChange = useCallback(
-    (page: number) => {
-      loadUsers(page, searchTerm);
-    },
-    [loadUsers, searchTerm]
-  );
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
-  /**
-   * Handle page size change
-   */
-  const handlePageSizeChange = useCallback(
-    (size: number) => {
-      setPageSize(size);
-      loadUsers(1, searchTerm);
-    },
-    [loadUsers, searchTerm]
-  );
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1);
+  };
 
-  /**
-   * Handle search change
-   */
-  const handleSearchChange = useCallback(
-    (keyword: string) => {
-      console.log("search keyword:", keyword);
-      setSearchTerm(keyword);
-      loadUsers(1, keyword);
-    },
-    [loadUsers]
-  );
+  const handleSearchChange = (keyword: string) => {
+    setSearchTerm(keyword);
+  };
 
-  /**
-   * Remove user from course
-   */
   const removeUserFromCourse = useCallback(
     async (userId: number) => {
       if (!courseId) {
@@ -117,8 +81,7 @@ export const useCourseUsers = (courseId: number) => {
 
       try {
         await userService.removeUserFromCourse(courseId, userId);
-        // Reload current page after removing
-        await loadUsers(currentPage, searchTerm);
+        await loadUsers();
       } catch (err) {
         const errorMessage =
           err instanceof Error
@@ -127,15 +90,16 @@ export const useCourseUsers = (courseId: number) => {
         throw new Error(errorMessage);
       }
     },
-    [courseId, currentPage, searchTerm, loadUsers]
+    [courseId, currentPage, loadUsers]
   );
-
-  /**
-   * Refresh users (reload current page)
-   */
   const refreshUsers = useCallback(() => {
-    loadUsers(currentPage, searchTerm);
-  }, [loadUsers, currentPage, searchTerm]);
+    loadUsers();
+  }, [loadUsers]);
+  useEffect(() => {
+    if (isInitialized) {
+      loadUsers();
+    }
+  }, [courseId, currentPage, pageSize, searchTerm, loadUsers, isInitialized]);
 
   return {
     usersInCourse,
@@ -153,7 +117,6 @@ export const useCourseUsers = (courseId: number) => {
     handlePageChange,
     handlePageSizeChange,
     handleSearchChange,
-
     removeUserFromCourse,
   };
 };

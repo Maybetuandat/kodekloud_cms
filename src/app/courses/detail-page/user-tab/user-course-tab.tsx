@@ -4,11 +4,11 @@ import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
-import { toast } from "sonner";
 import FilterBar from "@/components/ui/filter-bar";
 import { Pagination } from "@/components/ui/pagination";
 import { UserTableCourseDetail } from "@/components/courses/detail/user-tab/user-table-in-course-detail";
 import { RemoveUserDialog } from "@/components/courses/detail/user-tab/remove-user-dialog-from-course";
+import { AddUsersToCourseDialog } from "@/components/courses/detail/user-tab/add-users-to-course-dialog";
 
 interface CourseUserTabProps {
   isLoading: boolean;
@@ -44,28 +44,27 @@ export default function CourseUserTab({
   onRefresh,
 }: CourseUserTabProps) {
   const { t } = useTranslation(["courses", "common"]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [localSearchTerm, setLocalSearchTerm] = useState("");
   const [userToRemove, setUserToRemove] = useState<User | null>(null);
   const [isRemoving, setIsRemoving] = useState(false);
-
-  console.log(
-    "current page, totalPages, totalItems",
-    currentPage,
-    totalPages,
-    totalItems
-  );
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    onSearchChange(value);
-  };
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const handleSearchClear = () => {
-    setSearchTerm("");
+    setLocalSearchTerm("");
     onSearchChange("");
   };
 
   const handleDelete = (user: User) => {
     setUserToRemove(user);
+  };
+
+  const handleSearchSubmit = () => {
+    setLocalSearchTerm(localSearchTerm);
+    onSearchChange(localSearchTerm);
+  };
+
+  const handleAddUsersSuccess = () => {
+    onRefresh();
   };
 
   return (
@@ -74,15 +73,16 @@ export default function CourseUserTab({
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1">
           <FilterBar
-            searchTerm={searchTerm}
-            onSearchChange={handleSearchChange}
+            searchTerm={localSearchTerm}
+            onSearchChange={setLocalSearchTerm}
             onSearchClear={handleSearchClear}
+            onSearchSubmit={handleSearchSubmit}
             placeholder={t("Tìm kiếm theo tên, email hoặc tên đăng nhập...")}
           />
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={() => setIsAddDialogOpen(true)}>
           <UserPlus className="h-4 w-4" />
-          {"Thêm người dùng"}
+          Thêm người dùng
         </Button>
       </div>
 
@@ -94,7 +94,6 @@ export default function CourseUserTab({
       />
 
       {/* Pagination */}
-
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
@@ -108,6 +107,7 @@ export default function CourseUserTab({
         pageSizeOptions={[5, 10, 20, 50, 100]}
       />
 
+      {/* Remove User Dialog */}
       <RemoveUserDialog
         user={userToRemove}
         isRemoving={isRemoving}
@@ -115,6 +115,14 @@ export default function CourseUserTab({
         onClose={() => setUserToRemove(null)}
         onRemoveUser={onRemoveUser}
         onRefresh={onRefresh}
+      />
+
+      {/* Add Users Dialog */}
+      <AddUsersToCourseDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+        courseId={courseId}
+        onSuccess={handleAddUsersSuccess}
       />
     </div>
   );
