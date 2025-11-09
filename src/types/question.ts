@@ -6,6 +6,8 @@ export interface Question {
   question: string;
   solution: string;
   createdAt: string;
+  checkCommand: string;
+  typeQuestion: string;
   updatedAt: string;
   answers: Answer[];
 }

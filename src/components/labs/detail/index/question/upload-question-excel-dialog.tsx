@@ -16,8 +16,6 @@ import {
   FileSpreadsheet,
   AlertCircle,
   CheckCircle2,
-  X,
-  Check,
   AlertTriangle,
 } from "lucide-react";
 import { excelService, ExcelQuestionRow } from "@/services/excelService";
@@ -263,63 +261,94 @@ export function LabUploadExcelDialog({
                   {previewData.map((q, index) => (
                     <div
                       key={index}
-                      className="border rounded-lg p-4 space-y-3 bg-card hover:bg-accent/5 transition-colors"
+                      className="border rounded-lg p-5 space-y-4 bg-card hover:bg-accent/5 transition-colors"
                     >
+                      {/* Question Header */}
                       <div className="flex items-start gap-3">
-                        <Badge variant="outline" className="shrink-0 mt-1">
+                        <Badge
+                          variant="outline"
+                          className="shrink-0 mt-1 font-semibold"
+                        >
                           Q{index + 1}
                         </Badge>
-                        <div className="flex-1 space-y-2">
-                          <div className="font-medium text-base">
+                        <div className="flex-1">
+                          <div className="font-semibold text-lg text-foreground leading-relaxed">
                             {q.question}
                           </div>
-
-                          {q.hint && (
-                            <div className="text-sm text-muted-foreground">
-                              <span className="font-medium">💡 Gợi ý:</span>{" "}
-                              {q.hint}
-                            </div>
-                          )}
-
-                          {q.solution && (
-                            <div className="text-sm text-muted-foreground">
-                              <span className="font-medium">📝 Giải pháp:</span>{" "}
-                              {q.solution}
-                            </div>
-                          )}
                         </div>
                       </div>
 
-                      <div className="pl-12 space-y-2">
-                        <div className="text-sm font-medium text-muted-foreground">
-                          Câu trả lời:
+                      {/* Question Details - All in one row */}
+                      <div className="space-y-3">
+                        {/* Type Question */}
+                        {q.typeQuestion && (
+                          <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-md p-3">
+                            <div className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide mb-1">
+                              Loại câu hỏi
+                            </div>
+                            <div className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                              {q.typeQuestion}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Check Command */}
+                        {q.checkCommand && (
+                          <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900 rounded-md p-3">
+                            <div className="text-xs font-semibold text-purple-700 dark:text-purple-300 uppercase tracking-wide mb-1">
+                              Lệnh kiểm tra
+                            </div>
+                            <div className="text-sm font-mono font-medium text-purple-900 dark:text-purple-100 break-all">
+                              {q.checkCommand}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Hint */}
+                        {q.hint && (
+                          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-md p-3">
+                            <div className="text-xs font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-wide mb-1">
+                              Gợi ý
+                            </div>
+                            <div className="text-sm text-amber-900 dark:text-amber-100">
+                              {q.hint}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Solution */}
+                        {q.solution && (
+                          <div className="bg-teal-50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-900 rounded-md p-3">
+                            <div className="text-xs font-semibold text-teal-700 dark:text-teal-300 uppercase tracking-wide mb-1">
+                              Giải pháp
+                            </div>
+                            <div className="text-sm text-teal-900 dark:text-teal-100">
+                              {q.solution}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Answers Section */}
+                      <div className="space-y-2">
+                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                          Câu trả lời ({q.answers.length})
                         </div>
                         <div className="space-y-2">
                           {q.answers.map((answer, ansIdx) => (
                             <div
                               key={ansIdx}
-                              className={`flex items-start gap-2 p-2 rounded-md border ${
+                              className={`flex items-center justify-between gap-3 p-3 rounded-md border transition-colors ${
                                 answer.isRightAns
-                                  ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-900"
-                                  : "bg-gray-50 border-gray-200 dark:bg-gray-950/20 dark:border-gray-800"
+                                  ? "bg-green-50 border-green-300 dark:bg-green-950/30 dark:border-green-800"
+                                  : "bg-gray-50 border-gray-200 dark:bg-gray-900/50 dark:border-gray-700"
                               }`}
                             >
-                              <div className="shrink-0 mt-0.5">
-                                {answer.isRightAns ? (
-                                  <div className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white">
-                                    <Check className="h-3 w-3" />
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-                                    <X className="h-3 w-3" />
-                                  </div>
-                                )}
-                              </div>
                               <div className="flex-1">
                                 <div
                                   className={`text-sm ${
                                     answer.isRightAns
-                                      ? "font-medium text-green-900 dark:text-green-100"
+                                      ? "font-semibold text-green-900 dark:text-green-100"
                                       : "text-gray-700 dark:text-gray-300"
                                   }`}
                                 >
@@ -329,9 +358,9 @@ export function LabUploadExcelDialog({
                               {answer.isRightAns && (
                                 <Badge
                                   variant="default"
-                                  className="bg-green-500 hover:bg-green-600 text-xs"
+                                  className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold"
                                 >
-                                  Đúng
+                                  ✓ Đáp án đúng
                                 </Badge>
                               )}
                             </div>

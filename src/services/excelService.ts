@@ -5,6 +5,8 @@ export interface ExcelQuestionRow {
   question: string;
   hint: string;
   solution: string;
+  checkCommand: string;
+  typeQuestion: string;
   answers: CreateAnswerRequest[];
 }
 
@@ -60,6 +62,8 @@ class ExcelService {
           hint: String(row.Hint || "").trim(),
           solution: String(row.Solution || "").trim(),
           answers,
+          checkCommand: String(row.CheckCommand || "").trim(),
+          typeQuestion: String(row.TypeQuestion || "").trim(),
         });
       }
     });
@@ -85,6 +89,8 @@ class ExcelService {
         Question: "What is 2 + 2?",
         Hint: "Basic addition",
         Solution: "Add the two numbers together",
+        CheckCommand: "Docker check ",
+        TypeQuestion: "multiple-choice",
         Answer1: "3",
         IsCorrect1: "false",
         Answer2: "4",

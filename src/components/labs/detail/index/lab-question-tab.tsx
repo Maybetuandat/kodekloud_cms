@@ -3,10 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DeleteQuestionDialog } from "./question/delete-question-dialog";
 import { EditQuestionDialog } from "./question/edit-question-dialog";
 import { LoadingState } from "./question/loading-state";
-import { LabQuestionsFilters } from "./question/question-filter";
+
 import { LabQuestionsHeader } from "./question/question-header";
 import { LabQuestionsList } from "./question/question-list";
 import { LabUploadExcelDialog } from "./question/upload-question-excel-dialog";
+import FilterBar from "@/components/ui/filter-bar";
 
 interface LabQuestionsTabProps {
   labId: number;
@@ -23,8 +24,11 @@ export function LabQuestionsTab({ labId }: LabQuestionsTabProps) {
     questions,
     currentPage,
     pageSize,
+    filters,
 
     handleSearchChange,
+    handleSearchSubmit,
+    handleSearchClear,
     handleFiltersChange,
     handleEditQuestion,
     handleDeleteQuestion,
@@ -41,10 +45,6 @@ export function LabQuestionsTab({ labId }: LabQuestionsTabProps) {
     handleFiltersChange({ sortBy: value as "newest" | "oldest" });
   };
 
-  if (loading) {
-    return <LoadingState />;
-  }
-
   return (
     <>
       <Card>
@@ -53,20 +53,36 @@ export function LabQuestionsTab({ labId }: LabQuestionsTabProps) {
         />
 
         <CardContent>
-          <LabQuestionsFilters
-            searchValue={searchValue}
-            onSearchChange={handleSearchChange}
-            onSortChange={handleSortChange}
-          />
+          <div className="flex flex-col space-y-4">
+            <FilterBar
+              searchTerm={searchValue}
+              onSearchChange={handleSearchChange}
+              onSearchSubmit={handleSearchSubmit}
+              onSearchClear={handleSearchClear}
+              placeholder="Tìm kiếm câu hỏi, gợi ý hoặc giải pháp..."
+              filters={[
+                {
+                  value: filters.sortBy || "newest",
+                  onChange: handleSortChange,
+                  placeholder: "Sắp xếp theo",
+                  options: [
+                    { value: "newest", label: "Mới nhất" },
+                    { value: "oldest", label: "Cũ nhất" },
+                  ],
+                  widthClass: "w-40",
+                },
+              ]}
+            />
 
-          <LabQuestionsList
-            questions={questions}
-            currentPage={currentPage}
-            pageSize={pageSize}
-            onUploadExcel={() => setUploadExcelDialogOpen(true)}
-            onEditQuestion={handleEditQuestion}
-            onDeleteQuestion={handleDeleteQuestion}
-          />
+            <LabQuestionsList
+              questions={questions}
+              currentPage={currentPage}
+              pageSize={pageSize}
+              onUploadExcel={() => setUploadExcelDialogOpen(true)}
+              onEditQuestion={handleEditQuestion}
+              onDeleteQuestion={handleDeleteQuestion}
+            />
+          </div>
         </CardContent>
       </Card>
 

@@ -27,7 +27,7 @@ export interface UseLabQuestions {
   totalPages: number;
   totalItems: number;
   filters: QuestionFilters;
-  searchValue: string;
+  searchValue: string; // Local search value (for input display)
   deleteQuestionId: number | null;
   editQuestionId: number | null;
   editQuestionData: Question | null;
@@ -54,6 +54,8 @@ export interface UseLabQuestions {
   setDeleteQuestionId: (id: number | null) => void;
   setEditQuestionId: (id: number | null) => void;
   handleSearchChange: (value: string) => void;
+  handleSearchSubmit: () => void; // New: Submit search
+  handleSearchClear: () => void; // New: Clear search
   handleFiltersChange: (newFilters: Partial<QuestionFilters>) => void;
   handleEditQuestion: (questionId: number) => void;
   handleDeleteQuestion: (questionId: number) => void;
@@ -82,7 +84,7 @@ export const useLabQuestions = ({
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSizeState] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
@@ -91,7 +93,11 @@ export const useLabQuestions = ({
   const [editQuestionData, setEditQuestionData] = useState<Question | null>(
     null
   );
-  const [searchValue, setSearchValue] = useState("");
+
+  // Separate local search value (for input) and applied search (for filtering)
+  const [searchValue, setSearchValue] = useState(""); // Local input value
+  const [appliedSearch, setAppliedSearch] = useState(""); // Applied to filters
+
   const [uploadExcelDialogOpen, setUploadExcelDialogOpen] = useState(false);
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [filters, setFiltersState] = useState<QuestionFilters>({
@@ -162,8 +168,9 @@ export const useLabQuestions = ({
 
       let filteredQuestions = response;
 
-      if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
+      // Use appliedSearch instead of filters.search
+      if (appliedSearch) {
+        const searchLower = appliedSearch.toLowerCase();
         filteredQuestions = filteredQuestions.filter(
           (q) =>
             q.question.toLowerCase().includes(searchLower) ||
@@ -191,7 +198,7 @@ export const useLabQuestions = ({
     } finally {
       setLoading(false);
     }
-  }, [labId, filters, pageSize]);
+  }, [labId, appliedSearch, filters.sortBy, pageSize]);
 
   useEffect(() => {
     fetchQuestions();
@@ -261,9 +268,24 @@ export const useLabQuestions = ({
     setCurrentPage(0);
   };
 
+  // Only update local search value (doesn't trigger fetch)
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
-    setFilters({ search: value });
+  };
+
+  // Submit search (triggered by Enter key)
+  const handleSearchSubmit = () => {
+    setAppliedSearch(searchValue);
+    setFilters({ search: searchValue });
+    setCurrentPage(1);
+  };
+
+  // Clear search
+  const handleSearchClear = () => {
+    setSearchValue("");
+    setAppliedSearch("");
+    setFilters({ search: "" });
+    setCurrentPage(1);
   };
 
   const handleFiltersChange = (newFilters: Partial<QuestionFilters>) => {
@@ -357,6 +379,8 @@ export const useLabQuestions = ({
     setUploadExcelDialogOpen,
 
     handleSearchChange,
+    handleSearchSubmit, // New
+    handleSearchClear, // New
     handleFiltersChange,
     handleEditQuestion,
     handleDeleteQuestion,

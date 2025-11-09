@@ -75,6 +75,19 @@ export function LabQuestionItem({
                   {question.solution}
                 </div>
               )}
+              {/* Solution (collapsed by default) */}
+              {expanded && question.checkCommand && (
+                <div className="text-sm text-muted-foreground">
+                  <span className="font-medium">Lệnh kiểm tra:</span>{" "}
+                  {question.checkCommand}
+                </div>
+              )}
+              {expanded && question.typeQuestion && (
+                <div className="text-sm text-muted-foreground">
+                  <span className="font-medium">Loại câu hỏi:</span>{" "}
+                  {question.typeQuestion}
+                </div>
+              )}
             </div>
 
             {/* Action Buttons */}
