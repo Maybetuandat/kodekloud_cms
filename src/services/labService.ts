@@ -2,7 +2,6 @@ import {
   CreateLabRequest,
   Lab,
   PaginatedResponse,
-  PaginationParams,
   UpdateLabRequest,
 } from "@/types/lab";
 import {
@@ -120,31 +119,5 @@ export const labService = {
 
   testSetupStep: async (labId: number): Promise<LabTestResponse> => {
     return api.post<LabTestResponse>(`/labs/test/${labId}`);
-  },
-
-  getTestStatus: async (
-    labId: string,
-    podName: string
-  ): Promise<LabTestStatusResponse> => {
-    return api.get<LabTestStatusResponse>(`/labs/test/${labId}/status`, {
-      podName,
-    });
-  },
-
-  stopTestExecution: async (
-    labId: number,
-    podName: string
-  ): Promise<StopTestResponse> => {
-    return api.delete<StopTestResponse>(
-      `/labs/test/${labId}?podName=${podName}`
-    );
-  },
-
-  getWebSocketInfo: async (
-    podName: string
-  ): Promise<WebSocketConnectionInfo> => {
-    return api.get<WebSocketConnectionInfo>("/labs/test/websocket-info", {
-      podName,
-    });
   },
 };

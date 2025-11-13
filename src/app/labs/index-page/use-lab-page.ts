@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { CreateLabRequest, Lab, PaginatedResponse } from "@/types/lab";
 import { labService } from "@/services/labService";
-import { set } from "date-fns";
 
 export interface LabFilters {
   search: string;
