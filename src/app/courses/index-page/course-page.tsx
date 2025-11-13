@@ -123,12 +123,9 @@ export default function CoursePage() {
             <GraduationCap className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">
+            <h1 className="text-3xl font-bold tracking-tight">
               {t("courses.page.title")}
             </h1>
-            <p className="text-muted-foreground text-sm">
-              {t("courses.page.description")}
-            </p>
           </div>
         </div>
         <div className="flex items-center gap-3">

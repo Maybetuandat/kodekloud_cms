@@ -2,7 +2,7 @@ import * as React from "react";
 import {
   HelpCircleIcon,
   Boxes,
-  Home,
+  LayoutGrid,
   Tags,
   BookOpen,
   FlaskConical,
@@ -57,6 +57,12 @@ export function AppSidebar({
         url: "/users",
         icon: User,
         isActive: location.pathname.startsWith("/users"),
+      },
+      {
+        title: t("navigation.categories"),
+        url: "/categories",
+        icon: LayoutGrid,
+        isActive: location.pathname.startsWith("/categories"),
       },
     ],
     navSecondary: [

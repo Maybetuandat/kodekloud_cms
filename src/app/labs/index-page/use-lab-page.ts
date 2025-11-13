@@ -151,12 +151,11 @@ export const useLabManagement = (initialPageSize: number = 10) => {
     setDeleteLabId(null);
   }, []);
   const handleCreateLab = useCallback(
-    async (data: CreateLabRequest) => {
-      const response = await labService.createLab(data);
+    async (data: CreateLabRequest, categoryId: number) => {
+      const response = await labService.createLab(data, categoryId);
       console.log("Create Lab Response:", response);
       toast.success(`Tạo lab "${data.title}" thành công`);
       await fetchLabs();
-
       setFormDialogOpen(false);
     },
     [fetchLabs]

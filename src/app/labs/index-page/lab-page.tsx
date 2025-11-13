@@ -70,9 +70,6 @@ export default function LabPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Quản lý Lab</h1>
-          <p className="text-muted-foreground mt-1">
-            Quản lý và tổ chức các bài lab thực hành
-          </p>
         </div>
         <Button onClick={handleOpenCreateDialog} size="lg">
           <Plus className="h-5 w-5 mr-2" />

@@ -12,6 +12,7 @@ import { LabDetail } from "./app/labs/detail-page/lab-detail";
 import LabPage from "./app/labs/index-page/lab-page";
 import UserPage from "./app/user/user-page";
 import SubjectPage from "./app/subject/subject-page";
+import CategoryPage from "./app/category/category-page";
 
 function App() {
   return (
@@ -38,6 +39,9 @@ function App() {
 
           <Route path="users">
             <Route index element={<UserPage />} />
+          </Route>
+          <Route path="categories">
+            <Route index element={<CategoryPage />} />
           </Route>
         </Route>
       </Routes>

@@ -1,3 +1,5 @@
+import { Category } from "./category";
+
 export interface Lab {
   id: number;
   title: string;
@@ -5,6 +7,7 @@ export interface Lab {
   estimatedTime: number;
   isActive: boolean;
   createdAt: string;
+  category: Category;
 }
 
 export interface CreateLabRequest {

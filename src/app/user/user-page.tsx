@@ -153,9 +153,6 @@ export default function UserPage() {
           <h1 className="text-3xl font-bold tracking-tight">
             Quản lý người dùng
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Xem và quản lý tất cả người dùng trong hệ thống
-          </p>
         </div>
         <Button onClick={handleCreateUser} size="lg">
           <Plus className="mr-2 h-5 w-5" />

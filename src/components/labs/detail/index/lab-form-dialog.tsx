@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -21,10 +21,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Lab, CreateLabRequest, UpdateLabRequest } from "@/types/lab";
+
+import { toast } from "sonner";
+import { categoryService } from "@/services/categoryService";
+import { Category } from "@/types/category";
 
 const createLabFormSchema = (t: any) =>
   z.object({
@@ -34,13 +45,17 @@ const createLabFormSchema = (t: any) =>
       .number()
       .min(1, t("labs.validation.timeMin"))
       .max(600, t("labs.validation.timeMax")),
+    categoryId: z.number().min(1, "Vui lòng chọn danh mục"),
   });
 
 interface LabFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   lab?: Lab | null;
-  onSubmit: (data: CreateLabRequest | UpdateLabRequest) => Promise<void>;
+  onSubmit: (
+    data: CreateLabRequest | UpdateLabRequest,
+    categoryId: number
+  ) => Promise<void>;
   loading?: boolean;
 }
 
@@ -54,6 +69,8 @@ export function LabFormDialog({
   const { t } = useTranslation("common");
   const isEditMode = !!lab;
   const submitInProgressRef = useRef(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
 
   const labFormSchema = createLabFormSchema(t);
   type LabFormData = z.infer<typeof labFormSchema>;
@@ -64,21 +81,45 @@ export function LabFormDialog({
       title: "",
       description: "",
       estimatedTime: 60,
+      categoryId: undefined,
     },
   });
 
+  // Load categories when dialog opens
+  useEffect(() => {
+    const loadCategories = async () => {
+      if (!open) return;
+
+      try {
+        setLoadingCategories(true);
+        const response = await categoryService.getAllCategories();
+        setCategories(response);
+      } catch (error) {
+        console.error("Failed to load categories:", error);
+        toast.error("Không thể tải danh sách danh mục");
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    loadCategories();
+  }, [open]);
+
+  // Reset form when dialog opens/closes or lab changes
   useEffect(() => {
     if (open && lab) {
       form.reset({
         title: lab.title,
         description: lab.description || "",
         estimatedTime: lab.estimatedTime,
+        categoryId: lab.category?.id,
       });
     } else if (open && !lab) {
       form.reset({
         title: "",
         description: "",
         estimatedTime: 60,
+        categoryId: undefined,
       });
     }
   }, [open, lab, form]);
@@ -88,8 +129,8 @@ export function LabFormDialog({
 
     try {
       submitInProgressRef.current = true;
-      await onSubmit(data);
-
+      const { categoryId, ...labData } = data;
+      await onSubmit(labData, categoryId);
       form.reset();
     } catch (error) {
       console.error("Form submission error:", error);
@@ -168,6 +209,45 @@ export function LabFormDialog({
 
             <FormField
               control={form.control}
+              name="categoryId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Danh mục *</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                    value={field.value?.toString()}
+                    disabled={loading || loadingCategories}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            loadingCategories ? "Đang tải..." : "Chọn danh mục"
+                          }
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem
+                          key={category.id}
+                          value={category.id.toString()}
+                        >
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Chọn danh mục phù hợp cho lab này
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
@@ -224,7 +304,9 @@ export function LabFormDialog({
               </Button>
               <Button
                 type="submit"
-                disabled={loading || submitInProgressRef.current}
+                disabled={
+                  loading || submitInProgressRef.current || loadingCategories
+                }
               >
                 {(loading || submitInProgressRef.current) && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
