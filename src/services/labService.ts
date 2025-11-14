@@ -11,6 +11,7 @@ import {
   WebSocketConnectionInfo,
 } from "@/types/labTest";
 import { api } from "@/lib/api";
+import BackingImage from "@/types/backingImages";
 
 export const labService = {
   getLabsByCourseId: async (
@@ -119,5 +120,8 @@ export const labService = {
 
   testSetupStep: async (labId: number): Promise<LabTestResponse> => {
     return api.post<LabTestResponse>(`/labs/test/${labId}`);
+  },
+  getBackingImages: async (): Promise<BackingImage[]> => {
+    return api.get<BackingImage[]>("/labs/backing-images");
   },
 };

@@ -8,12 +8,14 @@ export interface Lab {
   isActive: boolean;
   createdAt: string;
   category: Category;
+  backingImage?: string;
 }
 
 export interface CreateLabRequest {
   title: string;
   description?: string;
   estimatedTime: number;
+  backingImage?: string;
 }
 
 export interface UpdateLabRequest extends CreateLabRequest {}

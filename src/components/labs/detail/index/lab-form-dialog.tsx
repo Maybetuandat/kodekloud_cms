@@ -35,6 +35,8 @@ import { Lab, CreateLabRequest, UpdateLabRequest } from "@/types/lab";
 import { toast } from "sonner";
 import { categoryService } from "@/services/categoryService";
 import { Category } from "@/types/category";
+import BackingImage from "@/types/backingImages";
+import { labService } from "@/services/labService";
 
 const createLabFormSchema = (t: any) =>
   z.object({
@@ -45,6 +47,9 @@ const createLabFormSchema = (t: any) =>
       .min(1, t("labs.validation.timeMin"))
       .max(600, t("labs.validation.timeMax")),
     categoryId: z.number().min(1, "Vui lòng chọn danh mục"),
+    backingImage: z
+      .string()
+      .min(1, "Vui lòng chọn hệ điều hành cho bài thực hành"),
   });
 
 interface LabFormDialogProps {
@@ -69,7 +74,9 @@ export function LabFormDialog({
   const isEditMode = !!lab;
   const submitInProgressRef = useRef(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [backingImages, setBackingImages] = useState<BackingImage[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
+  const [loadingBackingImages, setLoadingBackingImages] = useState(false);
 
   const labFormSchema = createLabFormSchema(t);
   type LabFormData = z.infer<typeof labFormSchema>;
@@ -81,6 +88,7 @@ export function LabFormDialog({
       description: "",
       estimatedTime: 60,
       categoryId: undefined,
+      backingImage: "",
     },
   });
 
@@ -100,8 +108,22 @@ export function LabFormDialog({
         setLoadingCategories(false);
       }
     };
+    const loadBackingImages = async () => {
+      if (!open) return;
+      try {
+        setLoadingBackingImages(true);
+        const response = await labService.getBackingImages();
+        setBackingImages(response);
+      } catch (error) {
+        console.error("Failed to load backing images:", error);
+        toast.error("Không thể tải danh sách hệ điều hành cho bài thực hành");
+      } finally {
+        setLoadingBackingImages(false);
+      }
+    };
 
     loadCategories();
+    loadBackingImages();
   }, [open]);
 
   // Reset form when dialog opens/closes or lab changes
@@ -112,6 +134,7 @@ export function LabFormDialog({
         description: lab.description || "",
         estimatedTime: lab.estimatedTime,
         categoryId: lab.category?.id,
+        backingImage: lab.backingImage || "",
       });
     } else if (open && !lab) {
       form.reset({
@@ -119,6 +142,7 @@ export function LabFormDialog({
         description: "",
         estimatedTime: 60,
         categoryId: undefined,
+        backingImage: "",
       });
     }
   }, [open, lab, form]);
@@ -239,6 +263,47 @@ export function LabFormDialog({
                   </Select>
                   <FormDescription>
                     Chọn danh mục phù hợp cho lab này
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="backingImage"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Hệ điều hành cho môi trường thực hành</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(value)}
+                    value={field.value?.toString()}
+                    disabled={loading || loadingBackingImages}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            loadingBackingImages
+                              ? "Đang tải..."
+                              : "Chọn hệ điều hành"
+                          }
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {backingImages.map((backingImage) => (
+                        <SelectItem
+                          key={backingImage.name}
+                          value={backingImage.name}
+                        >
+                          {backingImage.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Chọn hệ điều hành cho môi trường thực hành
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
