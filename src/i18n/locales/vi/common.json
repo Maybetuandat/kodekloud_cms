@@ -6,7 +6,8 @@
     "courses": "Khóa học",
     "subject": " Môn học",
     "users": "Người dùng",
-    "categories": "Danh mục"
+    "categories": "Danh mục",
+    "instancetypes": "Thông số"
   },
   "common": {
     "search": "Tìm kiếm",

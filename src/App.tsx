@@ -13,6 +13,7 @@ import LabPage from "./app/labs/index-page/lab-page";
 import UserPage from "./app/user/user-page";
 import SubjectPage from "./app/subject/subject-page";
 import CategoryPage from "./app/category/category-page";
+import InstanceTypePage from "./app/instancetype/instance-type-page";
 
 function App() {
   return (
@@ -42,6 +43,9 @@ function App() {
           </Route>
           <Route path="categories">
             <Route index element={<CategoryPage />} />
+          </Route>
+          <Route path="instancetypes">
+            <Route index element={<InstanceTypePage />} />
           </Route>
         </Route>
       </Routes>

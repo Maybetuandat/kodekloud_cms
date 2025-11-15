@@ -7,6 +7,7 @@ import {
   BookOpen,
   FlaskConical,
   User,
+  Cpu,
 } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -63,6 +64,12 @@ export function AppSidebar({
         url: "/categories",
         icon: LayoutGrid,
         isActive: location.pathname.startsWith("/categories"),
+      },
+      {
+        title: t("navigation.instancetypes"),
+        url: "/instancetypes",
+        icon: Cpu,
+        isActive: location.pathname.startsWith("/instancetypes"),
       },
     ],
     navSecondary: [

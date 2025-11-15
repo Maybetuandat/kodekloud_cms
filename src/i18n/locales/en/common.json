@@ -6,7 +6,8 @@
     "courses": "Courses",
     "subject": " Subjects",
     "users": "Users",
-    "categories": "Categories"
+    "categories": "Categories",
+    "instancetypes": " Instance Types"
   },
   "common": {
     "search": "Search",
