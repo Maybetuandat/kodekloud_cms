@@ -65,7 +65,7 @@ export default function InstanceTypePage() {
       await createInstanceType(
         data as CreateInstanceTypeRequest,
         () => {
-          toast.success("Instance type created successfully");
+          toast.success("Tạo instance type thành công");
           setDialogOpen(false);
         },
         (error) => {
@@ -81,7 +81,7 @@ export default function InstanceTypePage() {
     await deleteInstanceType(
       selectedInstanceType.id,
       () => {
-        toast.success("Instance type deleted successfully");
+        toast.success("Xóa loại instance thành công");
         setDeleteDialogOpen(false);
         setSelectedInstanceType(null);
       },
@@ -92,14 +92,11 @@ export default function InstanceTypePage() {
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="min-h-screen w-full px-6 py-6 space-y-6 mb-10">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Instance Types</h1>
-          <p className="text-muted-foreground">
-            Quản lý các loại instance cho hệ thống của bạn.
-          </p>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />

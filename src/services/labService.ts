@@ -93,11 +93,8 @@ export const labService = {
     return api.get<PaginatedResponse<Lab>>("/labs", queryParams);
   },
 
-  createLab: async (
-    lab: CreateLabRequest,
-    categoryId: number
-  ): Promise<Lab> => {
-    return api.post<Lab>(`/categories/${categoryId}/labs`, lab);
+  createLab: async (lab: CreateLabRequest): Promise<Lab> => {
+    return api.post<Lab>(`/labs`, lab);
   },
 
   updateLab: async (id: number, lab: UpdateLabRequest): Promise<Lab> => {

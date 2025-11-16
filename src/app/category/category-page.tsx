@@ -13,7 +13,6 @@ export default function CategoryPage() {
     categories,
     loading,
     actionLoading,
-    filters,
     createCategory,
     updateCategory,
     deleteCategory,

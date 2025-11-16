@@ -31,12 +31,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Lab, CreateLabRequest, UpdateLabRequest } from "@/types/lab";
-
 import { toast } from "sonner";
 import { categoryService } from "@/services/categoryService";
 import { Category } from "@/types/category";
 import BackingImage from "@/types/backingImages";
+import { InstanceType } from "@/types/instanceType";
 import { labService } from "@/services/labService";
+import { instanceTypeService } from "@/services/instanceTypeService";
 
 const createLabFormSchema = (t: any) =>
   z.object({
@@ -50,16 +51,14 @@ const createLabFormSchema = (t: any) =>
     backingImage: z
       .string()
       .min(1, "Vui lòng chọn hệ điều hành cho bài thực hành"),
+    instanceTypeId: z.number().min(1, "Vui lòng chọn loại instance"),
   });
 
 interface LabFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   lab?: Lab | null;
-  onSubmit: (
-    data: CreateLabRequest | UpdateLabRequest,
-    categoryId: number
-  ) => Promise<void>;
+  onSubmit: (data: CreateLabRequest | UpdateLabRequest) => Promise<void>;
   loading?: boolean;
 }
 
@@ -75,8 +74,10 @@ export function LabFormDialog({
   const submitInProgressRef = useRef(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [backingImages, setBackingImages] = useState<BackingImage[]>([]);
+  const [instanceTypes, setInstanceTypes] = useState<InstanceType[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [loadingBackingImages, setLoadingBackingImages] = useState(false);
+  const [loadingInstanceTypes, setLoadingInstanceTypes] = useState(false);
 
   const labFormSchema = createLabFormSchema(t);
   type LabFormData = z.infer<typeof labFormSchema>;
@@ -89,10 +90,11 @@ export function LabFormDialog({
       estimatedTime: 60,
       categoryId: undefined,
       backingImage: "",
+      instanceTypeId: undefined,
     },
   });
 
-  // Load categories when dialog opens
+  // Load categories, backing images, and instance types when dialog opens
   useEffect(() => {
     const loadCategories = async () => {
       if (!open) return;
@@ -108,6 +110,7 @@ export function LabFormDialog({
         setLoadingCategories(false);
       }
     };
+
     const loadBackingImages = async () => {
       if (!open) return;
       try {
@@ -122,8 +125,23 @@ export function LabFormDialog({
       }
     };
 
+    const loadInstanceTypes = async () => {
+      if (!open) return;
+      try {
+        setLoadingInstanceTypes(true);
+        const response = await instanceTypeService.getAllInstanceTypes();
+        setInstanceTypes(response);
+      } catch (error) {
+        console.error("Failed to load instance types:", error);
+        toast.error("Không thể tải danh sách loại instance");
+      } finally {
+        setLoadingInstanceTypes(false);
+      }
+    };
+
     loadCategories();
     loadBackingImages();
+    loadInstanceTypes();
   }, [open]);
 
   // Reset form when dialog opens/closes or lab changes
@@ -135,6 +153,7 @@ export function LabFormDialog({
         estimatedTime: lab.estimatedTime,
         categoryId: lab.category?.id,
         backingImage: lab.backingImage || "",
+        instanceTypeId: lab.instanceType?.id,
       });
     } else if (open && !lab) {
       form.reset({
@@ -143,6 +162,7 @@ export function LabFormDialog({
         estimatedTime: 60,
         categoryId: undefined,
         backingImage: "",
+        instanceTypeId: undefined,
       });
     }
   }, [open, lab, form]);
@@ -152,8 +172,16 @@ export function LabFormDialog({
 
     try {
       submitInProgressRef.current = true;
-      const { categoryId, ...labData } = data;
-      await onSubmit(labData, categoryId);
+      // Chuyển đổi LabFormData thành CreateLabRequest/UpdateLabRequest
+      const labRequest: CreateLabRequest | UpdateLabRequest = {
+        title: data.title,
+        description: data.description,
+        estimatedTime: data.estimatedTime,
+        backingImage: data.backingImage,
+        instanceTypeId: data.instanceTypeId,
+        categoryId: data.categoryId,
+      };
+      await onSubmit(labRequest);
       form.reset();
     } catch (error) {
       console.error("Form submission error:", error);
@@ -183,7 +211,7 @@ export function LabFormDialog({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
-        className="sm:max-w-[500px]"
+        className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto"
         onInteractOutside={(e) => {
           if (loading || submitInProgressRef.current) {
             e.preventDefault();
@@ -274,7 +302,7 @@ export function LabFormDialog({
               name="backingImage"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Hệ điều hành cho môi trường thực hành</FormLabel>
+                  <FormLabel>Hệ điều hành *</FormLabel>
                   <Select
                     onValueChange={(value) => field.onChange(value)}
                     value={field.value?.toString()}
@@ -304,6 +332,56 @@ export function LabFormDialog({
                   </Select>
                   <FormDescription>
                     Chọn hệ điều hành cho môi trường thực hành
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="instanceTypeId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Loại Instance *</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                    value={field.value?.toString()}
+                    disabled={loading || loadingInstanceTypes}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            loadingInstanceTypes
+                              ? "Đang tải..."
+                              : "Chọn loại instance"
+                          }
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {instanceTypes.map((instanceType) => (
+                        <SelectItem
+                          key={instanceType.id}
+                          value={instanceType.id.toString()}
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              {instanceType.name}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              CPU: {instanceType.cpuCores} cores | RAM:{" "}
+                              {instanceType.memoryGb}GB | Storage:{" "}
+                              {instanceType.storageGb}GB
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Chọn cấu hình phần cứng cho bài thực hành
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -369,7 +447,11 @@ export function LabFormDialog({
               <Button
                 type="submit"
                 disabled={
-                  loading || submitInProgressRef.current || loadingCategories
+                  loading ||
+                  submitInProgressRef.current ||
+                  loadingCategories ||
+                  loadingBackingImages ||
+                  loadingInstanceTypes
                 }
               >
                 {(loading || submitInProgressRef.current) && (

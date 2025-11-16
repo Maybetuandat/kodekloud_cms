@@ -1,4 +1,5 @@
 import { Category } from "./category";
+import { InstanceType } from "./instanceType";
 
 export interface Lab {
   id: number;
@@ -9,6 +10,7 @@ export interface Lab {
   createdAt: string;
   category: Category;
   backingImage?: string;
+  instanceType: InstanceType;
 }
 
 export interface CreateLabRequest {
@@ -16,6 +18,8 @@ export interface CreateLabRequest {
   description?: string;
   estimatedTime: number;
   backingImage?: string;
+  instanceTypeId: number;
+  categoryId: number;
 }
 
 export interface UpdateLabRequest extends CreateLabRequest {}
