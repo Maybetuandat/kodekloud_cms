@@ -4,14 +4,10 @@ import {
   PaginatedResponse,
   UpdateLabRequest,
 } from "@/types/lab";
-import {
-  LabTestResponse,
-  LabTestStatusResponse,
-  StopTestResponse,
-  WebSocketConnectionInfo,
-} from "@/types/labTest";
+
 import { api } from "@/lib/api";
 import BackingImage from "@/types/backingImages";
+import { LabTestResponse, LabTestStatusResponse } from "@/types/labTest";
 
 export const labService = {
   getLabsByCourseId: async (
@@ -98,7 +94,7 @@ export const labService = {
   },
 
   updateLab: async (id: number, lab: UpdateLabRequest): Promise<Lab> => {
-    return api.put<Lab>(`/labs/${id}`, lab);
+    return api.patch<Lab>(`/labs/${id}`, lab);
   },
 
   deleteLab: async (id: number): Promise<void> => {
@@ -115,10 +111,14 @@ export const labService = {
     return api.get<Lab>(`/labs/${labId}`);
   },
 
-  testSetupStep: async (labId: number): Promise<LabTestResponse> => {
-    return api.post<LabTestResponse>(`/labs/test/${labId}`);
-  },
   getBackingImages: async (): Promise<BackingImage[]> => {
     return api.get<BackingImage[]>("/labs/backing-images");
+  },
+
+  startLabTest: async (labId: number): Promise<LabTestResponse> => {
+    return api.post<LabTestResponse>(`/labs/${labId}/test`, {});
+  },
+  getTestStatus: async (testId: string): Promise<LabTestStatusResponse> => {
+    return api.get<LabTestStatusResponse>(`/labs/test/${testId}/status`);
   },
 };

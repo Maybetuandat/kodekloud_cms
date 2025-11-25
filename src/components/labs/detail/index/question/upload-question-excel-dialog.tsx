@@ -278,15 +278,14 @@ export function LabUploadExcelDialog({
                         </div>
                       </div>
 
-                      {/* Question Details - All in one row */}
                       <div className="space-y-3">
                         {/* Type Question */}
                         {q.typeQuestion && (
-                          <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-md p-3">
-                            <div className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide mb-1">
+                          <div className="rounded-lg border bg-muted/20 p-4">
+                            <div className="text-xs font-bold text-primary uppercase tracking-wide mb-1">
                               Loại câu hỏi
                             </div>
-                            <div className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                            <div className="text-sm font-medium">
                               {q.typeQuestion}
                             </div>
                           </div>
@@ -294,11 +293,11 @@ export function LabUploadExcelDialog({
 
                         {/* Check Command */}
                         {q.checkCommand && (
-                          <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900 rounded-md p-3">
-                            <div className="text-xs font-semibold text-purple-700 dark:text-purple-300 uppercase tracking-wide mb-1">
+                          <div className="rounded-lg border bg-muted/20 p-4">
+                            <div className="text-xs font-bold text-primary uppercase tracking-wide mb-1">
                               Lệnh kiểm tra
                             </div>
-                            <div className="text-sm font-mono font-medium text-purple-900 dark:text-purple-100 break-all">
+                            <div className="text-sm font-mono font-medium break-all">
                               {q.checkCommand}
                             </div>
                           </div>
@@ -306,25 +305,21 @@ export function LabUploadExcelDialog({
 
                         {/* Hint */}
                         {q.hint && (
-                          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-md p-3">
-                            <div className="text-xs font-semibold text-amber-700 dark:text-amber-300 uppercase tracking-wide mb-1">
+                          <div className="rounded-lg border bg-muted/20 p-4">
+                            <div className="text-xs font-bold text-primary uppercase tracking-wide mb-1">
                               Gợi ý
                             </div>
-                            <div className="text-sm text-amber-900 dark:text-amber-100">
-                              {q.hint}
-                            </div>
+                            <div className="text-sm">{q.hint}</div>
                           </div>
                         )}
 
                         {/* Solution */}
                         {q.solution && (
-                          <div className="bg-teal-50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-900 rounded-md p-3">
-                            <div className="text-xs font-semibold text-teal-700 dark:text-teal-300 uppercase tracking-wide mb-1">
+                          <div className="rounded-lg border bg-muted/20 p-4">
+                            <div className="text-xs font-bold text-primary uppercase tracking-wide mb-1">
                               Giải pháp
                             </div>
-                            <div className="text-sm text-teal-900 dark:text-teal-100">
-                              {q.solution}
-                            </div>
+                            <div className="text-sm">{q.solution}</div>
                           </div>
                         )}
                       </div>

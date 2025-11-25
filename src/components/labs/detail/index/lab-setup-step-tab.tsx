@@ -4,15 +4,21 @@ import { useTranslation } from "react-i18next";
 import { useSetupSteps } from "@/app/labs/detail-page/use-setup-step";
 import { SetupStepDeleteDialog } from "./setup-step/setup-step-delete-dialog";
 import { SetupStepFormDialog } from "./setup-step/setup-step-form-dialog";
-import { SetupStepHeader } from "./setup-step/setup-step-header";
+
 import { SetupStepList } from "./setup-step/setup-step-list";
+
+import { useState } from "react";
+import { TestDialog } from "../test";
+import { SetupStepHeader } from "./setup-step/setup-step-header";
 
 interface LabSetupStepsTabProps {
   labId: number;
+  labTitle: string;
 }
 
-export function LabSetupStepsTab({ labId }: LabSetupStepsTabProps) {
+export function LabSetupStepsTab({ labId, labTitle }: LabSetupStepsTabProps) {
   const { t } = useTranslation("labs");
+  const [isTestDialogOpen, setIsTestDialogOpen] = useState(false);
 
   const {
     setupSteps,
@@ -33,6 +39,10 @@ export function LabSetupStepsTab({ labId }: LabSetupStepsTabProps) {
     handleCloseCreateDialog,
     handleCloseEditDialog,
   } = useSetupSteps({ labId });
+
+  const handleTestClick = () => {
+    setIsTestDialogOpen(true);
+  };
 
   if (isLoading) {
     return (
@@ -65,6 +75,7 @@ export function LabSetupStepsTab({ labId }: LabSetupStepsTabProps) {
       <Card>
         <SetupStepHeader
           onCreateClick={handleCreateClick}
+          onTestClick={handleTestClick}
           disabled={actionLoading}
         />
         <CardContent>
@@ -101,6 +112,13 @@ export function LabSetupStepsTab({ labId }: LabSetupStepsTabProps) {
         onOpenChange={(open) => !open && handleCancelDelete()}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
+      />
+
+      <TestDialog
+        open={isTestDialogOpen}
+        onOpenChange={setIsTestDialogOpen}
+        labId={labId}
+        labTitle={labTitle}
       />
     </>
   );

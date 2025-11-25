@@ -5,19 +5,16 @@ import { useTranslation } from "react-i18next";
 
 interface SetupStepHeaderProps {
   onCreateClick: () => void;
+  onTestClick: () => void;
   disabled?: boolean;
 }
 
 export function SetupStepHeader({
   onCreateClick,
+  onTestClick,
   disabled = false,
 }: SetupStepHeaderProps) {
   const { t } = useTranslation("labs");
-
-  const handleTestClick = () => {
-    console.log("Test setup steps clicked");
-    // TODO: Implement test logic later
-  };
 
   return (
     <CardHeader>
@@ -32,7 +29,7 @@ export function SetupStepHeader({
         </div>
         <div className="flex gap-2">
           <Button
-            onClick={handleTestClick}
+            onClick={onTestClick}
             variant="outline"
             className="gap-2"
             disabled={disabled}

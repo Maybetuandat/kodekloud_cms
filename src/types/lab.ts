@@ -11,6 +11,7 @@ export interface Lab {
   category: Category;
   backingImage?: string;
   instanceType: InstanceType;
+  namespace: string;
 }
 
 export interface CreateLabRequest {
@@ -20,6 +21,7 @@ export interface CreateLabRequest {
   backingImage?: string;
   instanceTypeId: number;
   categoryId: number;
+  namespace: string;
 }
 
 export interface UpdateLabRequest extends CreateLabRequest {}

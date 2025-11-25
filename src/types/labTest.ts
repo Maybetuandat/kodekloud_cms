@@ -1,5 +1,3 @@
-
-
 export interface WebSocketConnectionInfo {
   url: string;
   endpoint: string;
@@ -23,39 +21,39 @@ export interface WebSocketConnectionInfo {
 }
 
 export interface LabTestResponse {
-  success: boolean;
-  message: string;
-  labId: string;
-  labName: string;
-  podName: string;
-  namespace: string;
-  websocket: WebSocketConnectionInfo;
-  executionStarted: boolean;
-  createdAt: string;
-  error?: string; // For error cases
+  testId: string;
+  labId: number;
+  testVmName: string;
+  status: string;
+  websocketUrl: string;
+  connectionInfo: WebSocketConnectionInfo;
 }
 
 export interface LabTestStatusResponse {
-  labId: string;
-  podName: string;
+  testId: string;
+  labId: number;
+  testVmName: string;
   status: string;
-  timestamp: string;
+  websocketUrl?: string;
 }
 
-export interface StopTestResponse {
-  success: boolean;
-  message: string;
-  labId: string;
-  podName: string;
-  stoppedAt: string;
-}
-
-export interface TerminalMessage {
+export interface TestMessage {
   type: string;
   message: string;
   data?: any;
   timestamp: number;
 }
 
-export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
-export type ExecutionStatus = 'running' | 'completed' | 'failed' | 'unknown';
+export type TestConnectionStatus =
+  | "idle"
+  | "connecting"
+  | "connected"
+  | "disconnected"
+  | "error";
+
+export type TestExecutionStatus =
+  | "idle"
+  | "waiting_connection"
+  | "running"
+  | "completed"
+  | "failed";
