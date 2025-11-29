@@ -6,9 +6,11 @@ import {
   Settings,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useCallback } from "react";
+import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
+import { useAuth } from "@/contexts/auth-context";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -25,95 +27,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-
-
 import { ThemeSettingsPanel } from "@/components/theme/theme-settings-panel";
 
-interface UserInfo {
-  id: string;
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  fullName: string;
-  isPremium: boolean;
-}
-
-
-const getMockUserData = (): UserInfo => {
-  // Kiểm tra localStorage trước
-  const storedUser = localStorage.getItem('userInfo');
-  if (storedUser) {
-    try {
-      return JSON.parse(storedUser);
-    } catch (error) {
-      console.error('Error parsing stored user data:', error);
-    }
-  }
-
-  // Fallback to mock data
-  return {
-    id: "user-123",
-    firstName: "John",
-    lastName: "Doe",
-    username: "johndoe",
-    email: "john.doe@example.com",
-    fullName: "John Doe",
-    isPremium: false,
-  };
-};
-
-// Simulate API call với delay
-const fetchUserInfo = (): Promise<UserInfo> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(getMockUserData());
-    }, 500); // Simulate network delay
-  });
-};
-
 export function NavUser() {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
-  
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
-
-  // Fetch user info - không còn dependency vào api
-  useEffect(() => {
-    let mounted = true;
-
-    const fetchUser = async () => {
-      if (hasLoaded) return; // Only fetch once
-
-      try {
-        setLoading(true);
-        const userData = await fetchUserInfo(); // Sử dụng function local thay vì api
-
-        if (mounted) {
-          setUserInfo(userData);
-          setHasLoaded(true);
-        }
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-        if (mounted) {
-          setHasLoaded(true); // Mark as loaded even on error
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchUser();
-
-    return () => {
-      mounted = false;
-    };
-  }, [hasLoaded]);
+  const { user, logout, loading, isAdmin } = useAuth();
 
   const handleAccountClick = useCallback(() => {
     navigate("/profile");
@@ -121,95 +41,71 @@ export function NavUser() {
 
   const handleLogout = useCallback(async () => {
     try {
-      // Show loading toast
-     
-      // Clear localStorage
-      localStorage.removeItem('userInfo');
-      localStorage.removeItem('authToken'); // nếu có
-      
-      // Simulate logout delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success("Đăng xuất thành công", {
+        description: "Hẹn gặp lại bạn!",
+      });
 
-     
+      logout();
 
-    
-
-      // Redirect after showing toast
+      // Redirect after a short delay
       setTimeout(() => {
         navigate("/login", { replace: true });
       }, 1000);
     } catch (error) {
       console.error("Logout error:", error);
-
-      // Clear local data anyway
-      localStorage.removeItem('userInfo');
-      localStorage.removeItem('authToken');
-
-    
-
-      setTimeout(() => {
-        navigate("/login", { replace: true });
-      }, 1000);
+      // Force logout anyway
+      logout();
+      navigate("/login", { replace: true });
     }
-  }, [navigate, t]); // Removed api dependency
+  }, [navigate, logout]);
 
-  // Helper functions - safe versions
-  const getInitials = (user: UserInfo | null): string => {
+  // Helper functions for user display
+  const getInitials = (): string => {
     if (!user) return "U";
 
-    if (user.firstName && user.lastName) {
-      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-    }
-    if (user.fullName) {
-      const parts = user.fullName.trim().split(/\s+/);
-      if (parts.length >= 2) {
-        return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
-      }
-      return user.fullName[0].toUpperCase();
-    }
     if (user.username) {
       return user.username.substring(0, 2).toUpperCase();
     }
+
+    if (user.email) {
+      return user.email.substring(0, 2).toUpperCase();
+    }
+
     return "U";
   };
 
-  const getDisplayName = (user: UserInfo | null): string => {
+  const getDisplayName = (): string => {
     if (!user) return "User";
-    return (
-      user.fullName ||
-      `${user.firstName} ${user.lastName}`.trim() ||
-      user.username ||
-      "User"
-    );
+    return user.username || user.email || "User";
   };
 
-  const getEmail = (user: UserInfo | null): string => {
+  const getEmail = (): string => {
     return user?.email || "user@example.com";
   };
 
-  // Render logic - simple and safe
-  const displayName = getDisplayName(userInfo);
-  const initials = getInitials(userInfo);
-  const email = getEmail(userInfo);
-  const isPremium = userInfo?.isPremium || false;
-
   // Show loading skeleton
-  if (loading && !userInfo) {
+  if (loading && !user) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg" disabled>
-            <div className="h-8 w-8 rounded-lg bg-muted animate-pulse" />
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <div className="h-4 bg-muted rounded animate-pulse mb-1" />
-              <div className="h-3 bg-muted rounded animate-pulse w-2/3" />
+          <SidebarMenuButton size="lg" disabled className="animate-pulse">
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-700">
+              <Loader2 className="h-4 w-4 animate-spin" />
             </div>
-            <Loader2 className="ml-auto size-4 animate-spin" />
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded mt-1"></div>
+            </div>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
     );
   }
+
+  // Main render with real user data
+  const displayName = getDisplayName();
+  const initials = getInitials();
+  const email = getEmail();
 
   return (
     <SidebarMenu>
@@ -221,19 +117,27 @@ export function NavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarFallback className="rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
+                <AvatarFallback className="rounded-lg bg-blue-600 text-white font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{displayName}</span>
-                <span className="truncate text-xs text-muted-foreground">
-                  {email}
-                </span>
+                <span className="truncate font-semibold">{displayName}</span>
+                <div className="flex items-center gap-2">
+                  <span className="truncate text-xs text-muted-foreground">
+                    {email}
+                  </span>
+                  {isAdmin && (
+                    <span className="px-1.5 py-0.5 text-[10px] bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 rounded-full font-medium">
+                      ADMIN
+                    </span>
+                  )}
+                </div>
               </div>
               <MoreVerticalIcon className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             side={isMobile ? "bottom" : "right"}
@@ -243,46 +147,52 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarFallback className="rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
+                  <AvatarFallback className="rounded-lg bg-blue-600 text-white font-semibold">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{displayName}</span>
+                  <span className="truncate font-semibold">{displayName}</span>
                   <span className="truncate text-xs text-muted-foreground">
                     {email}
                   </span>
                 </div>
               </div>
             </DropdownMenuLabel>
+
             <DropdownMenuSeparator />
+
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={handleAccountClick}>
-                <UserCircleIcon />
-                {t('sidebar.account')}
+              <DropdownMenuItem
+                onClick={handleAccountClick}
+                className="cursor-pointer"
+              >
+                <UserCircleIcon className="mr-2 h-4 w-4" />
+                {t("sidebar.account")}
               </DropdownMenuItem>
-              {isPremium && (
-                <DropdownMenuItem>
-                  <span className="text-yellow-600 font-medium">
-                    ✨ {t('sidebar.premiumAccount')}
-                  </span>
-                </DropdownMenuItem>
-              )}
+
+              <ThemeSettingsPanel
+                variant="popover"
+                trigger={
+                  <DropdownMenuItem
+                    onSelect={(e) => e.preventDefault()}
+                    className="cursor-pointer"
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    {t("sidebar.settings")}
+                  </DropdownMenuItem>
+                }
+              />
             </DropdownMenuGroup>
+
             <DropdownMenuSeparator />
-            <ThemeSettingsPanel 
-              variant="dialog"
-              trigger={
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                  <Settings />
-                  {t('sidebar.settings')}
-                </DropdownMenuItem>
-              }
-            />
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOutIcon />
-              {t('sidebar.logout')}
+
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-950/30"
+            >
+              <LogOutIcon className="mr-2 h-4 w-4" />
+              {t("sidebar.logout")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
