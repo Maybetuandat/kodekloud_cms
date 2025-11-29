@@ -167,6 +167,32 @@ export const InstanceTypeDialog: FC<InstanceTypeDialogProps> = ({
               )}
             </div>
 
+            {/* Memory Field */}
+            <div className="grid gap-2">
+              <Label htmlFor="storage">
+                Storage (GB) <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="storage"
+                type="number"
+                min="1"
+                placeholder="e.g., 1, 2, 4, 8"
+                {...register("storageGb", {
+                  required: "Storage là bắt buộc",
+                  min: {
+                    value: 1,
+                    message: "Storage phải có ít nhất 1 GB",
+                  },
+                  valueAsNumber: true,
+                })}
+              />
+              {errors.storageGb && (
+                <p className="text-sm text-destructive">
+                  {errors.storageGb.message}
+                </p>
+              )}
+            </div>
+
             {/* Description Field */}
             <div className="grid gap-2">
               <Label htmlFor="description">Mô tả</Label>
