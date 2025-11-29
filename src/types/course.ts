@@ -6,7 +6,6 @@ export interface Course {
   title: string;
   description?: string;
   level?: string;
-  durationMinutes?: number;
   updatedAt?: string;
   shortDescription?: string;
   isActive: boolean;
@@ -24,14 +23,13 @@ export interface CourseResponse {
   hasPrevious: boolean;
 }
 
-// Request để gửi lên backend
 export interface CreateCourseRequest {
   title: string;
   description?: string;
   level?: string;
-  durationMinutes?: number;
   shortDescription?: string;
   isActive?: boolean;
+  subjectId?: number;
 }
 
 export interface UpdateCourseRequest extends CreateCourseRequest {}

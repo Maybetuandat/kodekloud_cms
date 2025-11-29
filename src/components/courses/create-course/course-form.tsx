@@ -23,11 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import {
-  Course,
-  CreateCourseRequest,
-  UpdateCourseRequest,
-} from "@/types/course";
+import { Course, CreateCourseRequest } from "@/types/course";
 import { useSubjectPage } from "@/app/subject/use-subject";
 
 // Schema validation for form data
@@ -46,11 +42,10 @@ const createCourseFormSchema = (t: any) =>
     isActive: z.boolean().default(true),
   });
 
-// Helper function để transform form data thành request format
 const transformFormDataToRequest = (
   formData: z.infer<ReturnType<typeof createCourseFormSchema>>
-): CreateCourseRequest | UpdateCourseRequest => {
-  const { subjectId, ...rest } = formData;
+): CreateCourseRequest => {
+  const { ...rest } = formData;
   return {
     ...rest,
   };
@@ -58,7 +53,7 @@ const transformFormDataToRequest = (
 
 interface CourseFormProps {
   course?: Course | null;
-  onSubmit: (data: CreateCourseRequest, subjectId: number) => Promise<void>;
+  onSubmit: (data: CreateCourseRequest) => Promise<Course>;
   onCancel: () => void;
   loading?: boolean;
 }
@@ -93,8 +88,7 @@ export function CourseForm({
       description: course?.description || "",
       shortDescription: course?.shortDescription || "",
       level: course?.level || "",
-      durationMinutes: course?.durationMinutes || 60,
-      subjectId: course?.subject?.id || 0,
+      subjectId: course?.subject?.id ?? undefined,
       isActive: course?.isActive ?? true,
     },
   });
@@ -102,7 +96,7 @@ export function CourseForm({
   const handleSubmit = async (data: CourseFormData) => {
     // Transform form data to API request format
     const requestData = transformFormDataToRequest(data);
-    await onSubmit(requestData, data.subjectId);
+    await onSubmit(requestData);
   };
 
   return (
@@ -138,16 +132,17 @@ export function CourseForm({
           )}
         />
 
-        {/* Subject Dropdown */}
         <FormField
           control={form.control}
           name="subjectId"
+          rules={{ required: "Hãy lựa chọn môn học" }}
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-base">
                 {t("courses.form.subject")}{" "}
                 <span className="text-destructive">*</span>
               </FormLabel>
+
               <Select
                 onValueChange={(value) => field.onChange(Number(value))}
                 value={field.value?.toString()}
@@ -155,22 +150,21 @@ export function CourseForm({
               >
                 <FormControl>
                   <SelectTrigger className="text-base">
-                    <SelectValue
-                      placeholder={t("courses.form.subjectPlaceholder")}
-                    />
+                    <SelectValue placeholder="Hãy lựa chọn môn học" />
                   </SelectTrigger>
                 </FormControl>
+
                 <SelectContent>
                   {subjectLoading ? (
                     <SelectItem value="0" disabled>
                       <div className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        {t("courses.form.SubjectLoading")}
+                        Đang tải môn học...
                       </div>
                     </SelectItem>
                   ) : subjects.length === 0 ? (
                     <SelectItem value="0" disabled>
-                      {t("courses.form.SubjectEmpty")}
+                      Không có môn học nào
                     </SelectItem>
                   ) : (
                     subjects.map((subject) => (
@@ -187,7 +181,7 @@ export function CourseForm({
                   )}
                 </SelectContent>
               </Select>
-              <FormDescription>{t("courses.form.subjectHint")}</FormDescription>
+
               <FormMessage />
             </FormItem>
           )}
@@ -248,100 +242,82 @@ export function CourseForm({
           )}
         />
 
-        {/* Level and Duration Row */}
+        {/* Level and Active Status Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Level Field */}
           <FormField
             control={form.control}
             name="level"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-base">
-                  {t("courses.form.level")}
-                </FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  disabled={loading}
-                >
-                  <FormControl>
+              <FormItem className="rounded-lg border p-4 shadow-sm space-y-3">
+                <div>
+                  <FormLabel className="text-base font-medium">
+                    {t("courses.form.level")}
+                  </FormLabel>
+                  <FormDescription>
+                    {t("courses.form.levelHint")}
+                  </FormDescription>
+                </div>
+
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={loading}
+                  >
                     <SelectTrigger className="text-base">
                       <SelectValue
                         placeholder={t("courses.form.levelPlaceholder")}
                       />
                     </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {courseLevels.map((level) => (
-                      <SelectItem key={level.value} value={level.value}>
-                        <div className="flex items-center gap-2">
-                          <GraduationCap className="h-4 w-4" />
-                          {level.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormDescription>{t("courses.form.levelHint")}</FormDescription>
+                    <SelectContent>
+                      {courseLevels.map((level) => (
+                        <SelectItem key={level.value} value={level.value}>
+                          <div className="flex items-center gap-2">
+                            <GraduationCap className="h-4 w-4" />
+                            {level.label}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+
                 <FormMessage />
               </FormItem>
             )}
           />
 
+          {/* Active Field */}
           <FormField
             control={form.control}
-            name="durationMinutes"
+            name="isActive"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-base">
-                  {t("courses.form.duration")}
-                </FormLabel>
+              <FormItem className="rounded-lg border p-4 shadow-sm space-y-3">
+                <div>
+                  <FormLabel className="text-base font-medium">
+                    {t("courses.form.active")}
+                  </FormLabel>
+                  <FormDescription>
+                    {t("courses.form.activeHint")}
+                  </FormDescription>
+                </div>
+
                 <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="60"
-                    className="text-base"
-                    {...field}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value ? parseInt(e.target.value) : undefined
-                      )
-                    }
-                    disabled={loading}
-                  />
+                  <div className="flex items-center">
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={loading}
+                    />
+                  </div>
                 </FormControl>
-                <FormDescription>
-                  {t("courses.form.durationHint")}
-                </FormDescription>
+
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-
-        {/* Active Status */}
-        <FormField
-          control={form.control}
-          name="isActive"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base font-medium">
-                  {t("courses.form.active")}
-                </FormLabel>
-                <FormDescription>
-                  {t("courses.form.activeHint")}
-                </FormDescription>
-              </div>
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  disabled={loading}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-3 pt-4">

@@ -82,7 +82,7 @@
       "duration": "Thời lượng (phút)",
       "durationHint": "Thời gian ước tính để hoàn thành khóa học",
       "active": "Trạng thái hoạt động",
-      "activeHint": "Làm cho khóa học này hiển thị và có sẵn cho học viên"
+      "activeHint": "Chỉ khi trạng thái là active thì khóa học mới hiển thị tới học viên "
     },
     "validation": {
       "titleRequired": "Tiêu đề khóa học là bắt buộc",

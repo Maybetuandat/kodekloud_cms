@@ -47,14 +47,8 @@ export const courseService = {
     return response;
   },
 
-  createCourse: async (
-    data: CreateCourseRequest,
-    subjectId: number
-  ): Promise<Course> => {
-    const response = await api.post<Course>(
-      `/subjects/${subjectId}/courses`,
-      data
-    );
+  createCourse: async (data: CreateCourseRequest): Promise<Course> => {
+    const response = await api.post<Course>(`/courses`, data);
     return response;
   },
 
