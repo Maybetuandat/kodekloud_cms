@@ -1,5 +1,5 @@
-import { FC, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { FC, useEffect, useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import BackingImage from "@/types/backingImages";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +18,23 @@ import {
   CreateInstanceTypeRequest,
   UpdateInstanceTypeRequest,
 } from "@/types/instanceType";
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import { labService } from "@/services/labService";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface InstanceTypeDialogProps {
   open: boolean;
@@ -37,22 +55,42 @@ export const InstanceTypeDialog: FC<InstanceTypeDialogProps> = ({
 }) => {
   const isEdit = !!instanceType;
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<CreateInstanceTypeRequest>({
+  const [backingImages, setBackingImages] = useState<BackingImage[]>([]);
+  const methods = useForm<CreateInstanceTypeRequest>({
     defaultValues: {
       name: "",
       cpuCores: 1,
       memoryGb: 1,
       storageGb: 1,
       description: "",
+      backingImage: "",
     },
   });
 
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { errors },
+  } = methods;
+
+  const [loadingBackingImages, setLoadingBackingImages] = useState(false);
+
   useEffect(() => {
+    const loadBackingImages = async () => {
+      if (!open) return;
+      try {
+        setLoadingBackingImages(true);
+        const response = await labService.getBackingImages();
+        setBackingImages(response);
+      } catch (error) {
+        console.error("Failed to load backing images:", error);
+        toast.error("Không thể tải danh sách hệ điều hành cho bài thực hành");
+      } finally {
+        setLoadingBackingImages(false);
+      }
+    };
     if (open) {
       if (instanceType) {
         reset({
@@ -61,6 +99,7 @@ export const InstanceTypeDialog: FC<InstanceTypeDialogProps> = ({
           memoryGb: instanceType.memoryGb,
           storageGb: instanceType.storageGb,
           description: instanceType.description || "",
+          backingImage: "",
         });
       } else {
         reset({
@@ -69,9 +108,11 @@ export const InstanceTypeDialog: FC<InstanceTypeDialogProps> = ({
           memoryGb: 1,
           storageGb: 1,
           description: "",
+          backingImage: "",
         });
       }
     }
+    loadBackingImages();
   }, [open, instanceType, reset]);
 
   const handleFormSubmit = (data: CreateInstanceTypeRequest) => {
@@ -90,135 +131,180 @@ export const InstanceTypeDialog: FC<InstanceTypeDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)}>
-          <div className="grid gap-4 py-4">
-            {/* Name Field */}
-            <div className="grid gap-2">
-              <Label htmlFor="name">
-                Tên <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="name"
-                placeholder="e.g., t2.micro, t2.small"
-                {...register("name", {
-                  required: "Tên là bắt buộc",
-                  minLength: {
-                    value: 2,
-                    message: "Tên phải có ít nhất 2 ký tự",
-                  },
-                })}
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(handleFormSubmit)}>
+            <div className="grid gap-4 py-4">
+              {/* Name Field */}
+              <div className="grid gap-2">
+                <Label htmlFor="name">
+                  Tên <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="name"
+                  placeholder="e.g., t2.micro, t2.small"
+                  {...register("name", {
+                    required: "Tên là bắt buộc",
+                    minLength: {
+                      value: 2,
+                      message: "Tên phải có ít nhất 2 ký tự",
+                    },
+                  })}
+                />
+                {errors.name && (
+                  <p className="text-sm text-destructive">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              {/* CPU Field */}
+              <div className="grid gap-2">
+                <Label htmlFor="cpu">
+                  CPU (cores) <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="cpu"
+                  type="number"
+                  min="1"
+                  placeholder="e.g., 1, 2, 4"
+                  {...register("cpuCores", {
+                    required: "CPU là bắt buộc",
+                    min: {
+                      value: 1,
+                      message: "CPU phải có ít nhất 1 core",
+                    },
+                    valueAsNumber: true,
+                  })}
+                />
+                {errors.cpuCores && (
+                  <p className="text-sm text-destructive">
+                    {errors.cpuCores.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Memory Field */}
+              <div className="grid gap-2">
+                <Label htmlFor="memory">
+                  Memory (GB) <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="memory"
+                  type="number"
+                  min="1"
+                  placeholder="e.g., 1, 2, 4, 8"
+                  {...register("memoryGb", {
+                    required: "Memory là bắt buộc",
+                    min: {
+                      value: 1,
+                      message: "Memory phải có ít nhất 1 GB",
+                    },
+                    valueAsNumber: true,
+                  })}
+                />
+                {errors.memoryGb && (
+                  <p className="text-sm text-destructive">
+                    {errors.memoryGb.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Storage Field */}
+              <div className="grid gap-2">
+                <Label htmlFor="storage">
+                  Storage (GB) <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="storage"
+                  type="number"
+                  min="1"
+                  placeholder="e.g., 1, 2, 4, 8"
+                  {...register("storageGb", {
+                    required: "Storage là bắt buộc",
+                    min: {
+                      value: 1,
+                      message: "Storage phải có ít nhất 1 GB",
+                    },
+                    valueAsNumber: true,
+                  })}
+                />
+                {errors.storageGb && (
+                  <p className="text-sm text-destructive">
+                    {errors.storageGb.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Backing Image Field */}
+              <FormField
+                control={control}
+                name="backingImage"
+                rules={{ required: "Hệ điều hành là bắt buộc" }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Hệ điều hành *</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={loading || loadingBackingImages}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue
+                            placeholder={
+                              loadingBackingImages
+                                ? "Đang tải..."
+                                : "Chọn hệ điều hành"
+                            }
+                          />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {backingImages.map((backingImage) => (
+                          <SelectItem
+                            key={backingImage.name}
+                            value={backingImage.name}
+                          >
+                            {backingImage.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Chọn hệ điều hành cho môi trường thực hành
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.name && (
-                <p className="text-sm text-destructive">
-                  {errors.name.message}
-                </p>
-              )}
+
+              {/* Description Field */}
+              <div className="grid gap-2">
+                <Label htmlFor="description">Mô tả</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Mô tả tùy chọn..."
+                  rows={3}
+                  {...register("description")}
+                />
+              </div>
             </div>
 
-            {/* CPU Field */}
-            <div className="grid gap-2">
-              <Label htmlFor="cpu">
-                CPU (cores) <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="cpu"
-                type="number"
-                min="1"
-                placeholder="e.g., 1, 2, 4"
-                {...register("cpuCores", {
-                  required: "CPU là bắt buộc",
-                  min: {
-                    value: 1,
-                    message: "CPU phải có ít nhất 1 core",
-                  },
-                  valueAsNumber: true,
-                })}
-              />
-              {errors.cpuCores && (
-                <p className="text-sm text-destructive">
-                  {errors.cpuCores.message}
-                </p>
-              )}
-            </div>
-
-            {/* Memory Field */}
-            <div className="grid gap-2">
-              <Label htmlFor="memory">
-                Memory (GB) <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="memory"
-                type="number"
-                min="1"
-                placeholder="e.g., 1, 2, 4, 8"
-                {...register("memoryGb", {
-                  required: "Memory là bắt buộc",
-                  min: {
-                    value: 1,
-                    message: "Memory phải có ít nhất 1 GB",
-                  },
-                  valueAsNumber: true,
-                })}
-              />
-              {errors.memoryGb && (
-                <p className="text-sm text-destructive">
-                  {errors.memoryGb.message}
-                </p>
-              )}
-            </div>
-
-            {/* Memory Field */}
-            <div className="grid gap-2">
-              <Label htmlFor="storage">
-                Storage (GB) <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="storage"
-                type="number"
-                min="1"
-                placeholder="e.g., 1, 2, 4, 8"
-                {...register("storageGb", {
-                  required: "Storage là bắt buộc",
-                  min: {
-                    value: 1,
-                    message: "Storage phải có ít nhất 1 GB",
-                  },
-                  valueAsNumber: true,
-                })}
-              />
-              {errors.storageGb && (
-                <p className="text-sm text-destructive">
-                  {errors.storageGb.message}
-                </p>
-              )}
-            </div>
-
-            {/* Description Field */}
-            <div className="grid gap-2">
-              <Label htmlFor="description">Mô tả</Label>
-              <Textarea
-                id="description"
-                placeholder="Mô tả tùy chọn..."
-                rows={3}
-                {...register("description")}
-              />
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              Hủy
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Đang lưu..." : isEdit ? "Cập nhật" : "Tạo"}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={loading}
+              >
+                Hủy
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? "Đang lưu..." : isEdit ? "Cập nhật" : "Tạo"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

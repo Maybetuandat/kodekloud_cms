@@ -12,19 +12,15 @@ import { LabDetail } from "./app/labs/detail-page/lab-detail";
 import LabPage from "./app/labs/index-page/lab-page";
 import UserPage from "./app/user/user-page";
 import SubjectPage from "./app/subject/subject-page";
-import CategoryPage from "./app/category/category-page";
 import InstanceTypePage from "./app/instancetype/instance-type-page";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Root Layout */}
         <Route path="/" element={<MainLayout />}>
-          {/* Home */}
           <Route index element={<SubjectPage />} />
 
-          {/* Courses Section */}
           <Route path="courses">
             <Route index element={<CoursePage />} />
             <Route path="new" element={<NewCoursePage />} />
@@ -35,14 +31,10 @@ function App() {
             <Route index element={<LabPage />} />
             <Route path=":labId" element={<LabDetail />} />
           </Route>
-          {/* Subject Section */}
           <Route path="subjects" element={<SubjectPage />} />
 
           <Route path="users">
             <Route index element={<UserPage />} />
-          </Route>
-          <Route path="categories">
-            <Route index element={<CategoryPage />} />
           </Route>
           <Route path="instancetypes">
             <Route index element={<InstanceTypePage />} />

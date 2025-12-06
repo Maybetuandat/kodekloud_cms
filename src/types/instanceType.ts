@@ -13,6 +13,7 @@ export interface CreateInstanceTypeRequest {
   memoryGb: number;
   storageGb: number;
   description?: string;
+  backingImage: string;
 }
 
 export interface UpdateInstanceTypeRequest {
@@ -21,4 +22,5 @@ export interface UpdateInstanceTypeRequest {
   memoryGb?: number;
   storageGb?: number;
   description?: string;
+  backingImage?: string;
 }

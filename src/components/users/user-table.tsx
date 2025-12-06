@@ -91,7 +91,7 @@ export const UserTable: FC<UserTableProps> = ({
       <div className="border rounded-lg p-12 text-center">
         <p className="text-muted-foreground text-lg">Chưa có người dùng</p>
         <p className="text-sm text-muted-foreground mt-2">
-          Hãy thử điều chỉnh tiêu chí tìm kiếm hoặc bộ lọc
+          điều chỉnh tiêu chí tìm kiếm hoặc bộ lọc
         </p>
       </div>
     );
@@ -133,7 +133,7 @@ export const UserTable: FC<UserTableProps> = ({
               </TableCell>
               <TableCell>
                 <Badge variant="outline" className="capitalize">
-                  {user.role || "User"}
+                  {user.role.name}
                 </Badge>
               </TableCell>
               <TableCell>

@@ -32,13 +32,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Lab, CreateLabRequest, UpdateLabRequest } from "@/types/lab";
 import { toast } from "sonner";
-import { categoryService } from "@/services/categoryService";
-import { Category } from "@/types/category";
-import BackingImage from "@/types/backingImages";
 import { InstanceType } from "@/types/instanceType";
-import { labService } from "@/services/labService";
 import { instanceTypeService } from "@/services/instanceTypeService";
-
 const createLabFormSchema = (t: any) =>
   z.object({
     title: z.string().min(1, t("labs.validation.nameRequired")),
@@ -47,10 +42,6 @@ const createLabFormSchema = (t: any) =>
       .number()
       .min(1, t("labs.validation.timeMin"))
       .max(600, t("labs.validation.timeMax")),
-    categoryId: z.number().min(1, "Vui lòng chọn danh mục"),
-    backingImage: z
-      .string()
-      .min(1, "Vui lòng chọn hệ điều hành cho bài thực hành"),
     instanceTypeId: z.number().min(1, "Vui lòng chọn loại instance"),
   });
 
@@ -72,11 +63,8 @@ export function LabFormDialog({
   const { t } = useTranslation("common");
   const isEditMode = !!lab;
   const submitInProgressRef = useRef(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [backingImages, setBackingImages] = useState<BackingImage[]>([]);
+
   const [instanceTypes, setInstanceTypes] = useState<InstanceType[]>([]);
-  const [loadingCategories, setLoadingCategories] = useState(false);
-  const [loadingBackingImages, setLoadingBackingImages] = useState(false);
   const [loadingInstanceTypes, setLoadingInstanceTypes] = useState(false);
 
   const labFormSchema = createLabFormSchema(t);
@@ -88,43 +76,12 @@ export function LabFormDialog({
       title: "",
       description: "",
       estimatedTime: 60,
-      categoryId: undefined,
-      backingImage: "",
       instanceTypeId: undefined,
     },
   });
 
   // Load categories, backing images, and instance types when dialog opens
   useEffect(() => {
-    const loadCategories = async () => {
-      if (!open) return;
-
-      try {
-        setLoadingCategories(true);
-        const response = await categoryService.getAllCategories();
-        setCategories(response);
-      } catch (error) {
-        console.error("Failed to load categories:", error);
-        toast.error("Không thể tải danh sách danh mục");
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
-
-    const loadBackingImages = async () => {
-      if (!open) return;
-      try {
-        setLoadingBackingImages(true);
-        const response = await labService.getBackingImages();
-        setBackingImages(response);
-      } catch (error) {
-        console.error("Failed to load backing images:", error);
-        toast.error("Không thể tải danh sách hệ điều hành cho bài thực hành");
-      } finally {
-        setLoadingBackingImages(false);
-      }
-    };
-
     const loadInstanceTypes = async () => {
       if (!open) return;
       try {
@@ -139,8 +96,6 @@ export function LabFormDialog({
       }
     };
 
-    loadCategories();
-    loadBackingImages();
     loadInstanceTypes();
   }, [open]);
 
@@ -151,8 +106,7 @@ export function LabFormDialog({
         title: lab.title,
         description: lab.description || "",
         estimatedTime: lab.estimatedTime,
-        categoryId: lab.category?.id,
-        backingImage: lab.backingImage || "",
+
         instanceTypeId: lab.instanceType?.id,
       });
     } else if (open && !lab) {
@@ -160,8 +114,6 @@ export function LabFormDialog({
         title: "",
         description: "",
         estimatedTime: 60,
-        categoryId: undefined,
-        backingImage: "",
         instanceTypeId: undefined,
       });
     }
@@ -172,14 +124,13 @@ export function LabFormDialog({
 
     try {
       submitInProgressRef.current = true;
-      // Chuyển đổi LabFormData thành CreateLabRequest/UpdateLabRequest
+
       const labRequest: CreateLabRequest | UpdateLabRequest = {
         title: data.title,
         description: data.description,
         estimatedTime: data.estimatedTime,
-        backingImage: data.backingImage,
+
         instanceTypeId: data.instanceTypeId,
-        categoryId: data.categoryId,
       };
       await onSubmit(labRequest);
       form.reset();
@@ -253,86 +204,6 @@ export function LabFormDialog({
                       autoComplete="off"
                     />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="categoryId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Danh mục *</FormLabel>
-                  <Select
-                    onValueChange={(value) => field.onChange(parseInt(value))}
-                    value={field.value?.toString()}
-                    disabled={loading || loadingCategories}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={
-                            loadingCategories ? "Đang tải..." : "Chọn danh mục"
-                          }
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem
-                          key={category.id}
-                          value={category.id.toString()}
-                        >
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Chọn danh mục phù hợp cho lab này
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="backingImage"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hệ điều hành *</FormLabel>
-                  <Select
-                    onValueChange={(value) => field.onChange(value)}
-                    value={field.value?.toString()}
-                    disabled={loading || loadingBackingImages}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={
-                            loadingBackingImages
-                              ? "Đang tải..."
-                              : "Chọn hệ điều hành"
-                          }
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {backingImages.map((backingImage) => (
-                        <SelectItem
-                          key={backingImage.name}
-                          value={backingImage.name}
-                        >
-                          {backingImage.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Chọn hệ điều hành cho môi trường thực hành
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -447,11 +318,7 @@ export function LabFormDialog({
               <Button
                 type="submit"
                 disabled={
-                  loading ||
-                  submitInProgressRef.current ||
-                  loadingCategories ||
-                  loadingBackingImages ||
-                  loadingInstanceTypes
+                  loading || submitInProgressRef.current || loadingInstanceTypes
                 }
               >
                 {(loading || submitInProgressRef.current) && (

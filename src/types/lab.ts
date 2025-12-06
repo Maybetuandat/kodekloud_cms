@@ -1,4 +1,3 @@
-import { Category } from "./category";
 import { InstanceType } from "./instanceType";
 
 export interface Lab {
@@ -8,8 +7,6 @@ export interface Lab {
   estimatedTime: number;
   isActive: boolean;
   createdAt: string;
-  category: Category;
-  backingImage?: string;
   instanceType: InstanceType;
   namespace: string;
 }
@@ -18,10 +15,7 @@ export interface CreateLabRequest {
   title: string;
   description?: string;
   estimatedTime: number;
-  backingImage?: string;
   instanceTypeId: number;
-  categoryId: number;
-  namespace: string;
 }
 
 export interface UpdateLabRequest extends CreateLabRequest {}

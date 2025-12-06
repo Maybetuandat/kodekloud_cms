@@ -1,3 +1,5 @@
+import { Role } from "./role";
+
 export interface User {
   id: number;
   lastName: string;
@@ -6,7 +8,7 @@ export interface User {
   email: string;
   phoneNumber: string;
   isActive: boolean;
-  role: string;
+  role: Role;
 }
 
 export interface CreateUserRequest {

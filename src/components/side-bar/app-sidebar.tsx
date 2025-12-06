@@ -60,12 +60,6 @@ export function AppSidebar({
         isActive: location.pathname.startsWith("/users"),
       },
       {
-        title: t("navigation.categories"),
-        url: "/categories",
-        icon: LayoutGrid,
-        isActive: location.pathname.startsWith("/categories"),
-      },
-      {
         title: t("navigation.instancetypes"),
         url: "/instancetypes",
         icon: Cpu,
