@@ -124,6 +124,7 @@ export const useLabQuestions = ({
     setUploadResult(null);
 
     try {
+      console.log("debug question in file hook", questions);
       const result = await questionService.bulkCreateQuestionsFromExcel(
         labId,
         questions

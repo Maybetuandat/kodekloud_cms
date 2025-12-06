@@ -7,7 +7,7 @@ export interface Question {
   solution: string;
   createdAt: string;
   checkCommand: string;
-  typeQuestion: string;
+  typeQuestion: number;
   updatedAt: string;
   answers: Answer[];
 }
@@ -25,7 +25,6 @@ export interface UpdateQuestionRequest {
   solution?: string;
 }
 
-// Filters for querying questions
 export interface QuestionFilters {
   search?: string;
   labId?: number;
@@ -34,7 +33,6 @@ export interface QuestionFilters {
   pageSize?: number;
 }
 
-// Paginated response
 export interface QuestionsPaginatedResponse {
   data: Question[];
   total: number;

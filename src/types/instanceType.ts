@@ -5,6 +5,7 @@ export interface InstanceType {
   memoryGb: number;
   storageGb: number;
   description?: string;
+  backingImage: string;
 }
 
 export interface CreateInstanceTypeRequest {

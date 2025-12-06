@@ -76,21 +76,24 @@ export const InstanceTypeDialog: FC<InstanceTypeDialogProps> = ({
   } = methods;
 
   const [loadingBackingImages, setLoadingBackingImages] = useState(false);
+  const [hasLoadedImages, setHasLoadedImages] = useState(false);
+
+  const loadBackingImages = async () => {
+    if (hasLoadedImages) return;
+    try {
+      setLoadingBackingImages(true);
+      const response = await labService.getBackingImages();
+      setBackingImages(response);
+      setHasLoadedImages(true);
+    } catch (error) {
+      console.error("Failed to load backing images:", error);
+      toast.error("Không thể tải danh sách hệ điều hành cho bài thực hành");
+    } finally {
+      setLoadingBackingImages(false);
+    }
+  };
 
   useEffect(() => {
-    const loadBackingImages = async () => {
-      if (!open) return;
-      try {
-        setLoadingBackingImages(true);
-        const response = await labService.getBackingImages();
-        setBackingImages(response);
-      } catch (error) {
-        console.error("Failed to load backing images:", error);
-        toast.error("Không thể tải danh sách hệ điều hành cho bài thực hành");
-      } finally {
-        setLoadingBackingImages(false);
-      }
-    };
     if (open) {
       if (instanceType) {
         reset({
@@ -99,7 +102,7 @@ export const InstanceTypeDialog: FC<InstanceTypeDialogProps> = ({
           memoryGb: instanceType.memoryGb,
           storageGb: instanceType.storageGb,
           description: instanceType.description || "",
-          backingImage: "",
+          backingImage: instanceType.backingImage || "",
         });
       } else {
         reset({
@@ -111,8 +114,9 @@ export const InstanceTypeDialog: FC<InstanceTypeDialogProps> = ({
           backingImage: "",
         });
       }
+      setHasLoadedImages(false);
+      setBackingImages([]);
     }
-    loadBackingImages();
   }, [open, instanceType, reset]);
 
   const handleFormSubmit = (data: CreateInstanceTypeRequest) => {
@@ -246,7 +250,13 @@ export const InstanceTypeDialog: FC<InstanceTypeDialogProps> = ({
                     <Select
                       onValueChange={field.onChange}
                       value={field.value}
+                      defaultValue={field.value}
                       disabled={loading || loadingBackingImages}
+                      onOpenChange={(open) => {
+                        if (open) {
+                          loadBackingImages();
+                        }
+                      }}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -260,6 +270,14 @@ export const InstanceTypeDialog: FC<InstanceTypeDialogProps> = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        {field.value &&
+                          !backingImages.find(
+                            (img) => img.name === field.value
+                          ) && (
+                            <SelectItem value={field.value}>
+                              {field.value}
+                            </SelectItem>
+                          )}
                         {backingImages.map((backingImage) => (
                           <SelectItem
                             key={backingImage.name}

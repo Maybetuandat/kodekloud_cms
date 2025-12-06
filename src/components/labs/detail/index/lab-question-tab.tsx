@@ -2,8 +2,6 @@ import { useLabQuestions } from "@/app/labs/detail-page/use-lab-question";
 import { Card, CardContent } from "@/components/ui/card";
 import { DeleteQuestionDialog } from "./question/delete-question-dialog";
 import { EditQuestionDialog } from "./question/edit-question-dialog";
-import { LoadingState } from "./question/loading-state";
-
 import { LabQuestionsHeader } from "./question/question-header";
 import { LabQuestionsList } from "./question/question-list";
 import { LabUploadExcelDialog } from "./question/upload-question-excel-dialog";

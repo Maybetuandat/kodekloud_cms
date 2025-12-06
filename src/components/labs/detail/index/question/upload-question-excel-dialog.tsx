@@ -122,6 +122,20 @@ export function LabUploadExcelDialog({
     excelService.downloadTemplate();
   };
 
+  const getTypeQuestionLabel = (typeQuestion?: number) => {
+    if (typeQuestion === undefined || typeQuestion === null)
+      return { label: "Không xác định", variant: "secondary" as const };
+
+    switch (typeQuestion) {
+      case 0:
+        return { label: "Không kiểm tra", variant: "secondary" as const };
+      case 1:
+        return { label: "Kiểm tra hạ tầng", variant: "default" as const };
+      default:
+        return { label: `Loại ${typeQuestion}`, variant: "outline" as const };
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh]">
@@ -279,17 +293,30 @@ export function LabUploadExcelDialog({
                       </div>
 
                       <div className="space-y-3">
-                        {/* Type Question */}
-                        {q.typeQuestion && (
-                          <div className="rounded-lg border bg-muted/20 p-4">
-                            <div className="text-xs font-bold text-primary uppercase tracking-wide mb-1">
-                              Loại câu hỏi
+                        {/* Type Question - Updated display */}
+                        {q.typeQuestion !== undefined &&
+                          q.typeQuestion !== null && (
+                            <div className="rounded-lg border bg-muted/20 p-4">
+                              <div className="flex items-center justify-between">
+                                <div className="text-xs font-bold text-primary uppercase tracking-wide">
+                                  Có truyền lệnh kiểm tra không?
+                                </div>
+                                {(() => {
+                                  const typeInfo = getTypeQuestionLabel(
+                                    q.typeQuestion
+                                  );
+                                  return typeInfo ? (
+                                    <Badge
+                                      variant={typeInfo.variant}
+                                      className="text-xs"
+                                    >
+                                      {typeInfo.label}
+                                    </Badge>
+                                  ) : null;
+                                })()}
+                              </div>
                             </div>
-                            <div className="text-sm font-medium">
-                              {q.typeQuestion}
-                            </div>
-                          </div>
-                        )}
+                          )}
 
                         {/* Check Command */}
                         {q.checkCommand && (

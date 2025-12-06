@@ -16,11 +16,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { Skeleton } from "@/components/ui/skeleton";
 import { InstanceType } from "@/types/instanceType";
-import { date } from "zod";
-
 interface InstanceTypeTableProps {
   instanceTypes: InstanceType[];
   loading: boolean;
@@ -45,6 +42,9 @@ export const InstanceTypeTable: FC<InstanceTypeTableProps> = ({
               <TableHead>CPU (cores)</TableHead>
               <TableHead>Memory (GB)</TableHead>
               <TableHead className="hidden md:table-cell">Mô tả</TableHead>
+              <TableHead className="hidden md:table-cell">
+                Hệ điều hành
+              </TableHead>
               <TableHead className="w-[80px] text-right">Hành động</TableHead>
             </TableRow>
           </TableHeader>
@@ -72,7 +72,8 @@ export const InstanceTypeTable: FC<InstanceTypeTableProps> = ({
               <TableHead>Tên</TableHead>
               <TableHead>CPU (cores)</TableHead>
               <TableHead>Memory (GB)</TableHead>
-              <TableHead className="hidden md:table-cell">Mô tả</TableHead>
+              <TableHead className="">Mô tả</TableHead>
+              <TableHead className="">Hệ điều hành</TableHead>
               <TableHead className="w-[80px] text-right">Hành động</TableHead>
             </TableRow>
           </TableHeader>
@@ -98,6 +99,7 @@ export const InstanceTypeTable: FC<InstanceTypeTableProps> = ({
             <TableHead>CPU (cores)</TableHead>
             <TableHead>Memory (GB)</TableHead>
             <TableHead className="hidden md:table-cell">Mô tả</TableHead>
+            <TableHead className="hidden md:table-cell">Hệ điều hành</TableHead>
             <TableHead className="w-[80px] text-right">Hành động</TableHead>
           </TableRow>
         </TableHeader>
@@ -120,6 +122,15 @@ export const InstanceTypeTable: FC<InstanceTypeTableProps> = ({
                 {instanceType.description ? (
                   <span className="text-sm line-clamp-2">
                     {instanceType.description}
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground">-</span>
+                )}
+              </TableCell>
+              <TableCell className="hidden md:table-cell">
+                {instanceType.description ? (
+                  <span className="text-sm line-clamp-2">
+                    {instanceType.backingImage}
                   </span>
                 ) : (
                   <span className="text-muted-foreground">-</span>

@@ -73,11 +73,7 @@ export const questionService = {
     labId: number,
     data: CreateQuestionRequest
   ): Promise<Question> => {
-    return api.post<Question>(`${LABS_ENDPOINT}/${labId}/questions`, {
-      question: data.question,
-      hint: data.hint,
-      solution: data.solution,
-    });
+    return api.post<Question>(`${LABS_ENDPOINT}/${labId}/questions`, data);
   },
 
   // Update question
