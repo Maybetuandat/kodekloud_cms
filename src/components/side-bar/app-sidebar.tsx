@@ -2,7 +2,6 @@ import * as React from "react";
 import {
   HelpCircleIcon,
   Boxes,
-  LayoutGrid,
   Tags,
   BookOpen,
   FlaskConical,
@@ -24,6 +23,7 @@ import {
 import { NavMain } from "./nav-main";
 import { NavSecondary } from "./nav-secondary";
 import { NavUser } from "./nav-user";
+import { useAuth } from "@/contexts/auth-context";
 
 export function AppSidebar({
   variant,
@@ -31,41 +31,58 @@ export function AppSidebar({
 }: { variant?: string } & React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
   const { t } = useTranslation();
+  const { hasAnyRole } = useAuth();
+
+  // Define nav items with role requirements
+  const allNavItems = [
+    {
+      title: t("navigation.subject"),
+      url: "/subjects",
+      icon: Tags,
+      isActive:
+        location.pathname === "/" || location.pathname.startsWith("/subjects"),
+      requiredRoles: ["ROLE_ADMIN", "ROLE_LECTURER"],
+    },
+    {
+      title: t("navigation.courses"),
+      url: "/courses",
+      icon: BookOpen,
+      isActive: location.pathname.startsWith("/courses"),
+      requiredRoles: [], // All authenticated users
+    },
+    {
+      title: t("navigation.labs"),
+      url: "/labs",
+      icon: FlaskConical,
+      isActive: location.pathname.startsWith("/labs"),
+      requiredRoles: [], // All authenticated users
+    },
+    {
+      title: t("navigation.users"),
+      url: "/users",
+      icon: User,
+      isActive: location.pathname.startsWith("/users"),
+      requiredRoles: ["ROLE_ADMIN"],
+    },
+    {
+      title: t("navigation.instancetypes"),
+      url: "/instancetypes",
+      icon: Cpu,
+      isActive: location.pathname.startsWith("/instancetypes"),
+      requiredRoles: ["ROLE_ADMIN"],
+    },
+  ];
+
+  // Filter nav items based on user roles
+  const navMain = allNavItems.filter((item) => {
+    if (item.requiredRoles.length === 0) {
+      return true; // Show to all authenticated users
+    }
+    return hasAnyRole(item.requiredRoles);
+  });
 
   const data = {
-    navMain: [
-      {
-        title: t("navigation.subject"),
-        url: "/subjects",
-        icon: Tags,
-        isActive:
-          location.pathname == "/" || location.pathname.startsWith("/subjects"),
-      },
-      {
-        title: t("navigation.courses"),
-        url: "/courses",
-        icon: BookOpen,
-        isActive: location.pathname.startsWith("/courses"),
-      },
-      {
-        title: t("navigation.labs"),
-        url: "/labs",
-        icon: FlaskConical,
-        isActive: location.pathname.startsWith("/labs"),
-      },
-      {
-        title: t("navigation.users"),
-        url: "/users",
-        icon: User,
-        isActive: location.pathname.startsWith("/users"),
-      },
-      {
-        title: t("navigation.instancetypes"),
-        url: "/instancetypes",
-        icon: Cpu,
-        isActive: location.pathname.startsWith("/instancetypes"),
-      },
-    ],
+    navMain: navMain.map(({ requiredRoles, ...item }) => item), // Remove requiredRoles from final output
     navSecondary: [
       {
         title: t("navigation.feedback"),
