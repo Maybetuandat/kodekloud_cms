@@ -68,7 +68,7 @@ class AuthService {
     }
 
     const response = await api.post<TokenRefreshResponse>(
-      "/api/auth/refreshtoken",
+      "/auth/refreshtoken",
       { refreshToken }
     );
 

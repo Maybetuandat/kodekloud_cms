@@ -37,7 +37,7 @@ class ApiClient {
       throw new Error("No refresh token available");
     }
 
-    const response = await fetch(`${this.baseURL}/api/auth/refreshtoken`, {
+    const response = await fetch(`${this.baseURL}/auth/refreshtoken`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -73,8 +73,8 @@ class ApiClient {
 
     // Add auth token if available (except for auth endpoints)
     const isAuthEndpoint =
-      endpoint.includes("/api/auth/login") ||
-      endpoint.includes("/api/auth/refreshtoken");
+      endpoint.includes("/auth/login") ||
+      endpoint.includes("/auth/refreshtoken");
 
     if (!isAuthEndpoint) {
       const token = this.getAuthToken();
