@@ -5,9 +5,10 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { authService, JwtResponse, LoginRequest } from "@/services/authService";
+import { authService } from "@/services/authService";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { LoginRequest, JwtResponse } from "@/types/auth";
 
 interface User {
   id: number;

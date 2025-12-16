@@ -1,56 +1,22 @@
 import { api } from "@/lib/api";
-
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-export interface SignupRequest {
-  email: string;
-  ten: string;
-  password: string;
-}
-
-export interface JwtResponse {
-  accessToken: string;
-  refreshToken: string;
-  id: number;
-  username: string;
-  email: string;
-  roles: string[];
-}
-
-export interface TokenRefreshResponse {
-  accessToken: string;
-  refreshToken: string;
-}
-
-export interface RefreshTokenRequest {
-  refreshToken: string;
-}
-
-export interface MessageResponse {
-  message: string;
-}
+import { LoginRequest, JwtResponse, TokenRefreshResponse } from "@/types/auth";
 
 class AuthService {
   private readonly AUTH_TOKEN_KEY = "authToken";
   private readonly REFRESH_TOKEN_KEY = "refreshToken";
   private readonly USER_INFO_KEY = "userInfo";
 
-  /**
-   * Login user
-   */
   async login(loginRequest: LoginRequest): Promise<JwtResponse> {
     const response = await api.post<JwtResponse>("/auth/login", loginRequest);
 
-    // Lưu tokens và user info vào localStorage
     this.setAuthToken(response.accessToken);
     this.setRefreshToken(response.refreshToken);
     this.setUserInfo({
       id: response.id,
       username: response.username,
       email: response.email,
+      firstName: response.firstName,
+      lastName: response.lastName,
       roles: response.roles,
     });
 
@@ -135,6 +101,8 @@ class AuthService {
   setUserInfo(userInfo: {
     id: number;
     username: string;
+    firstName: string;
+    lastName: string;
     email: string;
     roles: string[];
   }): void {

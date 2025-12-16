@@ -8,7 +8,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -26,28 +25,17 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-
 import { ThemeSettingsPanel } from "@/components/theme/theme-settings-panel";
-
-interface UserInfo {
-  id: string;
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  fullName: string;
-  isPremium: boolean;
-}
-
+import { UserInfo } from "@/types/user";
 
 const getMockUserData = (): UserInfo => {
   // Kiểm tra localStorage trước
-  const storedUser = localStorage.getItem('userInfo');
+  const storedUser = localStorage.getItem("userInfo");
   if (storedUser) {
     try {
       return JSON.parse(storedUser);
     } catch (error) {
-      console.error('Error parsing stored user data:', error);
+      console.error("Error parsing stored user data:", error);
     }
   }
 
@@ -73,10 +61,10 @@ const fetchUserInfo = (): Promise<UserInfo> => {
 };
 
 export function NavUser() {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation("common");
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
-  
+
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -122,17 +110,13 @@ export function NavUser() {
   const handleLogout = useCallback(async () => {
     try {
       // Show loading toast
-     
+
       // Clear localStorage
-      localStorage.removeItem('userInfo');
-      localStorage.removeItem('authToken'); // nếu có
-      
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("authToken"); // nếu có
+
       // Simulate logout delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-     
-
-    
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Redirect after showing toast
       setTimeout(() => {
@@ -142,10 +126,8 @@ export function NavUser() {
       console.error("Logout error:", error);
 
       // Clear local data anyway
-      localStorage.removeItem('userInfo');
-      localStorage.removeItem('authToken');
-
-    
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("authToken");
 
       setTimeout(() => {
         navigate("/login", { replace: true });
@@ -259,30 +241,30 @@ export function NavUser() {
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={handleAccountClick}>
                 <UserCircleIcon />
-                {t('sidebar.account')}
+                {t("sidebar.account")}
               </DropdownMenuItem>
               {isPremium && (
                 <DropdownMenuItem>
                   <span className="text-yellow-600 font-medium">
-                    ✨ {t('sidebar.premiumAccount')}
+                    ✨ {t("sidebar.premiumAccount")}
                   </span>
                 </DropdownMenuItem>
               )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <ThemeSettingsPanel 
+            <ThemeSettingsPanel
               variant="dialog"
               trigger={
                 <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                   <Settings />
-                  {t('sidebar.settings')}
+                  {t("sidebar.settings")}
                 </DropdownMenuItem>
               }
             />
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOutIcon />
-              {t('sidebar.logout')}
+              {t("sidebar.logout")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

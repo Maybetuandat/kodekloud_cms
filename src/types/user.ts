@@ -1,5 +1,3 @@
-import { Role } from "./role";
-
 export interface User {
   id: number;
   lastName: string;
@@ -8,7 +6,17 @@ export interface User {
   email: string;
   phoneNumber: string;
   isActive: boolean;
-  role: Role;
+  roleName: string;
+}
+
+export interface UserInfo {
+  id: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  fullName: string;
+  isPremium: boolean;
 }
 
 export interface CreateUserRequest {

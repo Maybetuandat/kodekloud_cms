@@ -72,7 +72,7 @@ export const InstanceTypeTable: FC<InstanceTypeTableProps> = ({
               <TableHead>Tên</TableHead>
               <TableHead>CPU (cores)</TableHead>
               <TableHead>Memory (GB)</TableHead>
-              <TableHead className="">Mô tả</TableHead>
+
               <TableHead className="">Hệ điều hành</TableHead>
               <TableHead className="w-[80px] text-right">Hành động</TableHead>
             </TableRow>
@@ -98,7 +98,6 @@ export const InstanceTypeTable: FC<InstanceTypeTableProps> = ({
             <TableHead>Tên</TableHead>
             <TableHead>CPU (cores)</TableHead>
             <TableHead>Memory (GB)</TableHead>
-            <TableHead className="hidden md:table-cell">Mô tả</TableHead>
             <TableHead className="hidden md:table-cell">Hệ điều hành</TableHead>
             <TableHead className="w-[80px] text-right">Hành động</TableHead>
           </TableRow>
@@ -119,16 +118,7 @@ export const InstanceTypeTable: FC<InstanceTypeTableProps> = ({
                 </code>
               </TableCell>
               <TableCell className="hidden md:table-cell">
-                {instanceType.description ? (
-                  <span className="text-sm line-clamp-2">
-                    {instanceType.description}
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground">-</span>
-                )}
-              </TableCell>
-              <TableCell className="hidden md:table-cell">
-                {instanceType.description ? (
+                {instanceType.backingImage ? (
                   <span className="text-sm line-clamp-2">
                     {instanceType.backingImage}
                   </span>

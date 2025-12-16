@@ -96,7 +96,9 @@ export default function InstanceTypePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Instance Types</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Thông số cấu hình
+          </h1>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />

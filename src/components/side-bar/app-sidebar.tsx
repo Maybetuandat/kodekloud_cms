@@ -21,7 +21,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { NavMain } from "./nav-main";
-import { NavSecondary } from "./nav-secondary";
 import { NavUser } from "./nav-user";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -83,13 +82,6 @@ export function AppSidebar({
 
   const data = {
     navMain: navMain.map(({ requiredRoles, ...item }) => item), // Remove requiredRoles from final output
-    navSecondary: [
-      {
-        title: t("navigation.feedback"),
-        url: "#",
-        icon: HelpCircleIcon,
-      },
-    ],
   };
 
   return (
@@ -119,7 +111,6 @@ export function AppSidebar({
       </SidebarHeader>
       <SidebarContent className="bg-sidebar">
         <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter className="bg-sidebar border-t border-sidebar-border">
         <NavUser />

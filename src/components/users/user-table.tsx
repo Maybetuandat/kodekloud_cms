@@ -133,7 +133,7 @@ export const UserTable: FC<UserTableProps> = ({
               </TableCell>
               <TableCell>
                 <Badge variant="outline" className="capitalize">
-                  {user.role.name}
+                  {user.roleName}
                 </Badge>
               </TableCell>
               <TableCell>
