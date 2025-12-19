@@ -27,37 +27,40 @@ import {
 
 import { ThemeSettingsPanel } from "@/components/theme/theme-settings-panel";
 import { UserInfo } from "@/types/user";
+import { getUserFromToken, isTokenExpired } from "@/utils/jwt";
 
-const getMockUserData = (): UserInfo => {
-  // Kiểm tra localStorage trước
-  const storedUser = localStorage.getItem("userInfo");
-  if (storedUser) {
-    try {
-      return JSON.parse(storedUser);
-    } catch (error) {
-      console.error("Error parsing stored user data:", error);
+const getUserInfoFromToken = (): UserInfo | null => {
+  try {
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      return null;
     }
+
+    if (isTokenExpired(token)) {
+      localStorage.removeItem("authToken");
+      return null;
+    }
+
+    const userData = getUserFromToken(token);
+
+    if (!userData) {
+      return null;
+    }
+
+    return {
+      id: userData.id.toString(),
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      username: userData.username,
+      email: userData.email,
+      fullName: `${userData.firstName} ${userData.lastName}`.trim(),
+      isPremium: userData.roles?.includes("PREMIUM") || false,
+    };
+  } catch (error) {
+    console.error("Error getting user info from token:", error);
+    return null;
   }
-
-  // Fallback to mock data
-  return {
-    id: "user-123",
-    firstName: "John",
-    lastName: "Doe",
-    username: "johndoe",
-    email: "john.doe@example.com",
-    fullName: "John Doe",
-    isPremium: false,
-  };
-};
-
-// Simulate API call với delay
-const fetchUserInfo = (): Promise<UserInfo> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(getMockUserData());
-    }, 500); // Simulate network delay
-  });
 };
 
 export function NavUser() {
@@ -66,28 +69,26 @@ export function NavUser() {
   const navigate = useNavigate();
 
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch user info - không còn dependency vào api
   useEffect(() => {
     let mounted = true;
 
-    const fetchUser = async () => {
-      if (hasLoaded) return; // Only fetch once
-
+    const loadUser = () => {
       try {
-        setLoading(true);
-        const userData = await fetchUserInfo(); // Sử dụng function local thay vì api
+        const userData = getUserInfoFromToken();
 
         if (mounted) {
           setUserInfo(userData);
-          setHasLoaded(true);
+
+          if (!userData) {
+            navigate("/login", { replace: true });
+          }
         }
       } catch (error) {
-        console.error("Failed to fetch user:", error);
+        console.error("Failed to load user:", error);
         if (mounted) {
-          setHasLoaded(true); // Mark as loaded even on error
+          navigate("/login", { replace: true });
         }
       } finally {
         if (mounted) {
@@ -96,12 +97,12 @@ export function NavUser() {
       }
     };
 
-    fetchUser();
+    loadUser();
 
     return () => {
       mounted = false;
     };
-  }, [hasLoaded]);
+  }, [navigate]);
 
   const handleAccountClick = useCallback(() => {
     navigate("/profile");
@@ -109,33 +110,19 @@ export function NavUser() {
 
   const handleLogout = useCallback(async () => {
     try {
-      // Show loading toast
+      localStorage.removeItem("authToken");
 
-      // Clear localStorage
-      localStorage.removeItem("userInfo");
-      localStorage.removeItem("authToken"); // nếu có
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Simulate logout delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Redirect after showing toast
-      setTimeout(() => {
-        navigate("/login", { replace: true });
-      }, 1000);
+      navigate("/login", { replace: true });
     } catch (error) {
       console.error("Logout error:", error);
 
-      // Clear local data anyway
-      localStorage.removeItem("userInfo");
       localStorage.removeItem("authToken");
-
-      setTimeout(() => {
-        navigate("/login", { replace: true });
-      }, 1000);
+      navigate("/login", { replace: true });
     }
-  }, [navigate, t]); // Removed api dependency
+  }, [navigate]);
 
-  // Helper functions - safe versions
   const getInitials = (user: UserInfo | null): string => {
     if (!user) return "U";
 
@@ -169,14 +156,12 @@ export function NavUser() {
     return user?.email || "user@example.com";
   };
 
-  // Render logic - simple and safe
   const displayName = getDisplayName(userInfo);
   const initials = getInitials(userInfo);
   const email = getEmail(userInfo);
   const isPremium = userInfo?.isPremium || false;
 
-  // Show loading skeleton
-  if (loading && !userInfo) {
+  if (loading) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>

@@ -70,7 +70,6 @@ export const LabCard: FC<LabCardProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1 text-sm text-muted-foreground">
             <BookOpen className="h-4 w-4" />
-            <span>ID: {lab.id}</span>
           </div>
 
           <div className="flex items-center gap-2">

@@ -81,7 +81,7 @@ export function AppSidebar({
   });
 
   const data = {
-    navMain: navMain.map(({ requiredRoles, ...item }) => item), // Remove requiredRoles from final output
+    navMain: navMain.map(({ requiredRoles, ...item }) => item),
   };
 
   return (
