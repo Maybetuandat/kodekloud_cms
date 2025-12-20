@@ -59,10 +59,10 @@ interface CourseFormProps {
 }
 
 const courseLevels = [
-  { value: "Beginner", label: "Beginner" },
-  { value: "Intermediate", label: "Intermediate" },
-  { value: "Advanced", label: "Advanced" },
-  { value: "Expert", label: "Expert" },
+  { value: "Cơ bản", label: "Cơ bản" },
+  { value: "Trung cấp", label: "Trung cấp" },
+  { value: "Nâng cao", label: "Nâng cao" },
+  { value: "Chuyên gia", label: "Chuyên gia" },
 ];
 
 export function CourseForm({
