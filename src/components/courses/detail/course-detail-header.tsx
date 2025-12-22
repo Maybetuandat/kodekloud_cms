@@ -53,16 +53,8 @@ export function CourseDetailHeader({
 
       <div className="flex gap-3 flex-wrap">
         {course.level ? (
-          <Badge variant="secondary">
-            {t(`courses.levels.${course.level.toLowerCase()}`)}
-          </Badge>
+          <Badge variant="secondary">{course.level.toLowerCase()}</Badge>
         ) : null}
-        {course.durationMinutes && (
-          <Badge variant="secondary">
-            {Math.floor(course.durationMinutes / 60)}h{" "}
-            {course.durationMinutes % 60}m
-          </Badge>
-        )}
       </div>
       {/* Edit Basic Info Modal */}
       <EditBasicInfoModal

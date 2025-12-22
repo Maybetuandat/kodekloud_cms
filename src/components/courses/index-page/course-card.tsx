@@ -57,12 +57,9 @@ export function CourseCard({
     }
   };
 
-  // Map category to icon and gradient color
   const getCategoryIconAndGradient = (categorySlug?: string) => {
-    // Get slug from category or use a default
     const slug = categorySlug?.toLowerCase() || "default";
 
-    // Return category config or default
     return (
       categoryMap[slug as keyof typeof categoryMap] || {
         Icon: Code,
@@ -70,16 +67,6 @@ export function CourseCard({
         name: "Programming",
       }
     );
-  };
-
-  const formatDuration = (minutes?: number) => {
-    if (!minutes) return null;
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hours > 0) {
-      return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
-    }
-    return `${mins}m`;
   };
 
   const formatDate = (dateString?: string) => {
@@ -99,7 +86,7 @@ export function CourseCard({
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden transition-all duration-200 hover:shadow-lg",
+        "group relative overflow-hidden transition-all duration-200 hover:shadow-lg h-[400px] flex flex-col",
         className
       )}
     >
@@ -144,34 +131,27 @@ export function CourseCard({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Icon Section with gradient background based on category */}
-      <div className={cn("h-40 bg-gradient-to-br", gradient, "relative")}>
+      {/* Icon Section */}
+      <div
+        className={cn(
+          "h-40 bg-gradient-to-br flex-shrink-0",
+          gradient,
+          "relative"
+        )}
+      >
         <div className="absolute inset-0 bg-black/10" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
             <CourseIcon className="h-10 w-10 text-white" />
           </div>
         </div>
-
-        {/* Duration Badge - Top Left */}
-        {formatDuration(course.durationMinutes) && (
-          <div className="absolute top-2 left-2">
-            <Badge
-              variant="secondary"
-              className="bg-black/30 text-white backdrop-blur-sm border-0 font-medium"
-            >
-              <Clock className="h-3 w-3 mr-1" />
-              {formatDuration(course.durationMinutes)}
-            </Badge>
-          </div>
-        )}
       </div>
 
       {/* Content */}
-      <CardContent className="p-4 space-y-3">
-        {/* Title & Description */}
-        <div>
-          <h3 className="font-semibold text-base line-clamp-2 mb-1.5">
+      <CardContent className="p-4 space-y-3 flex-1 flex flex-col">
+        {/* Title & Description - Fixed height */}
+        <div className="flex-shrink-0">
+          <h3 className="font-semibold text-base line-clamp-2 mb-1.5 h-12">
             {course.title}
           </h3>
           <div className="h-10">
@@ -181,11 +161,10 @@ export function CourseCard({
           </div>
         </div>
 
-        {/* Meta Information - All in one row */}
-        <div className="flex items-center justify-between gap-2 text-xs">
-          {/* Left side: Subject */}
+        {/* Meta Information */}
+        <div className="flex items-center justify-between gap-2 text-xs flex-shrink-0">
           {course.subject && (
-            <div className="flex items-center gap-1.5 text-muted-foreground">
+            <div className="flex items-center gap-1.5 text-muted-foreground min-w-0">
               <FolderOpen className="h-3.5 w-3.5 flex-shrink-0" />
               <span className="font-medium truncate">
                 {course.subject.title}
@@ -193,7 +172,6 @@ export function CourseCard({
             </div>
           )}
 
-          {/* Right side: Level & Status */}
           <div className="flex items-center gap-2 flex-shrink-0">
             {course.level && (
               <Badge
@@ -203,7 +181,7 @@ export function CourseCard({
                   getLevelColor(course.level)
                 )}
               >
-                {t(`courses.levels.${course.level.toLowerCase()}`)}
+                {course.level}
               </Badge>
             )}
             {!course.isActive && (
@@ -215,13 +193,17 @@ export function CourseCard({
         </div>
 
         {/* Updated Date */}
-        <div className="flex items-center text-xs text-muted-foreground pt-1 border-t">
-          <Calendar className="h-3 w-3 mr-1.5" />
-          <span>{formatDate(course.updatedAt)}</span>
+        <div className="flex items-center text-xs text-muted-foreground pt-1 border-t flex-shrink-0">
+          <Calendar className="h-3 w-3 mr-1.5 flex-shrink-0" />
+          <span className="truncate">{formatDate(course.updatedAt)}</span>
         </div>
 
         {/* View Button */}
-        <Button onClick={() => onView?.(course)} className="w-full" size="sm">
+        <Button
+          onClick={() => onView?.(course)}
+          className="w-full mt-auto"
+          size="sm"
+        >
           {t("courses.card.viewCourse")}
         </Button>
       </CardContent>

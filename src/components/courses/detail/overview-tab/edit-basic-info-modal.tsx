@@ -36,7 +36,6 @@ const basicInfoSchema = z.object({
   title: z.string().min(1, "Title is required"),
   shortDescription: z.string().optional(),
   level: z.string().min(1, "Level is required"),
-  durationMinutes: z.number().min(1, "Duration must be at least 1 minute"),
 });
 
 export type BasicInfoFormData = z.infer<typeof basicInfoSchema>;
@@ -62,7 +61,6 @@ export function EditBasicInfoModal({
       title: course.title,
       shortDescription: course.shortDescription,
       level: course.level,
-      durationMinutes: course.durationMinutes,
     },
   });
 
@@ -73,7 +71,6 @@ export function EditBasicInfoModal({
         title: course.title,
         shortDescription: course.shortDescription,
         level: course.level,
-        durationMinutes: course.durationMinutes,
       });
     }
   }, [isOpen, course, form]);
@@ -164,26 +161,6 @@ export function EditBasicInfoModal({
                       </SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Duration */}
-            <FormField
-              control={form.control}
-              name="durationMinutes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("courses.form.duration")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="60"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                    />
-                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

@@ -62,9 +62,7 @@ export default function LoginPage() {
               <GraduationCap className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">
-            Devops Infra Lab Platform
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold">Lab Platform</CardTitle>
         </CardHeader>
 
         <Form {...form}>
@@ -147,7 +145,7 @@ export default function LoginPage() {
       </Card>
 
       <div className="absolute bottom-4 text-center text-sm text-muted-foreground">
-        <p>© 2025 Devops Infra Lab Platform. All rights reserved.</p>
+        <p>© 2025 Lab Platform. All rights reserved.</p>
       </div>
     </div>
   );

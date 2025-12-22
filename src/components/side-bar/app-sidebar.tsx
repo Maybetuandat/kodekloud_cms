@@ -102,7 +102,7 @@ export function AppSidebar({
               <Link to="/">
                 <Boxes className="h-5 w-5 text-sidebar-primary" />
                 <span className="text-base font-semibold text-sidebar-foreground">
-                  Devops Infra
+                  Lab Platform
                 </span>
               </Link>
             </SidebarMenuButton>
