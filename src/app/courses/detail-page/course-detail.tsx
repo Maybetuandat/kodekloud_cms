@@ -1,7 +1,8 @@
+// app/courses/detail-page/course-detail.tsx
 import { CourseDetailHeader } from "@/components/courses/detail/course-detail-header";
 import { CourseLabsTab } from "@/app/courses/detail-page/lab-tab/lab-tabs";
 import { CourseOverviewTab } from "@/app/courses/detail-page/overview-tab/overview-tab";
-import { SelectLabsDialog } from "@/components/courses/detail/lab-tab/select-labs-dialog";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Course } from "@/types/course";
 import { useState } from "react";
@@ -47,7 +48,9 @@ export function CourseDetail() {
   // Users hook
   const {
     usersInCourse,
+    leaderboard,
     isLoading: isLoadingUsers,
+    isLoadingLeaderboard,
     currentPage: usersCurrentPage,
     totalPages: usersTotalPages,
     totalItems: usersTotalItems,
@@ -67,7 +70,6 @@ export function CourseDetail() {
     title: "",
     description: "",
     level: "",
-    durationMinutes: 0,
     updatedAt: "",
     shortDescription: "",
     isActive: false,
@@ -152,10 +154,14 @@ export function CourseDetail() {
               onFiltersChange={handleFiltersChange}
             />
           </TabsContent>
+
+          {/* Users Tab */}
           <TabsContent value="users" className="space-y-6 mt-6">
             <CourseUserTab
               isLoading={isLoadingUsers}
               usersInCourse={usersInCourse}
+              leaderboard={leaderboard}
+              isLoadingLeaderboard={isLoadingLeaderboard}
               currentPage={usersCurrentPage}
               totalPages={usersTotalPages}
               totalItems={usersTotalItems}

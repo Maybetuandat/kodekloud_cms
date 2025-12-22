@@ -1,10 +1,15 @@
+// app/courses/detail-page/user-tab/use-user-tab.ts
 import { userService } from "@/services/userService";
+import { leaderboardService } from "@/services/leaderboardService";
 import { User } from "@/types/user";
+import { LeaderboardEntry } from "@/types/leaderboard";
 import { useState, useCallback, useEffect } from "react";
 
 export const useCourseUsers = (courseId: number) => {
   const [usersInCourse, setUsersInCourse] = useState<User[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -14,6 +19,20 @@ export const useCourseUsers = (courseId: number) => {
   const [hasNext, setHasNext] = useState(false);
   const [hasPrevious, setHasPrevious] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const loadLeaderboard = useCallback(async () => {
+    if (!courseId) return;
+
+    try {
+      setIsLoadingLeaderboard(true);
+      const data = await leaderboardService.getLeaderboardByCourse(courseId);
+      setLeaderboard(data);
+    } catch (err) {
+      console.error("Failed to load leaderboard:", err);
+    } finally {
+      setIsLoadingLeaderboard(false);
+    }
+  }, [courseId]);
 
   const loadUsers = useCallback(async () => {
     if (!courseId) {
@@ -57,8 +76,9 @@ export const useCourseUsers = (courseId: number) => {
     if (!isInitialized) {
       setIsInitialized(true);
       loadUsers();
+      loadLeaderboard();
     }
-  }, [isInitialized, loadUsers]);
+  }, [isInitialized, loadUsers, loadLeaderboard]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -82,6 +102,7 @@ export const useCourseUsers = (courseId: number) => {
       try {
         await userService.removeUserFromCourse(courseId, userId);
         await loadUsers();
+        await loadLeaderboard();
       } catch (err) {
         const errorMessage =
           err instanceof Error
@@ -90,11 +111,14 @@ export const useCourseUsers = (courseId: number) => {
         throw new Error(errorMessage);
       }
     },
-    [courseId, currentPage, loadUsers]
+    [courseId, loadUsers, loadLeaderboard]
   );
+
   const refreshUsers = useCallback(() => {
     loadUsers();
-  }, [loadUsers]);
+    loadLeaderboard();
+  }, [loadUsers, loadLeaderboard]);
+
   useEffect(() => {
     if (isInitialized) {
       loadUsers();
@@ -103,7 +127,9 @@ export const useCourseUsers = (courseId: number) => {
 
   return {
     usersInCourse,
+    leaderboard,
     isLoading,
+    isLoadingLeaderboard,
     error,
     isInitialized,
     currentPage,
