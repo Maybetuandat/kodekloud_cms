@@ -9,6 +9,7 @@ import {
 import { toast } from "sonner";
 import { WebSocketService } from "@/services/webSocketService";
 import { labService } from "@/services/labService";
+import { authService } from "@/services/authService";
 
 interface UseLabTestState {
   isLoading: boolean;
@@ -54,7 +55,7 @@ export const useLabTest = (labId: number) => {
         isLoading: false,
       }));
 
-      // 2. Connect to WebSocket
+      // 2. Connect to WebSocket with token
       await connectWebSocket(response.websocketUrl);
 
       toast.success("Test started successfully");
@@ -74,12 +75,24 @@ export const useLabTest = (labId: number) => {
   }, [labId]);
 
   /**
-   * Connect to WebSocket
+   * Connect to WebSocket with authentication token
    */
   const connectWebSocket = useCallback(async (websocketUrl: string) => {
     try {
+      // Get authentication token
+      const token = authService.getAuthToken();
+
+      if (!token) {
+        throw new Error("No authentication token available");
+      }
+
+      // Append token to WebSocket URL
+      const urlWithToken = `${websocketUrl}&token=${encodeURIComponent(token)}`;
+
+      console.log("🔐 Connecting to WebSocket with token...");
+
       // Create WebSocket service
-      const wsService = new WebSocketService(websocketUrl);
+      const wsService = new WebSocketService(urlWithToken);
       wsServiceRef.current = wsService;
 
       // Subscribe to messages
@@ -113,7 +126,8 @@ export const useLabTest = (labId: number) => {
       setState((prev) => ({
         ...prev,
         connectionStatus: "error",
-        error: "Failed to connect to WebSocket",
+        error:
+          err instanceof Error ? err.message : "Failed to connect to WebSocket",
       }));
     }
   }, []);

@@ -1,3 +1,4 @@
+// src/services/webSocketService.ts
 import {
   TestMessage,
   TestConnectionStatus,
@@ -26,6 +27,7 @@ export class WebSocketService {
       this.ws = new WebSocket(this.websocketUrl);
 
       this.ws.onopen = () => {
+        console.log("✅ WebSocket connected to:", this.websocketUrl);
         this.notifyConnectionStatus("connected");
         resolve();
       };
@@ -35,12 +37,13 @@ export class WebSocketService {
       };
 
       this.ws.onerror = (error) => {
-        console.error("WebSocket error:", error);
+        console.error("❌ WebSocket error:", error);
         this.notifyConnectionStatus("error");
         reject(error);
       };
 
       this.ws.onclose = () => {
+        console.log("🔌 WebSocket disconnected");
         this.notifyConnectionStatus("disconnected");
       };
     });
@@ -52,6 +55,8 @@ export class WebSocketService {
   private handleMessage(event: MessageEvent) {
     try {
       const data = JSON.parse(event.data);
+      console.log("📨 WebSocket message received:", data);
+
       const message: TestMessage = {
         type: data.type || "log",
         message: data.message || "",
@@ -62,7 +67,7 @@ export class WebSocketService {
       this.notifyMessage(message);
       this.updateExecutionStatus(message);
     } catch (error) {
-      console.error("Error parsing WebSocket message:", error);
+      console.error("❌ Error parsing WebSocket message:", error);
     }
   }
 
@@ -70,12 +75,30 @@ export class WebSocketService {
    * Update execution status based on message type
    */
   private updateExecutionStatus(message: TestMessage) {
-    if (message.type === "start") {
-      this.notifyExecutionStatus("running");
-    } else if (message.type === "success") {
-      this.notifyExecutionStatus("completed");
-    } else if (message.type === "error") {
-      this.notifyExecutionStatus("failed");
+    // Map backend message types to execution status
+    switch (message.type) {
+      case "connection":
+      case "start":
+      case "info":
+        this.notifyExecutionStatus("running");
+        break;
+      case "success":
+        // Check if this is final success message
+        if (
+          message.message.includes("ready") ||
+          message.message.includes("completed")
+        ) {
+          this.notifyExecutionStatus("completed");
+        } else {
+          this.notifyExecutionStatus("running");
+        }
+        break;
+      case "error":
+        this.notifyExecutionStatus("failed");
+        break;
+      case "warning":
+        // Warning doesn't change execution status
+        break;
     }
   }
 
