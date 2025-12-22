@@ -1,24 +1,20 @@
 // app/courses/detail-page/user-tab/use-user-tab.ts
-import { userService } from "@/services/userService";
 import { leaderboardService } from "@/services/leaderboardService";
-import { User } from "@/types/user";
 import { LeaderboardEntry } from "@/types/leaderboard";
 import { useState, useCallback, useEffect } from "react";
+import { userService } from "@/services/userService";
 
 export const useCourseUsers = (courseId: number) => {
-  const [usersInCourse, setUsersInCourse] = useState<User[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+
+  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [hasNext, setHasNext] = useState(false);
-  const [hasPrevious, setHasPrevious] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
 
   const loadLeaderboard = useCallback(async () => {
     if (!courseId) return;
@@ -26,72 +22,38 @@ export const useCourseUsers = (courseId: number) => {
     try {
       setIsLoadingLeaderboard(true);
       const data = await leaderboardService.getLeaderboardByCourse(courseId);
-      setLeaderboard(data);
+
+      // Calculate pagination
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      const paginatedData = data.slice(start, end);
+
+      setLeaderboard(paginatedData);
+      setTotalItems(data.length);
+      setTotalPages(Math.ceil(data.length / pageSize));
     } catch (err) {
       console.error("Failed to load leaderboard:", err);
+      setError("Failed to load leaderboard");
     } finally {
       setIsLoadingLeaderboard(false);
     }
-  }, [courseId]);
-
-  const loadUsers = useCallback(async () => {
-    if (!courseId) {
-      console.warn("courseId is required to load users");
-      return;
-    }
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await userService.getUsersInCoursePaginated(
-        {
-          page: currentPage,
-          pageSize: pageSize,
-          search: searchTerm,
-        },
-        courseId
-      );
-
-      setUsersInCourse(response.data);
-      setTotalItems(response.totalItems);
-      setTotalPages(response.totalPages);
-      setCurrentPage(response.currentPage);
-      setIsInitialized(true);
-      setHasNext(response.hasNext);
-      setHasPrevious(response.hasPrevious);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to load users";
-      setError(errorMessage);
-      setUsersInCourse([]);
-      setTotalItems(0);
-      setTotalPages(0);
-      setHasNext(false);
-      setHasPrevious(false);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [courseId, pageSize, searchTerm, currentPage]);
+  }, [courseId, currentPage, pageSize]);
 
   const initializeUsers = useCallback(() => {
     if (!isInitialized) {
       setIsInitialized(true);
-      loadUsers();
       loadLeaderboard();
     }
-  }, [isInitialized, loadUsers, loadLeaderboard]);
+  }, [isInitialized, loadLeaderboard]);
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-  };
+  }, []);
 
-  const handlePageSizeChange = (size: number) => {
+  const handlePageSizeChange = useCallback((size: number) => {
     setPageSize(size);
-    setCurrentPage(1);
-  };
-
-  const handleSearchChange = (keyword: string) => {
-    setSearchTerm(keyword);
-  };
+    setCurrentPage(1); // Reset to first page when changing page size
+  }, []);
 
   const removeUserFromCourse = useCallback(
     async (userId: number) => {
@@ -101,7 +63,6 @@ export const useCourseUsers = (courseId: number) => {
 
       try {
         await userService.removeUserFromCourse(courseId, userId);
-        await loadUsers();
         await loadLeaderboard();
       } catch (err) {
         const errorMessage =
@@ -111,24 +72,21 @@ export const useCourseUsers = (courseId: number) => {
         throw new Error(errorMessage);
       }
     },
-    [courseId, loadUsers, loadLeaderboard]
+    [courseId, loadLeaderboard]
   );
 
   const refreshUsers = useCallback(() => {
-    loadUsers();
     loadLeaderboard();
-  }, [loadUsers, loadLeaderboard]);
+  }, [loadLeaderboard]);
 
   useEffect(() => {
     if (isInitialized) {
-      loadUsers();
+      loadLeaderboard();
     }
-  }, [courseId, currentPage, pageSize, searchTerm, loadUsers, isInitialized]);
+  }, [isInitialized, loadLeaderboard]);
 
   return {
-    usersInCourse,
     leaderboard,
-    isLoading,
     isLoadingLeaderboard,
     error,
     isInitialized,
@@ -136,13 +94,10 @@ export const useCourseUsers = (courseId: number) => {
     totalPages,
     totalItems,
     pageSize,
-    hasNext,
-    hasPrevious,
     initializeUsers,
     refreshUsers,
     handlePageChange,
     handlePageSizeChange,
-    handleSearchChange,
     removeUserFromCourse,
   };
 };

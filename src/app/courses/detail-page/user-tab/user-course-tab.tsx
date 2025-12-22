@@ -1,145 +1,138 @@
 // app/courses/detail-page/user-tab/user-course-tab.tsx
-import { User } from "@/types/user";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
-import FilterBar from "@/components/ui/filter-bar";
-import { Pagination } from "@/components/ui/pagination";
-import { UserTableCourseDetail } from "@/components/courses/detail/user-tab/user-table-in-course-detail";
 import { RemoveUserDialog } from "@/components/courses/detail/user-tab/remove-user-dialog-from-course";
 import { AddUsersToCourseDialog } from "@/components/courses/detail/user-tab/add-users-to-course-dialog";
-import { LeaderboardTable } from "@/components/courses/detail/user-tab/leaderboard-table";
+import { LeaderboardWithActions } from "@/components/courses/detail/user-tab/leaderboard-with-actions";
 import { LeaderboardEntry } from "@/types/leaderboard";
+import { Pagination } from "@/components/ui/pagination";
 
 interface CourseUserTabProps {
-  isLoading: boolean;
-  usersInCourse: User[];
+  isLoadingLeaderboard: boolean;
+  courseId: number;
+  onRemoveUser: (userId: number) => Promise<void>;
+  onRefresh: () => void;
+  leaderboard: LeaderboardEntry[];
   currentPage: number;
   totalPages: number;
   totalItems: number;
   pageSize: number;
-  hasNext: boolean;
-  hasPrevious: boolean;
-  courseId: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
-  onSearchChange: (search: string) => void;
-  onRemoveUser: (userId: number) => Promise<void>;
-  onRefresh: () => void;
-  leaderboard: LeaderboardEntry[];
-  isLoadingLeaderboard: boolean;
 }
 
 export default function CourseUserTab({
-  isLoading,
-  usersInCourse,
+  isLoadingLeaderboard,
+  courseId,
+  onRemoveUser,
+  onRefresh,
+  leaderboard,
   currentPage,
   totalPages,
   totalItems,
   pageSize,
-  hasNext,
-  hasPrevious,
-  courseId,
   onPageChange,
   onPageSizeChange,
-  onSearchChange,
-  onRemoveUser,
-  onRefresh,
-  leaderboard,
-  isLoadingLeaderboard,
 }: CourseUserTabProps) {
   const { t } = useTranslation(["courses", "common"]);
-  const [localSearchTerm, setLocalSearchTerm] = useState("");
-  const [userToRemove, setUserToRemove] = useState<User | null>(null);
+  const [userIdToRemove, setUserIdToRemove] = useState<number | null>(null);
   const [isRemoving, setIsRemoving] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  const handleSearchClear = () => {
-    setLocalSearchTerm("");
-    onSearchChange("");
+  const handleDeleteClick = (userId: number) => {
+    setUserIdToRemove(userId);
   };
 
-  const handleDelete = (user: User) => {
-    setUserToRemove(user);
-  };
+  const handleConfirmRemove = async () => {
+    if (!userIdToRemove) return;
 
-  const handleSearchSubmit = () => {
-    setLocalSearchTerm(localSearchTerm);
-    onSearchChange(localSearchTerm);
+    try {
+      setIsRemoving(true);
+      await onRemoveUser(userIdToRemove);
+      setUserIdToRemove(null);
+      onRefresh();
+    } catch (error) {
+      console.error("Error removing user:", error);
+    } finally {
+      setIsRemoving(false);
+    }
   };
 
   const handleAddUsersSuccess = () => {
     onRefresh();
   };
 
+  // Tìm user info từ leaderboard
+  const userToRemove = leaderboard.find(
+    (entry) => entry.userId === userIdToRemove
+  );
+
   return (
     <div className="space-y-6">
-      {/* Leaderboard Section */}
-      <div>
-        <h3 className="text-lg font-semibold mb-4">🏆 Bảng xếp hạng</h3>
-        <LeaderboardTable
-          entries={leaderboard}
-          loading={isLoadingLeaderboard}
-        />
-      </div>
-
-      {/* Divider */}
-      <div className="border-t" />
-
-      {/* User Management Section */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Quản lý sinh viên</h3>
-
-        {/* Header with Filter and Add Button */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex-1">
-            <FilterBar
-              searchTerm={localSearchTerm}
-              onSearchChange={setLocalSearchTerm}
-              onSearchClear={handleSearchClear}
-              onSearchSubmit={handleSearchSubmit}
-              placeholder={t("Tìm kiếm theo tên, email hoặc tên đăng nhập...")}
-            />
-          </div>
-          <Button className="gap-2" onClick={() => setIsAddDialogOpen(true)}>
-            <UserPlus className="h-4 w-4" />
-            Thêm người dùng
-          </Button>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold">🏆 Bảng xếp hạng</h3>
+          <p className="text-sm text-muted-foreground">
+            Theo dõi tiến độ và thành tích của sinh viên
+          </p>
         </div>
-
-        {/* User Table */}
-        <UserTableCourseDetail
-          users={usersInCourse}
-          loading={isLoading}
-          onDelete={handleDelete}
-        />
-
-        {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalElements={totalItems}
-          pageSize={pageSize}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-          loading={isLoading}
-          showInfo={true}
-          showPageSizeSelector={true}
-          pageSizeOptions={[5, 10, 20, 50, 100]}
-        />
+        <Button className="gap-2" onClick={() => setIsAddDialogOpen(true)}>
+          <UserPlus className="h-4 w-4" />
+          Thêm sinh viên
+        </Button>
       </div>
 
-      {/* Dialogs */}
+      {/* Leaderboard Table */}
+      <LeaderboardWithActions
+        entries={leaderboard}
+        loading={isLoadingLeaderboard}
+        onDeleteUser={handleDeleteClick}
+      />
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalElements={totalItems}
+        pageSize={pageSize}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
+        loading={isLoadingLeaderboard}
+        showInfo={true}
+        showPageSizeSelector={true}
+        pageSizeOptions={[5, 10, 20, 50, 100]}
+      />
+
+      {/* Remove User Dialog */}
       <RemoveUserDialog
-        user={userToRemove}
+        user={
+          userToRemove
+            ? {
+                id: userToRemove.userId,
+                username: userToRemove.username,
+                firstName: userToRemove.fullName.split(" ").pop() || "",
+                lastName: userToRemove.fullName
+                  .split(" ")
+                  .slice(0, -1)
+                  .join(" "),
+                email: "",
+                phoneNumber: "",
+                isActive: true,
+                role: { id: 1, name: "ROLE_STUDENT" },
+              }
+            : null
+        }
         isRemoving={isRemoving}
         setIsRemoving={setIsRemoving}
-        onClose={() => setUserToRemove(null)}
-        onRemoveUser={onRemoveUser}
+        onClose={() => setUserIdToRemove(null)}
+        onRemoveUser={handleConfirmRemove}
         onRefresh={onRefresh}
       />
 
+      {/* Add Users Dialog */}
       <AddUsersToCourseDialog
         open={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}

@@ -2,7 +2,6 @@
 import { CourseDetailHeader } from "@/components/courses/detail/course-detail-header";
 import { CourseLabsTab } from "@/app/courses/detail-page/lab-tab/lab-tabs";
 import { CourseOverviewTab } from "@/app/courses/detail-page/overview-tab/overview-tab";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Course } from "@/types/course";
 import { useState } from "react";
@@ -33,35 +32,30 @@ export function CourseDetail() {
     availableLabs,
     isLoadingAvailableLabs,
     fetchAvailableLabs,
-    currentPage,
-    totalPages,
-    totalItems,
-    pageSize,
+    currentPage: labsCurrentPage,
+    totalPages: labsTotalPages,
+    totalItems: labsTotalItems,
+    pageSize: labsPageSize,
     addLabsToCourse,
     removeLabFromCourse,
-    handlePageChange,
-    handlePageSizeChange,
+    handlePageChange: handleLabsPageChange,
+    handlePageSizeChange: handleLabsPageSizeChange,
     handleFiltersChange,
     initializeLabs,
   } = useCourseLabs(courseIdNumber);
 
   // Users hook
   const {
-    usersInCourse,
     leaderboard,
-    isLoading: isLoadingUsers,
     isLoadingLeaderboard,
     currentPage: usersCurrentPage,
     totalPages: usersTotalPages,
     totalItems: usersTotalItems,
     pageSize: usersPageSize,
-    hasNext: usersHasNext,
-    hasPrevious: usersHasPrevious,
     initializeUsers,
     refreshUsers,
     handlePageChange: handleUsersPageChange,
     handlePageSizeChange: handleUsersPageSizeChange,
-    handleSearchChange: handleUsersSearchChange,
     removeUserFromCourse,
   } = useCourseUsers(courseIdNumber);
 
@@ -134,7 +128,7 @@ export function CourseDetail() {
             />
           </TabsContent>
 
-          {/* Labs Tab - Only loads when activated */}
+          {/* Labs Tab */}
           <TabsContent value="labs" className="mt-6">
             <CourseLabsTab
               labs={labsInCourse}
@@ -145,12 +139,12 @@ export function CourseDetail() {
               isLoadingAvailableLabs={isLoadingAvailableLabs}
               removeLabFromCourse={removeLabFromCourse}
               isLoading={isLoadingLabs}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              pageSize={pageSize}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
+              currentPage={labsCurrentPage}
+              totalPages={labsTotalPages}
+              totalItems={labsTotalItems}
+              pageSize={labsPageSize}
+              onPageChange={handleLabsPageChange}
+              onPageSizeChange={handleLabsPageSizeChange}
               onFiltersChange={handleFiltersChange}
             />
           </TabsContent>
@@ -158,20 +152,15 @@ export function CourseDetail() {
           {/* Users Tab */}
           <TabsContent value="users" className="space-y-6 mt-6">
             <CourseUserTab
-              isLoading={isLoadingUsers}
-              usersInCourse={usersInCourse}
-              leaderboard={leaderboard}
               isLoadingLeaderboard={isLoadingLeaderboard}
+              leaderboard={leaderboard}
               currentPage={usersCurrentPage}
               totalPages={usersTotalPages}
               totalItems={usersTotalItems}
               pageSize={usersPageSize}
-              hasNext={usersHasNext}
-              hasPrevious={usersHasPrevious}
               courseId={courseIdNumber}
               onPageChange={handleUsersPageChange}
               onPageSizeChange={handleUsersPageSizeChange}
-              onSearchChange={handleUsersSearchChange}
               onRemoveUser={removeUserFromCourse}
               onRefresh={refreshUsers}
             />
