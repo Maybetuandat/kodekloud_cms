@@ -1,12 +1,11 @@
-// app/courses/detail-page/user-tab/user-course-tab.tsx
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
 import { RemoveUserDialog } from "@/components/courses/detail/user-tab/remove-user-dialog-from-course";
 import { AddUsersToCourseDialog } from "@/components/courses/detail/user-tab/add-users-to-course-dialog";
-import { LeaderboardWithActions } from "@/components/courses/detail/user-tab/leaderboard-with-actions";
-import { LeaderboardEntry } from "@/types/leaderboard";
+import { LeaderboardWithActions } from "@/components/courses/detail/user-tab/dashboard-table";
+import { DashboardEntry } from "@/types/leaderboard";
 import { Pagination } from "@/components/ui/pagination";
 
 interface CourseUserTabProps {
@@ -14,7 +13,7 @@ interface CourseUserTabProps {
   courseId: number;
   onRemoveUser: (userId: number) => Promise<void>;
   onRefresh: () => void;
-  leaderboard: LeaderboardEntry[];
+  leaderboard: DashboardEntry[];
   currentPage: number;
   totalPages: number;
   totalItems: number;

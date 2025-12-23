@@ -1,15 +1,12 @@
-export interface LeaderboardEntry {
+export interface DashboardEntry {
   rank: number;
   userId: number;
   username: string;
   fullName: string;
   totalScore: number;
   completedLabs: number;
-  totalLabs: number;
+  totalAttempts: number;
+  totalSubmissions: number;
   completionRate: number;
-  averageTime: number;
-  totalTime: number;
-  firstTimeCompletions: number;
-  fastCompletions: number;
-  lastActivityAt: string;
+  lastActivityAt: string | null;
 }

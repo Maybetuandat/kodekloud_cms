@@ -1,11 +1,10 @@
-// app/courses/detail-page/user-tab/use-user-tab.ts
-import { leaderboardService } from "@/services/leaderboardService";
-import { LeaderboardEntry } from "@/types/leaderboard";
+import { leaderboardService } from "@/services/dashboardService";
+import { DashboardEntry } from "@/types/leaderboard";
 import { useState, useCallback, useEffect } from "react";
 import { userService } from "@/services/userService";
 
 export const useCourseUsers = (courseId: number) => {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [leaderboard, setLeaderboard] = useState<DashboardEntry[]>([]);
   const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);

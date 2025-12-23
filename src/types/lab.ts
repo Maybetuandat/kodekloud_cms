@@ -7,7 +7,7 @@ export interface Lab {
   estimatedTime: number;
   isActive: boolean;
   createdAt: string;
-  instanceType: InstanceType;
+  instanceType?: InstanceType;
   namespace: string;
 }
 

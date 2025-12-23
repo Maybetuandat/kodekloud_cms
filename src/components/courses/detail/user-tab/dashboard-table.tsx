@@ -1,4 +1,3 @@
-// components/courses/detail/user-tab/leaderboard-with-actions.tsx
 import { FC } from "react";
 import {
   Table,
@@ -8,14 +7,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import { Trophy, Medal, Award, Trash2 } from "lucide-react";
-import { LeaderboardEntry } from "@/types/leaderboard";
+import { DashboardEntry } from "@/types/leaderboard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 interface LeaderboardWithActionsProps {
-  entries: LeaderboardEntry[];
+  entries: DashboardEntry[];
   loading: boolean;
   onDeleteUser: (userId: number) => void;
 }
@@ -55,39 +54,100 @@ export const LeaderboardWithActions: FC<LeaderboardWithActionsProps> = ({
       <div className="border rounded-lg">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[80px]">Hạng</TableHead>
-              <TableHead>Sinh viên</TableHead>
-              <TableHead className="text-center">Điểm</TableHead>
-              <TableHead className="text-center">Hoàn thành</TableHead>
-              <TableHead className="text-center">Tỷ lệ</TableHead>
-              <TableHead className="text-center">TB Time</TableHead>
-              <TableHead className="text-center w-[100px]">Hành động</TableHead>
+            <TableRow className="bg-gradient-to-r from-primary/10 to-primary/5">
+              <TableHead className="w-[80px] font-bold">Hạng</TableHead>
+              <TableHead className="font-bold">Sinh viên</TableHead>
+              <TableHead className="text-center font-bold">Điểm</TableHead>
+              <TableHead className="text-center font-bold">
+                Hoàn thành
+              </TableHead>
+              <TableHead className="text-center font-bold">
+                Tổng lần thử
+              </TableHead>
+              <TableHead className="text-center font-bold">
+                Tổng bài nộp
+              </TableHead>
+              <TableHead className="text-center font-bold">Tỷ lệ</TableHead>
+              <TableHead className="text-center font-bold">
+                Hoạt động cuối
+              </TableHead>
+              <TableHead className="text-center font-bold w-[100px]">
+                Hành động
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {[...Array(10)].map((_, index) => (
-              <TableRow key={index}>
-                <TableCell>
-                  <Skeleton className="h-4 w-8" />
+            {entries.map((entry) => (
+              <TableRow
+                key={entry.userId}
+                className={`hover:bg-muted/50 ${
+                  entry.rank <= 3 ? "bg-muted/30" : ""
+                }`}
+              >
+                <TableCell className="font-medium">
+                  <div className="flex items-center gap-2">
+                    {getRankIcon(entry.rank)}
+                  </div>
                 </TableCell>
+
                 <TableCell>
-                  <Skeleton className="h-4 w-32" />
+                  <div>
+                    <div className="font-medium">{entry.fullName}</div>
+                    <div className="text-sm text-muted-foreground">
+                      @{entry.username}
+                    </div>
+                  </div>
                 </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-16 mx-auto" />
+
+                <TableCell className="text-center">
+                  <Badge variant="secondary" className="font-semibold text-lg">
+                    {entry.totalScore}
+                  </Badge>
                 </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-12 mx-auto" />
+
+                <TableCell className="text-center">
+                  <span className="font-medium">{entry.completedLabs}</span>
                 </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-12 mx-auto" />
+
+                <TableCell className="text-center">
+                  <span className="font-medium">{entry.totalAttempts}</span>
                 </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-16 mx-auto" />
+
+                <TableCell className="text-center">
+                  <span className="font-medium">{entry.totalSubmissions}</span>
                 </TableCell>
-                <TableCell>
-                  <Skeleton className="h-8 w-8 rounded-md mx-auto" />
+
+                <TableCell className="text-center">
+                  <Badge
+                    variant={
+                      entry.completionRate >= 80
+                        ? "default"
+                        : entry.completionRate >= 50
+                        ? "secondary"
+                        : "destructive"
+                    }
+                  >
+                    {entry.completionRate.toFixed(1)}%
+                  </Badge>
+                </TableCell>
+
+                <TableCell className="text-center">
+                  <span className="text-sm text-muted-foreground">
+                    {entry.lastActivityAt
+                      ? new Date(entry.lastActivityAt).toLocaleString("vi-VN")
+                      : "-"}
+                  </span>
+                </TableCell>
+
+                <TableCell className="text-center">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onDeleteUser(entry.userId)}
+                    className="hover:bg-destructive hover:text-destructive-foreground"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -158,12 +218,6 @@ export const LeaderboardWithActions: FC<LeaderboardWithActionsProps> = ({
               </TableCell>
 
               <TableCell className="text-center">
-                <span className="font-medium">
-                  {entry.completedLabs}/{entry.totalLabs}
-                </span>
-              </TableCell>
-
-              <TableCell className="text-center">
                 <Badge
                   variant={
                     entry.completionRate >= 80
@@ -175,10 +229,6 @@ export const LeaderboardWithActions: FC<LeaderboardWithActionsProps> = ({
                 >
                   {entry.completionRate.toFixed(1)}%
                 </Badge>
-              </TableCell>
-
-              <TableCell className="text-center text-muted-foreground">
-                {formatTime(entry.averageTime)}
               </TableCell>
 
               <TableCell className="text-center">
