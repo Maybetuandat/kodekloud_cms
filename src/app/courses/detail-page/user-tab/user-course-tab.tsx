@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { UserPlus } from "lucide-react";
 import { RemoveUserDialog } from "@/components/courses/detail/user-tab/remove-user-dialog-from-course";
 import { AddUsersToCourseDialog } from "@/components/courses/detail/user-tab/add-users-to-course-dialog";
-import { LeaderboardWithActions } from "@/components/courses/detail/user-tab/dashboard-table";
-import { DashboardEntry } from "@/types/leaderboard";
+import { DashboardWithActions } from "@/components/courses/detail/user-tab/dashboard-table";
+import { DashboardEntry } from "@/types/dashboard";
 import { Pagination } from "@/components/ui/pagination";
 
 interface CourseUserTabProps {
@@ -73,10 +73,7 @@ export default function CourseUserTab({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">🏆 Bảng xếp hạng</h3>
-          <p className="text-sm text-muted-foreground">
-            Theo dõi tiến độ và thành tích của sinh viên
-          </p>
+          <h3 className="text-lg font-semibold"> Bảng xếp hạng</h3>
         </div>
         <Button className="gap-2" onClick={() => setIsAddDialogOpen(true)}>
           <UserPlus className="h-4 w-4" />
@@ -85,7 +82,7 @@ export default function CourseUserTab({
       </div>
 
       {/* Leaderboard Table */}
-      <LeaderboardWithActions
+      <DashboardWithActions
         entries={leaderboard}
         loading={isLoadingLeaderboard}
         onDeleteUser={handleDeleteClick}
@@ -107,23 +104,8 @@ export default function CourseUserTab({
 
       {/* Remove User Dialog */}
       <RemoveUserDialog
-        user={
-          userToRemove
-            ? {
-                id: userToRemove.userId,
-                username: userToRemove.username,
-                firstName: userToRemove.fullName.split(" ").pop() || "",
-                lastName: userToRemove.fullName
-                  .split(" ")
-                  .slice(0, -1)
-                  .join(" "),
-                email: "",
-                phoneNumber: "",
-                isActive: true,
-                role: { id: 1, name: "ROLE_STUDENT" },
-              }
-            : null
-        }
+        name={userToRemove?.fullName || ""}
+        userId={userToRemove?.userId || 0}
         isRemoving={isRemoving}
         setIsRemoving={setIsRemoving}
         onClose={() => setUserIdToRemove(null)}

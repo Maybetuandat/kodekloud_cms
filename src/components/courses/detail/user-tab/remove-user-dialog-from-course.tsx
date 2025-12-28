@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { User } from "@/types/user";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,10 +11,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
 
 interface RemoveUserDialogProps {
-  user: User | null;
+  name: string;
+  userId: number;
   isRemoving: boolean;
   onClose: () => void;
   onRemoveUser: (userId: number) => Promise<void>;
@@ -23,7 +23,8 @@ interface RemoveUserDialogProps {
 }
 
 export const RemoveUserDialog: FC<RemoveUserDialogProps> = ({
-  user,
+  name,
+  userId,
   isRemoving,
   onClose,
   onRemoveUser,
@@ -31,12 +32,11 @@ export const RemoveUserDialog: FC<RemoveUserDialogProps> = ({
   setIsRemoving,
 }) => {
   const confirmRemoveUser = async () => {
-    if (!user) return;
     setIsRemoving(true);
     try {
-      await onRemoveUser(user.id);
+      await onRemoveUser(userId);
       toast.success("Xóa thành công", {
-        description: `Đã xóa ${user.lastName} ${user.firstName} khỏi khóa học`,
+        description: `Đã xóa ${name} khỏi khóa học`,
       });
       onRefresh();
       onClose();
@@ -53,15 +53,13 @@ export const RemoveUserDialog: FC<RemoveUserDialogProps> = ({
   };
 
   return (
-    <AlertDialog open={!!user} onOpenChange={(open) => !open && onClose()}>
+    <AlertDialog open={!!userId} onOpenChange={(open) => !open && onClose()}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{"Xóa người dùng khỏi khóa học"}</AlertDialogTitle>
           <AlertDialogDescription>
             {"Bạn có chắc chắn muốn xóa"}{" "}
-            <span className="font-semibold">
-              {user?.lastName} {user?.firstName}
-            </span>{" "}
+            <span className="font-semibold">{name}</span>{" "}
             {
               "khỏi khóa học này không? Người dùng sẽ không thể truy cập vào khóa học nữa."
             }

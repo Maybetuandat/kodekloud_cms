@@ -1,7 +1,6 @@
 import { ArrowLeft, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { categoryMap } from "@/constants/category-map";
 import { Course } from "@/types/course";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";

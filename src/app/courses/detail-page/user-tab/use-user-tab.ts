@@ -1,5 +1,5 @@
 import { leaderboardService } from "@/services/dashboardService";
-import { DashboardEntry } from "@/types/leaderboard";
+import { DashboardEntry } from "@/types/dashboard";
 import { useState, useCallback, useEffect } from "react";
 import { userService } from "@/services/userService";
 

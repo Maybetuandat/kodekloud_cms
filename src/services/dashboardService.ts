@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { DashboardEntry } from "@/types/leaderboard";
+import { DashboardEntry } from "@/types/dashboard";
 
 export const leaderboardService = {
   getLeaderboardByCourse: async (

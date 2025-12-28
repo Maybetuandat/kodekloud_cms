@@ -1,4 +1,3 @@
-// app/courses/detail-page/course-detail.tsx
 import { CourseDetailHeader } from "@/components/courses/detail/course-detail-header";
 import { CourseLabsTab } from "@/app/courses/detail-page/lab-tab/lab-tabs";
 import { CourseOverviewTab } from "@/app/courses/detail-page/overview-tab/overview-tab";

@@ -6,7 +6,6 @@ export interface DashboardEntry {
   totalScore: number;
   completedLabs: number;
   totalAttempts: number;
-  totalSubmissions: number;
   completionRate: number;
   lastActivityAt: string | null;
 }
