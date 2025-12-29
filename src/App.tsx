@@ -20,6 +20,7 @@ import InstanceTypePage from "./app/instancetype/instance-type-page";
 import LoginPage from "./app/login-page/login-page";
 import { ProtectedRoute } from "./components/auth/protect-route";
 import { AuthProvider } from "./contexts/auth-context";
+import HistoryPage from "./app/history-page/profile-page";
 
 function App() {
   return (
@@ -72,7 +73,8 @@ function App() {
               <Route path=":labId" element={<LabDetail />} />
             </Route>
 
-            {/* Users - Chỉ ADMIN */}
+            <Route path="profiles/:userId" element={<HistoryPage />} />
+
             <Route
               path="users"
               element={
@@ -82,7 +84,6 @@ function App() {
               }
             />
 
-            {/* Instance Types - Chỉ ADMIN */}
             <Route
               path="instancetypes"
               element={

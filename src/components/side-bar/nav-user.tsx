@@ -105,8 +105,8 @@ export function NavUser() {
   }, [navigate]);
 
   const handleAccountClick = useCallback(() => {
-    navigate("/profile");
-  }, [navigate]);
+    navigate(`/profiles/${userInfo?.id}`);
+  }, [navigate, userInfo]);
 
   const handleLogout = useCallback(async () => {
     try {
