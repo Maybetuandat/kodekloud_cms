@@ -20,7 +20,7 @@ import InstanceTypePage from "./app/instancetype/instance-type-page";
 import LoginPage from "./app/login-page/login-page";
 import { ProtectedRoute } from "./components/auth/protect-route";
 import { AuthProvider } from "./contexts/auth-context";
-import ProfilePage from "./app/profile-page/profile-page";
+
 import UserDetailPage from "./app/user/detail/user-detail-page";
 
 function App() {
@@ -74,11 +74,9 @@ function App() {
               <Route path=":labId" element={<LabDetail />} />
             </Route>
 
-            <Route path="profiles/:userId" element={<ProfilePage />} />
-
             <Route path="users">
               <Route index element={<UserPage />} />
-              <Route path=":userId" element={<UserDetailPage />} />
+              <Route path=":id" element={<UserDetailPage />} />
             </Route>
 
             <Route

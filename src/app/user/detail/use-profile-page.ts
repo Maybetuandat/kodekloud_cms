@@ -1,34 +1,8 @@
-// src/app/profile/use-profile-page.ts
 import { useState, useEffect, useCallback } from "react";
 import { userService } from "@/services/userService";
 import { labSessionService } from "@/services/labSessionService";
 import { User } from "@/types/user";
-
-interface UserLabSession {
-  id: number;
-  lab: {
-    id: number;
-    title: string;
-    labNumber: number;
-  };
-  status: string;
-  score: number;
-  totalTests: number;
-  passedTests: number;
-  startedAt: string;
-  submittedAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface LabHistoryResponse {
-  data: UserLabSession[];
-  currentPage: number;
-  totalItems: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrevious: boolean;
-}
+import { LabHistoryResponse } from "@/types/labSesion";
 
 export const useProfilePage = (userId?: number) => {
   const [profileData, setProfileData] = useState<User | null>(null);
@@ -66,12 +40,14 @@ export const useProfilePage = (userId?: number) => {
       return;
     }
 
+    console.log("Fetching lab history for userId:", userId);
     try {
       setIsLoadingHistory(true);
       const response = await labSessionService.getLabHistory({
         page: currentPage,
         pageSize: pageSize,
         keyword: keyword || undefined,
+        userId: userId || undefined,
       });
       setHistoryData(response);
     } catch (error) {
@@ -81,9 +57,9 @@ export const useProfilePage = (userId?: number) => {
     }
   }, [userId, currentPage, pageSize, keyword]);
 
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+  // useEffect(() => {
+  //   fetchProfile();
+  // }, [fetchProfile]);
 
   useEffect(() => {
     fetchHistory();
@@ -91,6 +67,15 @@ export const useProfilePage = (userId?: number) => {
 
   const handleSearch = () => {
     setKeyword(searchInput);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
     setCurrentPage(1);
   };
 
@@ -106,7 +91,8 @@ export const useProfilePage = (userId?: number) => {
     totalPages: historyData?.totalPages || 0,
     totalItems: historyData?.totalItems || 0,
     pageSize,
-    setCurrentPage,
-    setPageSize,
+    setCurrentPage: handlePageChange,
+    setPageSize: handlePageSizeChange,
+    refetchHistory: fetchHistory,
   };
 };
