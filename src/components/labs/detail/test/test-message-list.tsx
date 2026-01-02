@@ -8,6 +8,9 @@ import {
   AlertTriangle,
   Terminal,
   Loader2,
+  Link,
+  PartyPopper,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,39 +28,86 @@ export function TestMessageList({ messages }: TestMessageListProps) {
 
   const getMessageIcon = (type: string) => {
     switch (type) {
+      // Success states
       case "success":
+      case "step_success":
         return (
-          <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
+          <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
         );
+
+      // Setup complete
+      case "setup_complete":
+        return (
+          <PartyPopper className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+        );
+
+      // Error states
       case "error":
+      case "step_error":
+      case "step_failed":
         return <XCircle className="h-4 w-4 text-red-500 flex-shrink-0" />;
+
+      // Warning
       case "warning":
         return (
           <AlertTriangle className="h-4 w-4 text-yellow-500 flex-shrink-0" />
         );
+
+      // Connection
       case "connection":
-        return <Terminal className="h-4 w-4 text-blue-500 flex-shrink-0" />;
-      case "info":
-        return <Info className="h-4 w-4 text-slate-400 flex-shrink-0" />;
-      default:
+        return <Link className="h-4 w-4 text-cyan-500 flex-shrink-0" />;
+
+      // Start states
+      case "start":
+        return <Sparkles className="h-4 w-4 text-purple-500 flex-shrink-0" />;
+
+      case "step_start":
         return (
-          <Loader2 className="h-4 w-4 text-slate-400 flex-shrink-0 animate-spin" />
+          <Loader2 className="h-4 w-4 text-violet-500 flex-shrink-0 animate-spin" />
         );
+
+      // Info
+      case "info":
+        return <Info className="h-4 w-4 text-blue-400 flex-shrink-0" />;
+
+      default:
+        return <Terminal className="h-4 w-4 text-slate-400 flex-shrink-0" />;
     }
   };
 
   const getMessageColor = (type: string) => {
     switch (type) {
+      // Success states
       case "success":
-        return "text-green-400";
+      case "step_success":
+      case "setup_complete":
+        return "text-emerald-400";
+
+      // Error states
       case "error":
+      case "step_error":
+      case "step_failed":
         return "text-red-400";
+
+      // Warning
       case "warning":
         return "text-yellow-400";
+
+      // Connection
       case "connection":
-        return "text-blue-400";
+        return "text-cyan-400";
+
+      // Start states
+      case "start":
+        return "text-purple-400";
+
+      case "step_start":
+        return "text-violet-400";
+
+      // Info
       case "info":
-        return "text-slate-300";
+        return "text-blue-400";
+
       default:
         return "text-slate-300";
     }
