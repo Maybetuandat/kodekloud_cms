@@ -19,7 +19,7 @@ export interface SubmissionDetail {
   questionId: number;
   questionContent: string;
   userAnswerContent: string;
-  isCorrect: boolean;
+  correct: boolean;
   submittedAt: string;
 }
 

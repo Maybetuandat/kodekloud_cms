@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useNavigate } from "react-router-dom";
 import { Trophy, Medal, Award, Trash2 } from "lucide-react";
 import { DashboardEntry } from "@/types/dashboard";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +24,7 @@ export const DashboardWithActions: FC<DashboardWithActionsProps> = ({
   loading,
   onDeleteUser,
 }) => {
+  const navigate = useNavigate();
   if (loading) {
     return (
       <div className="border rounded-lg">
@@ -105,6 +107,7 @@ export const DashboardWithActions: FC<DashboardWithActionsProps> = ({
               className={`hover:bg-muted/50 ${
                 entry.rank <= 3 ? "bg-muted/30" : ""
               }`}
+              onClick={() => navigate(`/users/${entry.userId}`)}
             >
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">{entry.rank}</div>

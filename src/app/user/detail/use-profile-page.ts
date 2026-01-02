@@ -57,9 +57,9 @@ export const useProfilePage = (userId?: number) => {
     }
   }, [userId, currentPage, pageSize, keyword]);
 
-  // useEffect(() => {
-  //   fetchProfile();
-  // }, [fetchProfile]);
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   useEffect(() => {
     fetchHistory();
