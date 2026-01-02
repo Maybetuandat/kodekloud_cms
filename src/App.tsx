@@ -14,13 +14,14 @@ import NewCoursePage from "./app/courses/new-course-page/new-course-page";
 import { CourseDetail } from "./app/courses/detail-page/course-detail";
 import { LabDetail } from "./app/labs/detail-page/lab-detail";
 import LabPage from "./app/labs/index-page/lab-page";
-import UserPage from "./app/user/user-page";
+import UserPage from "./app/user/index/user-page";
 import SubjectPage from "./app/subject/subject-page";
 import InstanceTypePage from "./app/instancetype/instance-type-page";
 import LoginPage from "./app/login-page/login-page";
 import { ProtectedRoute } from "./components/auth/protect-route";
 import { AuthProvider } from "./contexts/auth-context";
-import HistoryPage from "./app/history-page/profile-page";
+import ProfilePage from "./app/profile-page/profile-page";
+import UserDetailPage from "./app/user/detail/user-detail-page";
 
 function App() {
   return (
@@ -73,16 +74,12 @@ function App() {
               <Route path=":labId" element={<LabDetail />} />
             </Route>
 
-            <Route path="profiles/:userId" element={<HistoryPage />} />
+            <Route path="profiles/:userId" element={<ProfilePage />} />
 
-            <Route
-              path="users"
-              element={
-                <ProtectedRoute requiredRoles={["ROLE_ADMIN"]}>
-                  <UserPage />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="users">
+              <Route index element={<UserPage />} />
+              <Route path=":userId" element={<UserDetailPage />} />
+            </Route>
 
             <Route
               path="instancetypes"
