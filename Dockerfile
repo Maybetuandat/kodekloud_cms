@@ -1,14 +1,24 @@
-# Use official Nginx image
-FROM nginx:alpine
+FROM node:22-bookworm-slim AS build
 
-# Copy Vite build output (from `dist/`) to Nginx html directory
-COPY dist /usr/share/nginx/html
+WORKDIR /app
 
-# Replace default nginx config with custom one (optional)
-COPY nginx/web.conf /etc/nginx/conf.d/default.conf
+COPY package*.json ./
 
-# Expose default HTTP port
+RUN npm ci
+
+COPY . .
+
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
+RUN npm run build
+
+FROM nginx:stable
+
+COPY --from=build /app/dist /usr/share/nginx/html
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 EXPOSE 80
 
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

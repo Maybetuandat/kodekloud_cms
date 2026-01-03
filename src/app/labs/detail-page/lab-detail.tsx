@@ -130,7 +130,10 @@ export function LabDetail() {
 
           {/* Setup Steps Tab */}
           <TabsContent value="setup-steps" className="mt-6">
-            <LabSetupStepsTab labId={Number(labId)} />
+            <LabSetupStepsTab
+              labId={Number(labId)}
+              labTitle={lab?.title ?? ""}
+            />
           </TabsContent>
 
           {/* Questions Tab */}

@@ -70,9 +70,6 @@ export const useCourseOverview = (courseId: number) => {
       if (updatedCourse.level !== undefined) {
         courseToUpdate.level = updatedCourse.level;
       }
-      if (updatedCourse.durationMinutes !== undefined) {
-        courseToUpdate.durationMinutes = updatedCourse.durationMinutes;
-      }
 
       const response = await courseService.updateCourse(
         courseId,

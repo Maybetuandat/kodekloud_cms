@@ -73,7 +73,7 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
           phoneNumber: user.phoneNumber,
           password: "",
           isActive: user.isActive,
-          role: user.role || "USER",
+          role: user.roleName || "USER",
         });
       } else {
         reset({
