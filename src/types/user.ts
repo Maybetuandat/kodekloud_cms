@@ -27,7 +27,7 @@ export interface CreateUserRequest {
   email: string;
   phoneNumber?: string;
   isActive?: boolean;
-  role?: string;
+  roleId?: number;
 }
 
 export interface UpdateUserRequest {
@@ -38,7 +38,7 @@ export interface UpdateUserRequest {
   email?: string;
   phoneNumber?: string;
   isActive?: boolean;
-  role?: string;
+  roleId?: number;
 }
 
 export interface UserFilters {

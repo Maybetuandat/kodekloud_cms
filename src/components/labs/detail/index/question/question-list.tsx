@@ -29,7 +29,7 @@ export function LabQuestionsList({
         <LabQuestionItem
           key={question.id}
           question={question}
-          index={currentPage * pageSize + index + 1}
+          index={(currentPage - 1) * pageSize + index + 1}
           onEdit={onEditQuestion}
           onDelete={onDeleteQuestion}
         />

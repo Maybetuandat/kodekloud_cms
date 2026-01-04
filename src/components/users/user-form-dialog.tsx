@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Dialog,
@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { User, CreateUserRequest, UpdateUserRequest } from "@/types/user";
+import { Role } from "@/types/role";
+import { roleService } from "@/services/roleService";
 import { Loader2 } from "lucide-react";
 
 interface UserFormDialogProps {
@@ -38,6 +40,8 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
   loading,
 }) => {
   const isEditMode = !!user;
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [rolesLoading, setRolesLoading] = useState(false);
 
   const {
     register,
@@ -46,7 +50,7 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
     reset,
     watch,
     setValue,
-  } = useForm<CreateUserRequest>({
+  } = useForm<CreateUserRequest & { roleId?: number }>({
     defaultValues: {
       username: "",
       firstName: "",
@@ -55,16 +59,34 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
       phoneNumber: "",
       password: "",
       isActive: true,
-      role: "USER",
+      roleId: undefined,
     },
   });
 
   const isActive = watch("isActive");
-  const role = watch("role");
+  const roleId = watch("roleId");
 
   useEffect(() => {
     if (open) {
+      setRolesLoading(true);
+      roleService
+        .getAllRoles()
+        .then((data) => {
+          setRoles(data);
+        })
+        .catch((err) => {
+          console.error("Failed to load roles:", err);
+        })
+        .finally(() => {
+          setRolesLoading(false);
+        });
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (open && roles.length > 0) {
       if (user) {
+        const userRole = roles.find((r) => r.name === user.roleName);
         reset({
           username: user.username,
           firstName: user.firstName,
@@ -73,7 +95,7 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
           phoneNumber: user.phoneNumber,
           password: "",
           isActive: user.isActive,
-          role: user.roleName || "USER",
+          roleId: userRole?.id,
         });
       } else {
         reset({
@@ -84,15 +106,14 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
           phoneNumber: "",
           password: "",
           isActive: true,
-          role: "USER",
+          roleId: roles[0]?.id,
         });
       }
     }
-  }, [open, user, reset]);
+  }, [open, user, roles, reset]);
 
-  const onSubmitForm = (data: CreateUserRequest) => {
+  const onSubmitForm = (data: CreateUserRequest & { roleId?: number }) => {
     if (isEditMode) {
-      // For update, only send changed fields and exclude empty password
       const updateData: UpdateUserRequest = {
         username: data.username,
         firstName: data.firstName,
@@ -100,14 +121,23 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
         email: data.email,
         phoneNumber: data.phoneNumber,
         isActive: data.isActive,
-        role: data.role,
+        roleId: data.roleId,
       };
       if (data.password) {
         updateData.password = data.password;
       }
       onSubmit(updateData);
     } else {
-      onSubmit(data);
+      onSubmit({
+        username: data.username,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        password: data.password,
+        isActive: data.isActive,
+        roleId: data.roleId,
+      });
     }
   };
 
@@ -120,128 +150,93 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
           </DialogTitle>
           <DialogDescription>
             {isEditMode
-              ? "Cập nhật thông tin người dùng. Để trống mật khẩu để giữ nguyên mật khẩu hiện tại."
+              ? "Cập nhật thông tin người dùng."
               : "Điền thông tin để tạo người dùng mới."}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmitForm)}>
-          <div className="space-y-4 py-4">
-            {/* Username */}
+        <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="username">
-                Tài khoản <span className="text-red-500">*</span>
-              </Label>
+              <Label htmlFor="firstName">Tên</Label>
               <Input
-                id="username"
-                placeholder="Nhập tài khoản"
-                {...register("username", {
-                  required: "Tài khoản là bắt buộc",
-                  minLength: {
-                    value: 3,
-                    message: "Tài khoản phải có ít nhất 3 ký tự",
-                  },
-                })}
+                id="firstName"
+                placeholder="Nhập tên"
+                {...register("firstName", { required: "Tên là bắt buộc" })}
                 disabled={loading}
               />
-              {errors.username && (
+              {errors.firstName && (
                 <p className="text-sm text-red-500">
-                  {errors.username.message}
+                  {errors.firstName.message}
                 </p>
               )}
             </div>
 
-            {/* First Name & Last Name */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">
-                  Tên <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="firstName"
-                  placeholder="Nhập tên"
-                  {...register("firstName", {
-                    required: "Tên là bắt buộc",
-                  })}
-                  disabled={loading}
-                />
-                {errors.firstName && (
-                  <p className="text-sm text-red-500">
-                    {errors.firstName.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="lastName">
-                  Họ <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="lastName"
-                  placeholder="Nhập họ"
-                  {...register("lastName", {
-                    required: "Họ là bắt buộc",
-                  })}
-                  disabled={loading}
-                />
-                {errors.lastName && (
-                  <p className="text-sm text-red-500">
-                    {errors.lastName.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Email */}
             <div className="space-y-2">
-              <Label htmlFor="email">
-                Email <span className="text-red-500">*</span>
-              </Label>
+              <Label htmlFor="lastName">Họ</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="Nhập địa chỉ email"
-                {...register("email", {
-                  required: "Email là bắt buộc",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Địa chỉ email không hợp lệ",
-                  },
-                })}
+                id="lastName"
+                placeholder="Nhập họ"
+                {...register("lastName", { required: "Họ là bắt buộc" })}
                 disabled={loading}
               />
-              {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
-              )}
-            </div>
-
-            {/* Phone Number */}
-            <div className="space-y-2">
-              <Label htmlFor="phoneNumber">Số điện thoại</Label>
-              <Input
-                id="phoneNumber"
-                type="tel"
-                placeholder="Nhập số điện thoại"
-                {...register("phoneNumber")}
-                disabled={loading}
-              />
-              {errors.phoneNumber && (
+              {errors.lastName && (
                 <p className="text-sm text-red-500">
-                  {errors.phoneNumber.message}
+                  {errors.lastName.message}
                 </p>
               )}
             </div>
+          </div>
 
-            {/* Password */}
+          <div className="space-y-2">
+            <Label htmlFor="username">Tên đăng nhập</Label>
+            <Input
+              id="username"
+              placeholder="Nhập tên đăng nhập"
+              {...register("username", {
+                required: "Tên đăng nhập là bắt buộc",
+              })}
+              disabled={loading || isEditMode}
+            />
+            {errors.username && (
+              <p className="text-sm text-red-500">{errors.username.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Nhập email"
+              {...register("email", {
+                required: "Email là bắt buộc",
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: "Email không hợp lệ",
+                },
+              })}
+              disabled={loading}
+            />
+            {errors.email && (
+              <p className="text-sm text-red-500">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phoneNumber">Số điện thoại</Label>
+            <Input
+              id="phoneNumber"
+              placeholder="Nhập số điện thoại"
+              {...register("phoneNumber")}
+              disabled={loading}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="password">
-                Mật khẩu{" "}
-                {!isEditMode && <span className="text-red-500">*</span>}
-                {isEditMode && (
-                  <span className="text-sm text-muted-foreground ml-1">
-                    (Để trống để giữ nguyên mật khẩu hiện tại)
-                  </span>
-                )}
+                {isEditMode ? "Mật khẩu mới" : "Mật khẩu"}
               </Label>
               <Input
                 id="password"
@@ -250,7 +245,7 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
                   isEditMode ? "Nhập mật khẩu (tuỳ chọn)" : "Nhập mật khẩu"
                 }
                 {...register("password", {
-                  required: !isEditMode ? "Password is required" : false,
+                  required: !isEditMode ? "Mật khẩu là bắt buộc" : false,
                   minLength: {
                     value: 6,
                     message: "Mật khẩu phải có ít nhất 6 ký tự",
@@ -265,24 +260,37 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
               )}
             </div>
 
-            {/* Role */}
             <div className="space-y-2">
               <Label htmlFor="role">Vai trò</Label>
               <Select
-                value={role}
-                onValueChange={(value) => setValue("role", value)}
-                disabled={loading}
+                value={roleId?.toString()}
+                onValueChange={(value) => setValue("roleId", parseInt(value))}
+                disabled={loading || rolesLoading}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select role" />
+                  <SelectValue
+                    placeholder={rolesLoading ? "Đang tải..." : "Chọn vai trò"}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="USER">Sinh viên</SelectItem>
-                  <SelectItem value="ADMIN">Quản trị viên</SelectItem>
-                  <SelectItem value="MODERATOR">Giáo viên</SelectItem>
+                  {roles.map((role) => (
+                    <SelectItem key={role.id} value={role.id.toString()}>
+                      {role.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="isActive"
+              checked={isActive}
+              onCheckedChange={(checked) => setValue("isActive", checked)}
+              disabled={loading}
+            />
+            <Label htmlFor="isActive">Kích hoạt</Label>
           </div>
 
           <DialogFooter>
@@ -292,11 +300,11 @@ export const UserFormDialog: FC<UserFormDialogProps> = ({
               onClick={() => onOpenChange(false)}
               disabled={loading}
             >
-              Cancel
+              Hủy
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading || rolesLoading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isEditMode ? "Update" : "Create"}
+              {isEditMode ? "Cập nhật" : "Tạo"}
             </Button>
           </DialogFooter>
         </form>

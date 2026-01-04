@@ -27,7 +27,7 @@ export interface UseLabQuestions {
   totalPages: number;
   totalItems: number;
   filters: QuestionFilters;
-  searchValue: string; // Local search value (for input display)
+  searchValue: string;
   deleteQuestionId: number | null;
   editQuestionId: number | null;
   editQuestionData: Question | null;
@@ -54,8 +54,8 @@ export interface UseLabQuestions {
   setDeleteQuestionId: (id: number | null) => void;
   setEditQuestionId: (id: number | null) => void;
   handleSearchChange: (value: string) => void;
-  handleSearchSubmit: () => void; // New: Submit search
-  handleSearchClear: () => void; // New: Clear search
+  handleSearchSubmit: () => void;
+  handleSearchClear: () => void;
   handleFiltersChange: (newFilters: Partial<QuestionFilters>) => void;
   handleEditQuestion: (questionId: number) => void;
   handleDeleteQuestion: (questionId: number) => void;
@@ -94,9 +94,8 @@ export const useLabQuestions = ({
     null
   );
 
-  // Separate local search value (for input) and applied search (for filtering)
-  const [searchValue, setSearchValue] = useState(""); // Local input value
-  const [appliedSearch, setAppliedSearch] = useState(""); // Applied to filters
+  const [searchValue, setSearchValue] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
 
   const [uploadExcelDialogOpen, setUploadExcelDialogOpen] = useState(false);
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
@@ -105,7 +104,9 @@ export const useLabQuestions = ({
     sortBy: "newest",
   });
 
-  // Load question data when editQuestionId changes
+  // Add a refresh trigger to force re-fetch
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   useEffect(() => {
     if (editQuestionId !== null) {
       const question = questions.find((q) => q.id === editQuestionId);
@@ -124,14 +125,14 @@ export const useLabQuestions = ({
     setUploadResult(null);
 
     try {
-      console.log("debug question in file hook", questions);
       const result = await questionService.bulkCreateQuestionsFromExcel(
         labId,
         questions
       );
 
       setUploadResult(result);
-      await fetchQuestions();
+      // Trigger refresh
+      setRefreshTrigger((prev) => prev + 1);
 
       if (result.failed === 0) {
         setTimeout(() => {
@@ -169,7 +170,6 @@ export const useLabQuestions = ({
 
       let filteredQuestions = response;
 
-      // Use appliedSearch instead of filters.search
       if (appliedSearch) {
         const searchLower = appliedSearch.toLowerCase();
         filteredQuestions = filteredQuestions.filter(
@@ -199,7 +199,7 @@ export const useLabQuestions = ({
     } finally {
       setLoading(false);
     }
-  }, [labId, appliedSearch, filters.sortBy, pageSize]);
+  }, [labId, appliedSearch, filters.sortBy, pageSize, refreshTrigger]);
 
   useEffect(() => {
     fetchQuestions();
@@ -214,7 +214,8 @@ export const useLabQuestions = ({
     try {
       const result = await action();
       onSuccessCallback(result);
-      await fetchQuestions();
+      // Use refresh trigger instead of direct fetchQuestions call
+      setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       onErrorCallback?.(error as Error);
     } finally {
@@ -261,27 +262,24 @@ export const useLabQuestions = ({
 
   const setFilters = (newFilterValues: Partial<QuestionFilters>) => {
     setFiltersState((prevFilters) => ({ ...prevFilters, ...newFilterValues }));
-    setCurrentPage(0);
+    setCurrentPage(1);
   };
 
   const setPageSize = (newSize: number) => {
     setPageSizeState(newSize);
-    setCurrentPage(0);
+    setCurrentPage(1);
   };
 
-  // Only update local search value (doesn't trigger fetch)
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
   };
 
-  // Submit search (triggered by Enter key)
   const handleSearchSubmit = () => {
     setAppliedSearch(searchValue);
     setFilters({ search: searchValue });
     setCurrentPage(1);
   };
 
-  // Clear search
   const handleSearchClear = () => {
     setSearchValue("");
     setAppliedSearch("");
@@ -306,7 +304,6 @@ export const useLabQuestions = ({
       await deleteQuestion(
         deleteQuestionId,
         () => {
-          console.log("Question deleted successfully");
           setDeleteQuestionId(null);
         },
         (error) => {
@@ -320,7 +317,7 @@ export const useLabQuestions = ({
     setDeleteQuestionId(null);
   };
 
-  // Save edited question with answers
+  // Fixed: Use refreshTrigger to force UI update after save
   const handleSaveEditQuestion = async (data: {
     question: string;
     hint: string;
@@ -335,14 +332,13 @@ export const useLabQuestions = ({
 
     setActionLoading(true);
     try {
-      // Call API with complete data including answers
       await questionService.updateQuestion(editQuestionId, data);
 
-      // Refresh questions list
-      await fetchQuestions();
-
-      // Close dialog
+      // Close dialog first
       setEditQuestionId(null);
+
+      // Trigger refresh to update UI
+      setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       console.error("Failed to save question:", error);
       throw error;
@@ -380,8 +376,8 @@ export const useLabQuestions = ({
     setUploadExcelDialogOpen,
 
     handleSearchChange,
-    handleSearchSubmit, // New
-    handleSearchClear, // New
+    handleSearchSubmit,
+    handleSearchClear,
     handleFiltersChange,
     handleEditQuestion,
     handleDeleteQuestion,
@@ -390,6 +386,6 @@ export const useLabQuestions = ({
     handleUploadExcel,
     handleSaveEditQuestion,
 
-    refresh: fetchQuestions,
+    refresh: () => setRefreshTrigger((prev) => prev + 1),
   };
 };

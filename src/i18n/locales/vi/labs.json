@@ -56,7 +56,7 @@
   },
 
   "questions": {
-    "title": "Câu Hỏi Bài Lab",
+    "title": "Câu hỏi bài thực hành",
     "description": "Quản lý câu hỏi cho bài lab này",
     "addQuestion": "Thêm Câu Hỏi",
     "createFirstQuestion": "Tạo Câu Hỏi Đầu Tiên",

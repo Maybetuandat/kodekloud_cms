@@ -65,7 +65,6 @@ export const userService = {
     if (params.isActive != null) {
       queryParams.isActive = params.isActive;
     }
-    console.log("search term used:", params);
 
     const response = await api.get<PaginatedResponse<User>>(
       `/courses/${courseId}/users`,
@@ -103,9 +102,6 @@ export const userService = {
     });
   },
 
-  /**
-   * Remove user from course
-   */
   removeUserFromCourse: async (
     courseId: number,
     userId: number
@@ -115,51 +111,6 @@ export const userService = {
       courseId: number;
       userId: number;
     }>(`/courses/${courseId}/users/${userId}`);
-    return response;
-  },
-  getUsersNotInCourse: async (
-    params: {
-      page: number;
-      pageSize: number;
-      search?: string;
-      isActive?: boolean;
-    },
-    courseId: number
-  ): Promise<PaginatedResponse<User>> => {
-    const queryParams: {
-      page: number;
-      pageSize: number;
-      search?: string;
-      isActive?: boolean;
-    } = {
-      page: params.page,
-      pageSize: params.pageSize,
-    };
-
-    if (params.search) {
-      queryParams.search = params.search;
-    }
-
-    if (params.isActive != null) {
-      queryParams.isActive = params.isActive;
-    }
-
-    const response = await api.get<PaginatedResponse<User>>(
-      `/courses/${courseId}/users/not-in-course`,
-      queryParams
-    );
-
-    return response;
-  },
-
-  /**
-   * Add multiple users to course
-   */
-  addUsersToCourse: async (
-    courseId: number,
-    userIds: number[]
-  ): Promise<any> => {
-    const response = await api.post<any>(`/courses/${courseId}/users`, userIds);
     return response;
   },
 };
