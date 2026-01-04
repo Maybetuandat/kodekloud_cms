@@ -30,12 +30,13 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const ALLOWED_ADMIN_ROLES = ["ROLE_ADMIN", "ROLE_LECTURER"];
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Initialize auth state from localStorage
   useEffect(() => {
     const initAuth = () => {
       try {
@@ -43,7 +44,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const token = authService.getAuthToken();
 
         if (userInfo && token) {
-          setUser(userInfo);
+          const hasAllowedRole = userInfo.roles.some((role) =>
+            ALLOWED_ADMIN_ROLES.includes(role)
+          );
+
+          if (hasAllowedRole) {
+            setUser(userInfo);
+          } else {
+            authService.logout();
+          }
         }
       } catch (error) {
         console.error("Failed to initialize auth:", error);
@@ -62,6 +71,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoading(true);
         const response: JwtResponse = await authService.login(credentials);
 
+        const hasAllowedRole = response.roles.some((role) =>
+          ALLOWED_ADMIN_ROLES.includes(role)
+        );
+
+        if (!hasAllowedRole) {
+          authService.logout();
+          toast.error("Không có quyền truy cập", {
+            description:
+              "Tài khoản của bạn không có quyền truy cập vào hệ thống quản trị.",
+          });
+          throw new Error("Không có quyền truy cập hệ thống quản trị");
+        }
+
         const userData: User = {
           id: response.id,
           username: response.username,
@@ -72,22 +94,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(userData);
         toast.success("Đăng nhập thành công!");
 
-        // Navigate based on role
         if (response.roles.includes("ROLE_ADMIN")) {
           navigate("/subjects");
         } else if (response.roles.includes("ROLE_LECTURER")) {
           navigate("/courses");
-        } else {
-          navigate("/courses");
         }
       } catch (error) {
         console.error("Login failed:", error);
-        toast.error("Đăng nhập thất bại", {
-          description:
-            error instanceof Error
-              ? error.message
-              : "Vui lòng kiểm tra lại thông tin đăng nhập",
-        });
+        if (
+          !(
+            error instanceof Error &&
+            error.message.includes("Không có quyền truy cập")
+          )
+        ) {
+          toast.error("Đăng nhập thất bại", {
+            description:
+              error instanceof Error
+                ? error.message
+                : "Vui lòng kiểm tra lại thông tin đăng nhập",
+          });
+        }
         throw error;
       } finally {
         setIsLoading(false);
