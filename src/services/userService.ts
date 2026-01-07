@@ -74,6 +74,41 @@ export const userService = {
     return response;
   },
 
+  getUsersNotInCourse: async (
+    params: {
+      page: number;
+      pageSize: number;
+      search?: string;
+      isActive?: boolean;
+    },
+    courseId: number
+  ): Promise<PaginatedResponse<User>> => {
+    const queryParams: {
+      page: number;
+      pageSize: number;
+      search?: string;
+      isActive?: boolean;
+    } = {
+      page: params.page,
+      pageSize: params.pageSize,
+    };
+
+    if (params.search) {
+      queryParams.search = params.search;
+    }
+
+    if (params.isActive != null) {
+      queryParams.isActive = params.isActive;
+    }
+
+    const response = await api.get<PaginatedResponse<User>>(
+      `/courses/${courseId}/users/not-in-course`,
+      queryParams
+    );
+
+    return response;
+  },
+
   getUserById: async (id: number): Promise<User> => {
     const response = await api.get<User>(`/users/${id}`);
     return response;
@@ -112,5 +147,12 @@ export const userService = {
       userId: number;
     }>(`/courses/${courseId}/users/${userId}`);
     return response;
+  },
+
+  addUsersToCourse: async (
+    courseId: number,
+    userIds: number[]
+  ): Promise<void> => {
+    await api.post(`/courses/${courseId}/users`, userIds);
   },
 };

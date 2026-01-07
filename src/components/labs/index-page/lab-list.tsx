@@ -48,7 +48,7 @@ export const LabList: FC<LabListProps> = ({
         </div>
         <h3 className="text-lg font-medium text-gray-900">Không có lab nào</h3>
         <p className="mt-1 text-sm text-gray-500">
-          Bắt đầu bằng cách tạo lab mới
+          Bắt đầu bằng cách tạo bài thực hành mới
         </p>
       </div>
     );

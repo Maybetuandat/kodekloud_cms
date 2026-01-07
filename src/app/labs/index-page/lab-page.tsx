@@ -75,7 +75,7 @@ export default function LabPage() {
         </div>
         <Button onClick={handleOpenCreateDialog} size="lg">
           <Plus className="h-5 w-5 mr-2" />
-          Tạo Lab mới
+          Tạo bài thực hành mới
         </Button>
       </div>
 
