@@ -18,7 +18,12 @@ import {
   CheckCircle2,
   AlertTriangle,
 } from "lucide-react";
-import { excelService, ExcelQuestionRow } from "@/services/excelService";
+import {
+  excelService,
+  ExcelQuestionRow,
+  ValidationError,
+  ParseResult,
+} from "@/services/excelService";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +46,9 @@ export function LabUploadExcelDialog({
   const [previewData, setPreviewData] = useState<ExcelQuestionRow[] | null>(
     null
   );
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
+    []
+  );
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadResult, setUploadResult] = useState<any | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -57,17 +65,28 @@ export function LabUploadExcelDialog({
     setFile(selectedFile);
     setError(null);
     setUploadResult(null);
+    setValidationErrors([]);
 
     try {
-      const questions = await excelService.parseExcelFile(selectedFile);
-      if (questions.length === 0) {
+      const result: ParseResult =
+        await excelService.parseExcelFileWithValidation(selectedFile);
+
+      if (result.validationErrors.length > 0) {
+        setValidationErrors(result.validationErrors);
+      }
+
+      if (
+        result.questions.length === 0 &&
+        result.validationErrors.length === 0
+      ) {
         setError("Không tìm thấy câu hỏi hợp lệ nào trong tệp");
         return;
       }
-      setPreviewData(questions);
+
+      setPreviewData(result.questions);
     } catch (err) {
       setError("Không thể phân tích tệp Excel. Vui lòng kiểm tra định dạng.");
-      console.error(err);
+      console.error("Parse Excel error:", err);
     }
   };
 
@@ -93,6 +112,7 @@ export function LabUploadExcelDialog({
       const result = await onUpload(previewData);
 
       clearInterval(progressInterval);
+      setUploadProgress(100);
 
       setUploadResult(result);
 
@@ -100,7 +120,7 @@ export function LabUploadExcelDialog({
       handleClose();
     } catch (err) {
       setError("Tải lên câu hỏi thất bại. Vui lòng thử lại.");
-      console.error(err);
+      console.error("Upload error:", err);
     } finally {
       setLoading(false);
     }
@@ -110,6 +130,7 @@ export function LabUploadExcelDialog({
     setFile(null);
     setPreviewData(null);
     setError(null);
+    setValidationErrors([]);
     setUploadProgress(0);
     setUploadResult(null);
     if (fileInputRef.current) {
@@ -128,13 +149,18 @@ export function LabUploadExcelDialog({
 
     switch (typeQuestion) {
       case 0:
-        return { label: "Không kiểm tra", variant: "secondary" as const };
+        return { label: "Câu hỏi thường", variant: "secondary" as const };
       case 1:
         return { label: "Kiểm tra hạ tầng", variant: "default" as const };
       default:
         return { label: `Loại ${typeQuestion}`, variant: "outline" as const };
     }
   };
+
+  const infrastructureCount =
+    previewData?.filter((q) => q.typeQuestion === 1).length || 0;
+  const normalCount =
+    previewData?.filter((q) => q.typeQuestion !== 1).length || 0;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -160,6 +186,26 @@ export function LabUploadExcelDialog({
               Tải Mẫu (Template)
             </Button>
           </div>
+
+          {/* Hướng dẫn loại câu hỏi */}
+          <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
+            <AlertCircle className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-blue-800 dark:text-blue-200">
+              <div className="space-y-1">
+                <div className="font-medium">Hướng dẫn loại câu hỏi:</div>
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  <li>
+                    <strong>TypeQuestion = 0</strong>: Câu hỏi thường - cần có
+                    ít nhất 1 câu trả lời và 1 đáp án đúng
+                  </li>
+                  <li>
+                    <strong>TypeQuestion = 1</strong>: Kiểm tra hạ tầng - cần có
+                    CheckCommand, không cần câu trả lời
+                  </li>
+                </ul>
+              </div>
+            </AlertDescription>
+          </Alert>
 
           <div className="space-y-2">
             <div className="flex items-center gap-2">
@@ -196,6 +242,42 @@ export function LabUploadExcelDialog({
             </Alert>
           )}
 
+          {/* Hiển thị validation errors */}
+          {validationErrors.length > 0 && (
+            <Alert
+              variant="destructive"
+              className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20"
+            >
+              <AlertTriangle className="h-4 w-4 text-yellow-600" />
+              <AlertDescription>
+                <div className="space-y-2">
+                  <div className="font-medium text-yellow-800 dark:text-yellow-200">
+                    Phát hiện {validationErrors.length} lỗi validation:
+                  </div>
+                  <ScrollArea className="max-h-[150px]">
+                    <ul className="space-y-2">
+                      {validationErrors.map((err, idx) => (
+                        <li
+                          key={idx}
+                          className="text-xs bg-white dark:bg-gray-900 p-2 rounded border"
+                        >
+                          <div className="font-medium text-red-600">
+                            Dòng {err.row}: {err.question}
+                          </div>
+                          <ul className="list-disc list-inside mt-1 text-muted-foreground">
+                            {err.errors.map((e, i) => (
+                              <li key={i}>{e}</li>
+                            ))}
+                          </ul>
+                        </li>
+                      ))}
+                    </ul>
+                  </ScrollArea>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
           {uploadResult && (
             <Alert
               variant={uploadResult.failed === 0 ? "default" : "destructive"}
@@ -216,7 +298,7 @@ export function LabUploadExcelDialog({
                     Tải lên hoàn tất: {uploadResult.success} thành công,{" "}
                     {uploadResult.failed} thất bại
                   </div>
-                  {uploadResult.errors.length > 0 && (
+                  {uploadResult.errors && uploadResult.errors.length > 0 && (
                     <div className="text-sm">
                       <div className="font-medium mb-2">Câu hỏi bị lỗi:</div>
                       <ScrollArea className="max-h-[150px]">
@@ -252,8 +334,21 @@ export function LabUploadExcelDialog({
             <Alert className="border-green-200 bg-green-50 dark:bg-green-950/20">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-800 dark:text-green-200">
-                Phân tích tệp thành công! {previewData.length} câu hỏi sẵn sàng
-                để tải lên.
+                <div className="space-y-1">
+                  <div>
+                    Phân tích tệp thành công! {previewData.length} câu hỏi sẵn
+                    sàng để tải lên.
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-medium">
+                      Kiểm tra hạ tầng: {infrastructureCount}
+                    </span>
+                    {" | "}
+                    <span className="font-medium">
+                      Câu hỏi thường: {normalCount}
+                    </span>
+                  </div>
+                </div>
               </AlertDescription>
             </Alert>
           )}
@@ -264,10 +359,14 @@ export function LabUploadExcelDialog({
                 <div className="text-sm font-medium">
                   Xem trước ({previewData.length} câu hỏi)
                 </div>
-                <Badge variant="secondary">
-                  {previewData.reduce((sum, q) => sum + q.answers.length, 0)}{" "}
-                  tổng số câu trả lời
-                </Badge>
+                <div className="flex gap-2">
+                  <Badge variant="default">{infrastructureCount} Hạ tầng</Badge>
+                  <Badge variant="secondary">{normalCount} Thường</Badge>
+                  <Badge variant="outline">
+                    {previewData.reduce((sum, q) => sum + q.answers.length, 0)}{" "}
+                    câu trả lời
+                  </Badge>
+                </div>
               </div>
 
               <ScrollArea className="h-[400px] w-full rounded-md border">
@@ -290,36 +389,22 @@ export function LabUploadExcelDialog({
                             {q.question}
                           </div>
                         </div>
+                        {(() => {
+                          const typeInfo = getTypeQuestionLabel(q.typeQuestion);
+                          return (
+                            <Badge
+                              variant={typeInfo.variant}
+                              className="shrink-0"
+                            >
+                              {typeInfo.label}
+                            </Badge>
+                          );
+                        })()}
                       </div>
 
                       <div className="space-y-3">
-                        {/* Type Question - Updated display */}
-                        {q.typeQuestion !== undefined &&
-                          q.typeQuestion !== null && (
-                            <div className="rounded-lg border bg-muted/20 p-4">
-                              <div className="flex items-center justify-between">
-                                <div className="text-xs font-bold text-primary uppercase tracking-wide">
-                                  Có truyền lệnh kiểm tra không?
-                                </div>
-                                {(() => {
-                                  const typeInfo = getTypeQuestionLabel(
-                                    q.typeQuestion
-                                  );
-                                  return typeInfo ? (
-                                    <Badge
-                                      variant={typeInfo.variant}
-                                      className="text-xs"
-                                    >
-                                      {typeInfo.label}
-                                    </Badge>
-                                  ) : null;
-                                })()}
-                              </div>
-                            </div>
-                          )}
-
-                        {/* Check Command */}
-                        {q.checkCommand && (
+                        {/* Check Command - chỉ hiển thị nếu là kiểm tra hạ tầng */}
+                        {q.typeQuestion === 1 && q.checkCommand && (
                           <div className="rounded-lg border bg-muted/20 p-4">
                             <div className="text-xs font-bold text-primary uppercase tracking-wide mb-1">
                               Lệnh kiểm tra
@@ -351,44 +436,53 @@ export function LabUploadExcelDialog({
                         )}
                       </div>
 
-                      {/* Answers Section */}
-                      <div className="space-y-2">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                          Câu trả lời ({q.answers.length})
-                        </div>
+                      {/* Answers Section - chỉ hiển thị cho câu hỏi thường */}
+                      {q.typeQuestion !== 1 && q.answers.length > 0 && (
                         <div className="space-y-2">
-                          {q.answers.map((answer, ansIdx) => (
-                            <div
-                              key={ansIdx}
-                              className={`flex items-center justify-between gap-3 p-3 rounded-md border transition-colors ${
-                                answer.isRightAns
-                                  ? "bg-green-50 border-green-300 dark:bg-green-950/30 dark:border-green-800"
-                                  : "bg-gray-50 border-gray-200 dark:bg-gray-900/50 dark:border-gray-700"
-                              }`}
-                            >
-                              <div className="flex-1">
-                                <div
-                                  className={`text-sm ${
-                                    answer.isRightAns
-                                      ? "font-semibold text-green-900 dark:text-green-100"
-                                      : "text-gray-700 dark:text-gray-300"
-                                  }`}
-                                >
-                                  {answer.content}
+                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                            Câu trả lời ({q.answers.length})
+                          </div>
+                          <div className="space-y-2">
+                            {q.answers.map((answer, ansIdx) => (
+                              <div
+                                key={ansIdx}
+                                className={`flex items-center justify-between gap-3 p-3 rounded-md border transition-colors ${
+                                  answer.isRightAns
+                                    ? "bg-green-50 border-green-300 dark:bg-green-950/30 dark:border-green-800"
+                                    : "bg-gray-50 border-gray-200 dark:bg-gray-900/50 dark:border-gray-700"
+                                }`}
+                              >
+                                <div className="flex-1">
+                                  <div
+                                    className={`text-sm ${
+                                      answer.isRightAns
+                                        ? "font-semibold text-green-900 dark:text-green-100"
+                                        : "text-gray-700 dark:text-gray-300"
+                                    }`}
+                                  >
+                                    {answer.content}
+                                  </div>
                                 </div>
+                                {answer.isRightAns && (
+                                  <Badge
+                                    variant="default"
+                                    className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold"
+                                  >
+                                    Đáp án đúng
+                                  </Badge>
+                                )}
                               </div>
-                              {answer.isRightAns && (
-                                <Badge
-                                  variant="default"
-                                  className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold"
-                                >
-                                  ✓ Đáp án đúng
-                                </Badge>
-                              )}
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      )}
+
+                      {/* Thông báo cho câu hỏi kiểm tra hạ tầng */}
+                      {q.typeQuestion === 1 && (
+                        <div className="text-xs text-muted-foreground italic bg-muted/20 p-2 rounded">
+                          Câu hỏi kiểm tra hạ tầng - không yêu cầu câu trả lời
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

@@ -69,7 +69,9 @@ export default function LabPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Quản lý Lab</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Quản lý bài thực hành
+          </h1>
         </div>
         <Button onClick={handleOpenCreateDialog} size="lg">
           <Plus className="h-5 w-5 mr-2" />

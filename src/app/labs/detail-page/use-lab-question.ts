@@ -104,7 +104,6 @@ export const useLabQuestions = ({
     sortBy: "newest",
   });
 
-  // Add a refresh trigger to force re-fetch
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
@@ -118,6 +117,68 @@ export const useLabQuestions = ({
     }
   }, [editQuestionId, questions]);
 
+  const validateQuestionsBeforeUpload = (
+    questions: ExcelQuestionRow[]
+  ): {
+    valid: ExcelQuestionRow[];
+    errors: Array<{ question: string; error: string }>;
+  } => {
+    const valid: ExcelQuestionRow[] = [];
+    const errors: Array<{ question: string; error: string }> = [];
+
+    questions.forEach((q, index) => {
+      const isInfrastructureCheck = q.typeQuestion === 1;
+      const questionLabel = q.question || `Câu hỏi ${index + 1}`;
+
+      if (!q.question || q.question.trim() === "") {
+        errors.push({
+          question: questionLabel,
+          error: "Thiếu nội dung câu hỏi",
+        });
+        return;
+      }
+
+      if (isInfrastructureCheck) {
+        // typeQuestion = 1: Kiểm tra hạ tầng - cần checkCommand
+        if (!q.checkCommand || q.checkCommand.trim() === "") {
+          errors.push({
+            question: questionLabel,
+            error:
+              "Câu hỏi kiểm tra hạ tầng cần có lệnh kiểm tra (CheckCommand)",
+          });
+          return;
+        }
+        // Không cần answers, push vào valid với answers rỗng
+        valid.push({
+          ...q,
+          answers: [],
+        });
+      } else {
+        // typeQuestion = 0 hoặc khác: Câu hỏi thường - cần answers
+        if (q.answers.length === 0) {
+          errors.push({
+            question: questionLabel,
+            error: "Câu hỏi thường cần có ít nhất 1 câu trả lời",
+          });
+          return;
+        }
+
+        const hasCorrectAnswer = q.answers.some((a) => a.isRightAns);
+        if (!hasCorrectAnswer) {
+          errors.push({
+            question: questionLabel,
+            error: "Cần có ít nhất 1 đáp án đúng",
+          });
+          return;
+        }
+
+        valid.push(q);
+      }
+    });
+
+    return { valid, errors };
+  };
+
   const handleUploadExcel = async (
     questions: ExcelQuestionRow[]
   ): Promise<UploadResult> => {
@@ -125,23 +186,55 @@ export const useLabQuestions = ({
     setUploadResult(null);
 
     try {
-      const result = await questionService.bulkCreateQuestionsFromExcel(
-        labId,
-        questions
+      // Validate trước khi upload
+      const { valid, errors: validationErrors } =
+        validateQuestionsBeforeUpload(questions);
+
+      console.log(
+        "Validated questions:",
+        valid.length,
+        "valid,",
+        validationErrors.length,
+        "errors"
       );
 
-      setUploadResult(result);
-      // Trigger refresh
+      if (valid.length === 0) {
+        const result: UploadResult = {
+          success: 0,
+          failed: validationErrors.length,
+          errors: validationErrors,
+        };
+        setUploadResult(result);
+        return result;
+      }
+
+      // Upload các câu hỏi hợp lệ
+      const result = await questionService.bulkCreateQuestionsFromExcel(
+        labId,
+        valid
+      );
+
+      // Kết hợp kết quả với validation errors
+      const finalResult: UploadResult = {
+        success:
+          typeof result.success === "number" ? result.success : valid.length,
+        failed:
+          (typeof result.failed === "number" ? result.failed : 0) +
+          validationErrors.length,
+        errors: [...validationErrors, ...(result.errors || [])],
+      };
+
+      setUploadResult(finalResult);
       setRefreshTrigger((prev) => prev + 1);
 
-      if (result.failed === 0) {
+      if (finalResult.failed === 0) {
         setTimeout(() => {
           setUploadExcelDialogOpen(false);
           setUploadResult(null);
         }, 1500);
       }
 
-      return result;
+      return finalResult;
     } catch (error) {
       console.error("Failed to upload questions:", error);
       const errorResult: UploadResult = {
@@ -149,8 +242,9 @@ export const useLabQuestions = ({
         failed: questions.length,
         errors: [
           {
-            question: "All questions",
-            error: error instanceof Error ? error.message : "Unknown error",
+            question: "Tất cả câu hỏi",
+            error:
+              error instanceof Error ? error.message : "Lỗi không xác định",
           },
         ],
       };
@@ -214,7 +308,6 @@ export const useLabQuestions = ({
     try {
       const result = await action();
       onSuccessCallback(result);
-      // Use refresh trigger instead of direct fetchQuestions call
       setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       onErrorCallback?.(error as Error);
@@ -317,7 +410,6 @@ export const useLabQuestions = ({
     setDeleteQuestionId(null);
   };
 
-  // Fixed: Use refreshTrigger to force UI update after save
   const handleSaveEditQuestion = async (data: {
     question: string;
     hint: string;
@@ -334,10 +426,7 @@ export const useLabQuestions = ({
     try {
       await questionService.updateQuestion(editQuestionId, data);
 
-      // Close dialog first
       setEditQuestionId(null);
-
-      // Trigger refresh to update UI
       setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       console.error("Failed to save question:", error);
