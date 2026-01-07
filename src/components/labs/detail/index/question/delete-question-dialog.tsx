@@ -32,7 +32,7 @@ export function DeleteQuestionDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>{t("common.confirmDelete")}</AlertDialogTitle>
           <AlertDialogDescription>
-            {t("questions.deleteConfirmation")}
+            Xác nhận xóa câu hỏi này? Hành động này không thể hoàn tác.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

@@ -12,6 +12,7 @@
   "common": {
     "search": "Search",
     "loading": "Loading...",
+    "confirmDelete": "Confirm Delete",
     "error": "Error",
     "retry": "Retry",
     "cancel": "Cancel",

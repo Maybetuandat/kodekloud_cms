@@ -23,7 +23,8 @@
     "previous": "Trước",
     "clear": "Xóa",
     "close": "Đóng",
-    "update": "Cập nhật"
+    "update": "Cập nhật",
+    "confirmDelete": "Xác nhận xóa"
   },
   "settings": {
     "title": "Cài đặt",
