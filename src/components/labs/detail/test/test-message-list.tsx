@@ -1,4 +1,3 @@
-// src/components/labs/detail/test/test-message-list.tsx
 import { useEffect, useRef } from "react";
 import { TestMessage } from "@/types/labTest";
 import {

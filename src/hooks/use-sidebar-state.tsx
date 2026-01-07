@@ -1,4 +1,3 @@
-// src/hooks/use-sidebar-state.tsx
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 

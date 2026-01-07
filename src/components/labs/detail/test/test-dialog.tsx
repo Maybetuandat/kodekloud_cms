@@ -63,7 +63,7 @@ export function TestDialog({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <DialogTitle className="text-gray-900">
-                Kiểm tra Infrastructure
+                Kiểm tra bài thực hành
               </DialogTitle>
               <DialogDescription className="mt-1 text-gray-600">
                 Lab: {labTitle}
